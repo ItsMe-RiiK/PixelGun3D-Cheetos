@@ -36,7 +36,7 @@ jobs:
         run: cmake --build build -j$(nproc)
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: built-binaries
           path: |

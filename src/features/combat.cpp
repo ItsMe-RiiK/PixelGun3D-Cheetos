@@ -194,8 +194,7 @@ namespace Combat {
         backup.hasBackup = false;
         lastWeaponSounds = nullptr;
       }
-    }
-    catch (...) {
+    } catch (...) {
       // Prevent crash on invalid pointer read
     }
   }

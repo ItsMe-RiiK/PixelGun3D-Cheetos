@@ -40,8 +40,7 @@ namespace WeaponMod {
           IL2CPP::WriteField(ws, distancePiercingMelee, boostedRadius * 2.0f);
         }
       }
-    }
-    catch (...) {
+    } catch (...) {
       // Prevent crash
     }
   }

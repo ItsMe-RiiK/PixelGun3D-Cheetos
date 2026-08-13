@@ -13,10 +13,10 @@ namespace Visual {
   using fn_WorldToScreenPoint               = Vector3 (*)(void* camera, Vector3 worldPos);
   fn_WorldToScreenPoint pWorldToScreenPoint = nullptr;
 
-  using fn_GetPixelWidth = int (*)(void* camera);
+  using fn_GetPixelWidth          = int (*)(void* camera);
   fn_GetPixelWidth pGetPixelWidth = nullptr;
 
-  using fn_GetPixelHeight = int (*)(void* camera);
+  using fn_GetPixelHeight           = int (*)(void* camera);
   fn_GetPixelHeight pGetPixelHeight = nullptr;
 
   using fn_GetPosition        = Vector3 (*)(void* transform);
@@ -161,7 +161,8 @@ namespace Visual {
         if (!pmc || pmc == localPMC)
           continue;
 
-        auto playerTransform = IL2CPP::ReadField<void*>(pmc, Offsets::PlayerMoveC::myPlayerTransform);
+        auto playerTransform =
+          IL2CPP::ReadField<void*>(pmc, Offsets::PlayerMoveC::myPlayerTransform);
         if (!playerTransform)
           continue;
 
@@ -176,9 +177,10 @@ namespace Visual {
             continue;
         }
 
-        Vector3 targetPos  = pGetPosition(playerTransform);
-        auto headTransform = IL2CPP::ReadField<void*>(pmc, Offsets::PlayerMoveC::PlayerHeadTransform);
-        Vector3 headPos    = targetPos;
+        Vector3 targetPos = pGetPosition(playerTransform);
+        auto    headTransform =
+          IL2CPP::ReadField<void*>(pmc, Offsets::PlayerMoveC::PlayerHeadTransform);
+        Vector3 headPos = targetPos;
         if (headTransform) {
           headPos = pGetPosition(headTransform);
           headPos.y += 0.3f;  // Offset to top of head
@@ -227,8 +229,7 @@ namespace Visual {
 
       std::lock_guard<std::mutex> lock(espMutex);
       cachedPlayers = newCache;
-    }
-    catch (...) {
+    } catch (...) {
       // Catch exceptions (like read access violations) to prevent crashes
     }
   }

@@ -35,12 +35,12 @@ namespace Config {
     j["combat"]["instant_charge"] = Features::bInstantCharge;
 
     // Visual
-    j["visual"]["player_esp"]   = Features::bPlayerESP;
-    j["visual"]["esp_teammates"]= Features::bPlayerESPTeammates;
-    j["visual"]["esp_boxes"]    = Features::bPlayerESPBoxes;
-    j["visual"]["esp_health"]   = Features::bPlayerESPHealth;
-    j["visual"]["esp_names"]    = Features::bPlayerESPNames;
-    j["visual"]["skeleton_esp"] = Features::bSkeletonESP;
+    j["visual"]["player_esp"]    = Features::bPlayerESP;
+    j["visual"]["esp_teammates"] = Features::bPlayerESPTeammates;
+    j["visual"]["esp_boxes"]     = Features::bPlayerESPBoxes;
+    j["visual"]["esp_health"]    = Features::bPlayerESPHealth;
+    j["visual"]["esp_names"]     = Features::bPlayerESPNames;
+    j["visual"]["skeleton_esp"]  = Features::bSkeletonESP;
 
     // Weapon Mod
     j["weaponmod"]["infinite_ammo"]   = Features::bInfiniteAmmo;

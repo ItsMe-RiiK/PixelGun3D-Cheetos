@@ -1,4 +1,8 @@
 build/
 analysis/
-dump/
+dumped/
 .vscode/
+logs/
+
+compile_commands.json
+.clangd

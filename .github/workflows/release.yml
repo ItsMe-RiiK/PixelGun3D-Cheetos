@@ -16,12 +16,12 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: built-binaries
           path: release-bins
@@ -108,7 +108,7 @@ jobs:
           zip -r PG3D-Release-${{ steps.version.outputs.tag }}.zip PG3D-Cheetos/
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: PG3D ${{ steps.version.outputs.major }}

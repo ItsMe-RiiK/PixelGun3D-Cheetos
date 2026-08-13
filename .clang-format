@@ -49,7 +49,7 @@ PackConstructorInitializers: Never
 
 ReflowComments: false
 
-SortIncludes: true
+SortIncludes: false
 SortUsingDeclarations: false
 SpaceAfterCStyleCast: true
 SpaceAfterTemplateKeyword: false

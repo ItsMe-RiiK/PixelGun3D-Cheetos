@@ -1,0 +1,15 @@
+{
+  "name": "pg3dtrainer",
+  "version": "0.0.1",
+  "dependencies": [
+    "minhook",
+    {
+      "name": "imgui",
+      "features": [
+        "dx11-binding",
+        "win32-binding"
+      ]
+    },
+    "nlohmann-json"
+  ]
+}

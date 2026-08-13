@@ -1,0 +1,116 @@
+name: Release
+
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publish Release
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: built-binaries
+          path: release-bins
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Parse Version
+        id: version
+        run: |
+          # The branch in a tag push is the tag name itself (e.g. v1.0.0)
+          TAG_NAME="${{ github.event.workflow_run.head_branch }}"
+          echo "tag=${TAG_NAME}" >> $GITHUB_OUTPUT
+          
+          # Parse the major version from the tag
+          if [[ "$TAG_NAME" =~ ^v([0-9]+) ]]; then
+            echo "major=v${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+          else
+            echo "major=${TAG_NAME}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Archive Old Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Fetch all releases
+          releases=$(gh release list --json tagName,name -L 100) || releases="[]"
+          current_major="${{ steps.version.outputs.major }}"
+          
+          echo "$releases" | jq -c '.[]' | while read release; do
+            tag=$(echo "$release" | jq -r .tagName)
+            name=$(echo "$release" | jq -r .name)
+            
+            # Skip the current tag
+            if [ "$tag" = "${{ steps.version.outputs.tag }}" ]; then
+              continue
+            fi
+            
+            # Parse major version of the old tag
+            if [[ "$tag" =~ ^v([0-9]+) ]]; then
+              old_major="v${BASH_REMATCH[1]}"
+            else
+              old_major="$tag"
+            fi
+            
+            # Archive if the old major version is different from the current major version
+            # AND it doesn't already have [Archived]
+            if [ "$old_major" != "$current_major" ] && [[ "$name" != *"[Archived]"* ]]; then
+              echo "Archiving older major release $tag..."
+              gh release edit "$tag" --title "[Archived] $name" || true
+            fi
+          done
+
+      - name: Generate Release Notes
+        id: release_notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cat << 'EOF' > release_notes.md
+          ## PG3D ${{ steps.version.outputs.tag }} (this is the latest version)
+          
+          ### Changelog
+          EOF
+          
+          # We can use GitHub's generated notes
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            /repos/${{ github.repository }}/releases/generate-notes \
+            -f tag_name="${{ steps.version.outputs.tag }}" \
+            --jq .body >> release_notes.md || echo "See commits for full changelog." >> release_notes.md
+
+      - name: Create Release Archive
+        run: |
+          # Create a root folder for the archive
+          mkdir -p PG3D-Cheetos
+          
+          # Copy the pre-built binaries
+          cp release-bins/* PG3D-Cheetos/
+          
+          # Copy only the run scripts (exclude build and updateOffset scripts)
+          cp scripts/runLinux.sh scripts/runWindows.bat PG3D-Cheetos/
+          
+          # Package everything into a zip file
+          zip -r PG3D-Release-${{ steps.version.outputs.tag }}.zip PG3D-Cheetos/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: PG3D ${{ steps.version.outputs.major }}
+          body_path: release_notes.md
+          files: PG3D-Release-${{ steps.version.outputs.tag }}.zip

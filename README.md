@@ -1,52 +1,126 @@
-# Pixel Gun 3D : PC Edition
-is a fps game based on unity engine.
+# Pixel Gun 3D: PC Edition - Internal Cheat
 
-## The Challenge
-create a trainer menu (cheat) for the game:
+![Cheat Version](https://img.shields.io/badge/Version-0.0.1-green.svg)
+![Game Version](https://img.shields.io/badge/Game%20Version-1.7.3-brightgreen.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+[![Build Status](https://github.com/ItsMe-RiiK/PixelGun3D-Cheetos/actions/workflows/build.yml/badge.svg)](https://github.com/ItsMe-RiiK/PixelGun3D-Cheetos/actions)
 
-**Features**
+An internal cheat for **Pixel Gun 3D (PC Edition)**
 
-***A. Combat***
-1. aimbot
-2. no recoil
-3. no spread
-4. Rapid Fire
-5. AOEBullets
-6. Instant Charge for charged weapons
+## Features
 
-***B. Visual***
-1. Player ESP — boxes, health
-2. Skeleton ESP
+<details>
+<summary><b>Combat</b></summary>
 
-***C. WeaponMod***
-1. Infinite Ammo
-2. No reload
-3. 100% crit chance (guaranteed for crit)
-4. Reach (extended melee range)
+| Feature | Description | Status |
+| :--- | :--- | :--- |
+| **Aimbot** | Adjustable FOV, Target Head Only | <span title="Maintenance">🚧</span> |
+| **No Recoil** | Eliminates weapon recoil | <span title="Maintenance">🚧</span> |
+| **No Spread** | Eliminates bullet spread | <span title="Maintenance">🚧</span> |
+| **Rapid Fire** | Increases firing rate | <span title="Maintenance">🚧</span> |
+| **AOE Bullets** | Area of Effect with adjustable radius | <span title="Work">✅</span> |
+| **Instant Charge** | Instantly charges weapons | <span title="Maintenance">🚧</span> |
 
-***D. PlayerMod***
-1. Speed Hack (fast move)
-2. Invisibility
-3. NoFallDamage
-4. God Mode / AutoHeal
+</details>
 
-***E. Economy***
-1. Infinite Gem Claim
-2. Unlock All Weapons
-3. Unlock All Skins
+<details>
+<summary><b>Visuals</b></summary>
+
+| Feature | Description | Status |
+| :--- | :--- | :--- |
+| **Player ESP** | Box and Health only (Name ESP in progress) | <span title="Work">✅</span> |
+| **Skeleton ESP** | Draws player skeletons | <span title="Maintenance">🚧</span> |
+
+</details>
+
+<details>
+<summary><b>Weapon Mods</b></summary>
+
+| Feature | Description | Status |
+| :--- | :--- | :--- |
+| **Infinite Ammo** | Unlimited ammunition | <span title="Maintenance">🚧</span> |
+| **No Reload** | Removes reload delays | <span title="Maintenance">🚧</span> |
+| **Guaranteed Criticals** | 100% Crit Chance with adjustable multiplier | <span title="Work">✅</span> |
+| **Reach** | Extended melee range | <span title="Maintenance">🚧</span> |
+
+</details>
+
+<details>
+<summary><b>Player Mods</b></summary>
+
+| Feature | Description | Status |
+| :--- | :--- | :--- |
+| **Speed Hack** | Adjustable movement speed multiplier | <span title="Maintenance">🚧</span> |
+| **Invisibility** | Hides the player model | <span title="Maintenance">🚧</span> |
+| **No Fall Damage** | Prevents damage from falling | <span title="Maintenance">🚧</span> |
+| **God Mode** | Invulnerability | <span title="Maintenance">🚧</span> |
+| **Auto Heal** | Automatically regenerates health | <span title="Maintenance">🚧</span> |
+
+</details>
+
+<details>
+<summary><b>System</b></summary>
+
+| Feature | Description | Status |
+| :--- | :--- | :--- |
+| **Bypass Anti-Cheat** | Enabled by default | <span title="Work">✅</span> |
+
+</details>
+
+## How to Build
+
+### Prerequisites
+- **CMake** (3.20 or higher)
+- **MinGW-w64** (for cross-compiling on Linux or building natively)
+- **vcpkg** (The project includes it, just make sure it's initialized)
+
+### Build Steps (Linux cross-compilation)
+
+1. **Clone the repository (with submodules):**
+   ```bash
+   git clone --recursive https://github.com/ItsMe-RiiK/PixelGun3D-Cheetos.git
+   cd PixelGun3D-Cheetos
+   ```
+   *(If `vcpkg` isn't bootstrapped yet, run `./vcpkg/bootstrap-vcpkg.sh` first)*
+
+2. **Configure the project:**
+   Generate the build files using CMake and configure vcpkg to use the MinGW static triplet:
+   ```bash
+   cmake -B build -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-mingw-static -DCMAKE_BUILD_TYPE=Release
+   ```
+
+3. **Compile the code:**
+   ```bash
+   cmake --build build -j$(nproc)
+   ```
+
+4. **Locate the Output:**
+   Once successfully built, the resulting `trainer.dll` and `PG3D_Injector.exe` will be located inside the `build/bin/` directory.
+
+## How to Run
+
+Whether you compiled the code yourself or downloaded a pre-built Release archive, we provide smart launch scripts to make injecting easy:
+
+**On Windows:**
+1. Start Pixel Gun 3D via Steam.
+2. Run `runWindows.bat` (if downloaded from Releases) or `scripts\runWindows.bat` (if built from source).
+
+**On Linux (Proton/Wine):**
+1. Start Pixel Gun 3D via Steam.
+2. Open a terminal and run `./runLinux.sh` (if downloaded from Releases) or `./scripts/runLinux.sh` (if built from source).
+*(Note: This requires `protontricks` installed on your system to correctly inject into the Steam Proton prefix).*
+
+## Technical Details
+
+- **Architecture**: Internal DLL injected directly into the game process.
+- **Languages & Libraries**: C++20, MinHook, ImGui, nlohmann/json, Direct3D 11.
+- **Build System**: CMake with MinGW (`x86_64-w64-mingw32`) / vcpkg.
 
 
-### Fast Way:
-**Static analysis**
-- the current ghidra analysis at "Github.exe" listing claimed to had all the feature (wroted above), connect to ghidra mcp to see the full analysis that already opened. all the folder inside C:\Users\riik\Downloads\GithubSetup (this is old version, and idk if this is still working)
+## LICENSE
+This project under [MIT LICENSE](license)
 
-- the new dump.cs already on  D:\PixelGun3D\resources\dump\dump.cs, use this to find newest and validated offsets needed for the feature
+## Disclaimer
+This project is created for **educational and reverse engineering purposes only**. It demonstrates memory manipulation, function hooking, and DirectX overlay techniques.
+Any use of this project for cheating or hacking in online games is illegal and unethical. and we dont take any responsibility for the actions of users who use this project for cheating or hacking in online games.
 
-**Dynamic analysis**
-- cheat engine mcp already stay and attached to the process, waiting for dynamic analysis. and im on the game right now (standby lobby) if need dynamic analysis. the bridge using this script: D:\PixelGun3D\the-bridge-ce-mcp.lua
-
-
-### The rules
-- we prefer chose c/c++ and some json for config later
-- find the offsets for all the feature needed above. also dont forget to find the Anti-Cheat Behaviour and bypass it
-- wrote all founded and valid offsets inside the /src/offsets.h

@@ -30,7 +30,11 @@ jobs:
           cmake -B build -G Ninja \
                 -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake \
                 -DVCPKG_TARGET_TRIPLET=x64-mingw-static \
-                -DCMAKE_BUILD_TYPE=Release
+                -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_SYSTEM_NAME=Windows \
+                -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
+                -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ \
+                -DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres
 
       - name: Build
         run: cmake --build build -j$(nproc)

@@ -108,7 +108,7 @@ jobs:
           zip -r PG3D-Release-${{ steps.version.outputs.tag }}.zip PG3D-Cheetos/
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: PG3D ${{ steps.version.outputs.major }}

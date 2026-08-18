@@ -66,7 +66,6 @@ namespace Menu {
     // VISUAL
     items.push_back({"-- VISUAL --", ItemType::Header});
     items.push_back({"Player ESP", ItemType::Bool, &Features::bPlayerESP});
-    items.push_back({"ESP Teammates", ItemType::Bool, &Features::bPlayerESPTeammates});
     items.push_back({"ESP Boxes", ItemType::Bool, &Features::bPlayerESPBoxes});
     items.push_back({"ESP Health", ItemType::Bool, &Features::bPlayerESPHealth});
     items.push_back({"ESP Names", ItemType::Bool, &Features::bPlayerESPNames});

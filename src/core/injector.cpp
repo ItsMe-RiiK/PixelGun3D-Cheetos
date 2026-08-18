@@ -28,7 +28,7 @@ void PrintBanner()
   SetColor(COLOR_PURPLE);
   std::cout << R"(
     ╔══════════════════════════════════════════════╗
-    ║       PIXEL GUN 3D PC TRAINER v1.0           ║
+    ║       PIXEL GUN 3D PC TRAINER v0.0.3         ║
     ║                                              ║
     ║       DLL Injector                           ║
     ╚══════════════════════════════════════════════╝

@@ -80,7 +80,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cat << 'EOF' > release_notes.md
-          ## PG3D ${{ steps.version.outputs.tag }} (this is the latest version)
+          ## Current latest version of PG3D ${{ steps.version.outputs.tag }}
           
           ### Changelog
           EOF

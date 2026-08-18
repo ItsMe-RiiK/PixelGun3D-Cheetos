@@ -1,6 +1,6 @@
 # Pixel Gun 3D: PC Edition - Internal Cheat
 
-![Cheat Version](https://img.shields.io/badge/Version-0.0.2-green.svg)
+![Cheat Version](https://img.shields.io/badge/Version-0.0.3-green.svg)
 ![Game Version](https://img.shields.io/badge/Game%20Version-26.10.2.0-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 [![Build Status](https://github.com/ItsMe-RiiK/PixelGun3D-Cheetos/actions/workflows/build.yml/badge.svg)](https://github.com/ItsMe-RiiK/PixelGun3D-Cheetos/actions)
@@ -19,7 +19,7 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 | **No Spread** | Eliminates bullet spread | <span title="Maintenance">🚧</span> |
 | **Rapid Fire** | Increases firing rate | <span title="Maintenance">🚧</span> |
 | **AOE Bullets** | Area of Effect with adjustable radius | <span title="Work">✅</span> |
-| **Instant Charge** | Instantly charges weapons | <span title="Maintenance">🚧</span> |
+| **Instant Charge** | Weapon need to charge cooldown to attack | <span title="Maintenance">🚧</span> |
 
 </details>
 
@@ -28,7 +28,7 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 
 | Feature | Description | Status |
 | :--- | :--- | :--- |
-| **Player ESP** | Box and Health only (Name ESP in progress) | <span title="Work">✅</span> |
+| **Player ESP** | Box, Health, Name | <span title="Work">✅</span> |
 | **Skeleton ESP** | Draws player skeletons | <span title="Maintenance">🚧</span> |
 
 </details>
@@ -38,7 +38,7 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 
 | Feature | Description | Status |
 | :--- | :--- | :--- |
-| **Infinite Ammo** | Unlimited ammunition | <span title="Maintenance">🚧</span> |
+| **Infinite Ammo** | Unlimited ammunition | <span title="Work">✅</span> |
 | **No Reload** | Removes reload delays | <span title="Maintenance">🚧</span> |
 | **Guaranteed Criticals** | 100% Crit Chance with adjustable multiplier | <span title="Work">✅</span> |
 | **Reach** | Extended melee range | <span title="Maintenance">🚧</span> |
@@ -53,8 +53,8 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 | **Speed Hack** | Adjustable movement speed multiplier | <span title="Maintenance">🚧</span> |
 | **Invisibility** | Hides the player model | <span title="Maintenance">🚧</span> |
 | **No Fall Damage** | Prevents damage from falling | <span title="Maintenance">🚧</span> |
-| **God Mode** | Invulnerability | <span title="Maintenance">🚧</span> |
-| **Auto Heal** | Automatically regenerates health | <span title="Maintenance">🚧</span> |
+| **God Mode** | invulnerability state when in spawn protection | <span title="Maintenance">🚧</span> |
+| **Auto Heal** | Automatically regenerates health | <span title="Work">✅</span> |
 
 </details>
 
@@ -74,7 +74,7 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 - **MinGW-w64** (for cross-compiling on Linux or building natively)
 - **vcpkg** (The project includes it, just make sure it's initialized)
 
-### Build Steps (Linux cross-compilation)
+### Build Steps (cross-compilation)
 
 1. **Clone the repository (with submodules):**
    ```bash
@@ -102,11 +102,11 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 Whether you compiled the code yourself or downloaded a pre-built Release archive, we provide smart launch scripts to make injecting easy:
 
 **On Windows:**
-1. Start Pixel Gun 3D via Steam.
-2. Run `runWindows.bat` (if downloaded from Releases) or `scripts\runWindows.bat` (if built from source).
+1. Start the game via Steam.
+2. Click `runWindows.bat` (if downloaded from Releases) or `scripts\runWindows.bat` (if built from source).
 
 **On Linux (Proton/Wine):**
-1. Start Pixel Gun 3D via Steam.
+1. Start the game via Steam.
 2. Open a terminal and run `./runLinux.sh` (if downloaded from Releases) or `./scripts/runLinux.sh` (if built from source).
 *(Note: This requires `protontricks` installed on your system to correctly inject into the Steam Proton prefix).*
 

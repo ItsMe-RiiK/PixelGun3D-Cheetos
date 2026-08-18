@@ -29,8 +29,8 @@ NC='\033[0m'
 banner() {
     echo -e "${PURPLE}"
     echo "  ╔══════════════════════════════════════════════╗"
-    echo "  ║       PIXEL GUN 3D PC TRAINER v1.0           ║"
-    echo "  ║       Launcher ($(uname -s))                       ║"
+    echo "  ║       PIXEL GUN 3D PC TRAINER v0.0.1         ║"
+    echo "  ║       Launcher ($(uname -s))                 ║"
     echo "  ╚══════════════════════════════════════════════╝"
     echo -e "${NC}"
 }
@@ -58,7 +58,7 @@ find_game_dir() {
     return 1
 }
 
-# --- Check build artifacts exist ---
+check_build() {
     if [ ! -f "$BIN_DIR/trainer.dll" ] && [ ! -f "$BIN_DIR/libtrainer.dll" ]; then
         error "trainer.dll not found."
         if [[ "$BIN_DIR" == *"build/bin"* ]]; then

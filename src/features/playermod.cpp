@@ -39,11 +39,9 @@ namespace PlayerMod {
 
   void ApplyNoFallDamage()
   {
-    auto pmc = IL2CPP::GetLocalPlayerMoveC();
-    if (!pmc)
-      return;
-
-    IL2CPP::WriteField(pmc, Offsets::PlayerMoveC::IsWeaponDelay, false);
+    // No-fall-damage is now handled by the ApplyDamage hook in hooks.cpp
+    // which blocks all self-damage when bNoFallDamage is enabled.
+    // Nothing to do here.
   }
 
   void ApplyAutoHeal()
@@ -52,7 +50,10 @@ namespace PlayerMod {
     if (!pmc)
       return;
 
+    // Reset last damage time so game's passive regen kicks in immediately
     IL2CPP::WriteField(pmc, Offsets::PlayerMoveC::lastDamageTime, 0.0f);
+    // Set healingByPlayer to self to trigger teammate-heal logic
+    IL2CPP::WriteField(pmc, Offsets::PlayerMoveC::healingByPlayer, pmc);
   }
 
   void ApplyInvisibility()

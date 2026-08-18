@@ -25,6 +25,32 @@ namespace Visual {
   using fn_GetMainCamera          = void* (*) ();
   fn_GetMainCamera pGetMainCamera = nullptr;
 
+  // TextMesh text reading for ESP names
+  using fn_GetText    = void* (*) (void* textMesh);
+  fn_GetText pGetText = nullptr;
+
+  // Helper: extract C-string from IL2CPP string object
+  // IL2CPP string layout: [object header 0x10] [int32 length @ 0x10] [char16_t chars[] @ 0x14]
+  static bool ReadIL2CPPString(void* il2cppStr, char* outBuf, size_t outBufSize)
+  {
+    if (!il2cppStr || outBufSize == 0)
+      return false;
+
+    int strLen = *reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(il2cppStr) + 0x10);
+    if (strLen <= 0 || strLen > 256) {
+      outBuf[0] = '\0';
+      return false;
+    }
+
+    auto   chars   = reinterpret_cast<char16_t*>(reinterpret_cast<uintptr_t>(il2cppStr) + 0x14);
+    size_t copyLen = (strLen < (outBufSize - 1)) ? strLen : (outBufSize - 1);
+    for (size_t i = 0; i < copyLen; ++i) {
+      outBuf[i] = (chars[i] < 128) ? static_cast<char>(chars[i]) : '?';
+    }
+    outBuf[copyLen] = '\0';
+    return true;
+  }
+
   bool ResolveUnityMethods()
   {
     auto hUnity = GetModuleHandleA("UnityPlayer.dll");
@@ -82,6 +108,29 @@ namespace Visual {
       auto getPosMethod = IL2CPP::class_get_method_from_name(transformClass, "get_position", 0);
       if (getPosMethod) {
         pGetPosition = *reinterpret_cast<fn_GetPosition*>(getPosMethod);
+      }
+    }
+
+    // Resolve TextMesh::get_text from TextRenderingModule
+    void* textRenderingImage = nullptr;
+    for (size_t i = 0; i < asmCount; i++) {
+      auto img = IL2CPP::assembly_get_image(assemblies[i]);
+      if (!img)
+        continue;
+      const char* name = IL2CPP::image_get_name(img);
+      if (name && strstr(name, "UnityEngine.TextRenderingModule")) {
+        textRenderingImage = img;
+        break;
+      }
+    }
+
+    if (textRenderingImage) {
+      auto textMeshClass = IL2CPP::class_from_name(textRenderingImage, "UnityEngine", "TextMesh");
+      if (textMeshClass) {
+        auto getTextMethod = IL2CPP::class_get_method_from_name(textMeshClass, "get_text", 0);
+        if (getTextMethod) {
+          pGetText = *reinterpret_cast<fn_GetText*>(getTextMethod);
+        }
       }
     }
 
@@ -197,26 +246,34 @@ namespace Visual {
           continue;
         }
 
-        // Is enemy?
+        // Is enemy? IsEnemyTo takes Player_move_c* as parameter (not PlayerDamageable*)
         bool isEnemy = true;
         if (damageable) {
           using fn_IsEnemyTo = bool (*)(void*, void*);
           auto isEnemyTo     = reinterpret_cast<fn_IsEnemyTo>(
             IL2CPP::GetMethodAddress(Offsets::PlayerDamageable::IsEnemyTo_RVA)
           );
-          auto localDamageable =
-            IL2CPP::ReadField<void*>(localPMC, Offsets::PlayerMoveC::playerDamageable);
-          if (isEnemyTo && localDamageable) {
-            isEnemy = isEnemyTo(damageable, localDamageable);
+          if (isEnemyTo) {
+            isEnemy = isEnemyTo(damageable, localPMC);
           }
         }
 
-        if (!isEnemy && !Features::bPlayerESPTeammates) {
-          continue;
+        if (!isEnemy) {
+          continue;  // Skip teammates — ESP team feature is deleted
         }
 
         float health    = 100.0f;
         float maxHealth = 100.0f;
+
+        // Read player name from nickLabel TextMesh
+        char playerName[64] = {0};
+        if (Features::bPlayerESPNames && pGetText) {
+          auto nickLabel = IL2CPP::ReadField<void*>(pmc, Offsets::PlayerMoveC::nickLabel);
+          if (nickLabel) {
+            void* il2cppStr = pGetText(nickLabel);
+            ReadIL2CPPString(il2cppStr, playerName, sizeof(playerName));
+          }
+        }
 
         PlayerESPData data;
         data.screenPos  = footScreen;
@@ -224,6 +281,7 @@ namespace Visual {
         data.health     = health;
         data.maxHealth  = maxHealth;
         data.isEnemy    = isEnemy;
+        memcpy(data.name, playerName, sizeof(data.name));
         newCache.push_back(data);
       }
 
@@ -244,7 +302,7 @@ namespace Visual {
       if (Features::bPlayerESPBoxes) {
         DrawPlayerBox(
           pDrawList, player.screenPos, player.screenHead, player.health, player.maxHealth,
-          player.isEnemy, "Player", g_screenW, g_screenH
+          player.isEnemy, player.name[0] ? player.name : nullptr, g_screenW, g_screenH
         );
       }
     }
@@ -296,6 +354,11 @@ namespace Visual {
         ImVec2(left - 6.0f, bottom - hpBarHeight), ImVec2(left - 2.0f, bottom), healthColor
       );
       dl->AddRect(ImVec2(left - 6.0f, top), ImVec2(left - 2.0f, bottom), 0xFF000000);
+    }
+
+    // Draw name above box
+    if (Features::bPlayerESPNames && name && name[0]) {
+      dl->AddText(ImVec2(centerX - 20.0f, top - 14.0f), 0xFFFFFFFF, name);
     }
   }
 }  // namespace Visual

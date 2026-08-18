@@ -14,11 +14,16 @@ namespace WeaponMod {
 
       if (Features::bInfiniteAmmo) {
         IL2CPP::WriteField(ws, isUnlimitedAmmo, true);
+        int maxAmmoVal = IL2CPP::ReadField<int>(ws, maxAmmo);
+        if (maxAmmoVal > 0) {
+          IL2CPP::WriteField(ws, ammoInClip, maxAmmoVal);
+        }
       }
 
       if (Features::bNoReload) {
-        int maxAmmoVal = IL2CPP::ReadField<int>(ws, maxAmmo);
-        if (maxAmmoVal > 0) {
+        int maxAmmoVal  = IL2CPP::ReadField<int>(ws, maxAmmo);
+        int currentAmmo = IL2CPP::ReadField<int>(ws, ammoInClip);
+        if (maxAmmoVal > 0 && currentAmmo <= 0) {
           IL2CPP::WriteField(ws, ammoInClip, maxAmmoVal);
         }
       }

@@ -23,12 +23,13 @@ namespace Hooks {
     void*       someEnum
   )
   {
-    if (Features::bGodMode) {
+    // Block damage to local player for god mode OR no fall damage
+    if (Features::bGodMode || Features::bNoFallDamage) {
       auto localPMC = IL2CPP::GetLocalPlayerMoveC();
       if (localPMC && thisPtr) {
         auto thisPMC = IL2CPP::ReadField<void*>(thisPtr, Offsets::PlayerDamageable::playerMoveC);
         if (thisPMC == localPMC) {
-          return;
+          return;  // Block all damage to self (covers both god mode and fall damage)
         }
       }
     }
@@ -44,6 +45,12 @@ namespace Hooks {
 
   void hkPlayerMoveC_Update(void* thisPtr)
   {
+    // Run the game's original Update first
+    if (oPlayerMoveC_Update) {
+      oPlayerMoveC_Update(thisPtr);
+    }
+
+    // Apply our mods AFTER the game's Update so our values don't get overwritten
     if (thisPtr == IL2CPP::GetLocalPlayerMoveC()) {
       if (Features::bPlayerESP || Features::bSkeletonESP) {
         Visual::TickMainThread();
@@ -51,9 +58,6 @@ namespace Hooks {
       Combat::Tick();
       WeaponMod::Tick();
       PlayerMod::Tick();
-    }
-    if (oPlayerMoveC_Update) {
-      oPlayerMoveC_Update(thisPtr);
     }
   }
 

@@ -26,7 +26,7 @@ banner() {
     echo -e "${PURPLE}"
     echo "  ╔═══════════════════════════════════════════╗"
     echo "  ║       PIXEL GUN 3D PC - Builder           ║"
-    echo "  ║       Build Script ($(uname -s))          ║"
+    echo "  ║       Build Script ($(uname -s))             ║"
     echo "  ╚═══════════════════════════════════════════╝"
     echo -e "${NC}"
 }
@@ -120,7 +120,7 @@ build_project() {
     success "  trainer.dll      → $BIN_DIR/trainer.dll"
     success "  PG3D_Injector    → $BIN_DIR/PG3D_Injector.exe"
     echo ""
-    info "To launch, run: ./scripts/launch.sh"
+    info "To launch, run: ./scripts/runLinux.sh"
 }
 
 # --- Clean ---

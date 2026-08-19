@@ -112,7 +112,7 @@ echo   [+] Build complete!
 echo   [+] trainer.dll     -^> %BIN_DIR%\trainer.dll
 echo   [+] PG3D_Injector   -^> %BIN_DIR%\PG3D_Injector.exe
 echo.
-echo   [*] To launch, run: scripts\launch.bat
+echo   [*] To launch, run: scripts\runWindows.bat
 exit /b 0
 
 REM =====================================================

@@ -209,6 +209,7 @@ namespace IL2CPP {
     Offsets::Classes::CheatDetectedBanner =
       reinterpret_cast<uintptr_t>(GetClass("CheatDetectedBanner"));
     Offsets::Classes::ClickerDetector = reinterpret_cast<uintptr_t>(GetClass("ClickerDetector"));
+    Offsets::Classes::RPG_Controller  = reinterpret_cast<uintptr_t>(GetClass("RPG_Controller"));
 
     return Offsets::Classes::WeaponManager != 0 && Offsets::Classes::PlayerMoveC != 0
         && Offsets::Classes::WeaponSounds != 0;

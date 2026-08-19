@@ -49,13 +49,13 @@ namespace Menu {
     items.clear();
     // COMBAT
     items.push_back({"-- COMBAT --", ItemType::Header});
-    items.push_back({"Aimbot", ItemType::Bool, &Features::bAimbot});
+    items.push_back({"No Recoil & Spread", ItemType::Bool, &Features::bNoRecoil});
+    // Suspending Aimbot (but keeping it in menu)
+    items.push_back({"Aimbot [Suspended]", ItemType::Bool, &Features::bAimbot});
     items.push_back(
       {"Aimbot FOV", ItemType::Float, nullptr, &Features::fAimbotFOV, 1.0f, 90.0f, 1.0f}
     );
     items.push_back({"Aimbot Head Only", ItemType::Bool, &Features::bAimbotHeadOnly});
-    items.push_back({"No Recoil", ItemType::Bool, &Features::bNoRecoil});
-    items.push_back({"No Spread", ItemType::Bool, &Features::bNoSpread});
     items.push_back({"Rapid Fire", ItemType::Bool, &Features::bRapidFire});
     items.push_back({"AOE Bullets", ItemType::Bool, &Features::bAOEBullets});
     items.push_back(
@@ -67,14 +67,12 @@ namespace Menu {
     items.push_back({"-- VISUAL --", ItemType::Header});
     items.push_back({"Player ESP", ItemType::Bool, &Features::bPlayerESP});
     items.push_back({"ESP Boxes", ItemType::Bool, &Features::bPlayerESPBoxes});
-    items.push_back({"ESP Health", ItemType::Bool, &Features::bPlayerESPHealth});
     items.push_back({"ESP Names", ItemType::Bool, &Features::bPlayerESPNames});
     items.push_back({"Skeleton ESP", ItemType::Bool, &Features::bSkeletonESP});
 
     // WEAPON
     items.push_back({"-- WEAPON --", ItemType::Header});
     items.push_back({"Infinite Ammo", ItemType::Bool, &Features::bInfiniteAmmo});
-    items.push_back({"No Reload", ItemType::Bool, &Features::bNoReload});
     items.push_back({"100% Crit Chance", ItemType::Bool, &Features::bCritChance100});
     items.push_back(
       {"Crit Multiplier", ItemType::Float, nullptr, &Features::fCritMultiplier, 1.0f, 20.0f, 1.0f}
@@ -92,12 +90,14 @@ namespace Menu {
     items.push_back(
       {"Speed Multiplier", ItemType::Float, nullptr, &Features::fSpeedMultiplier, 1.0f, 10.0f, 0.5f}
     );
-    items.push_back({"No Fall Damage", ItemType::Bool, &Features::bNoFallDamage});
-    items.push_back({"Invisibility", ItemType::Bool, &Features::bInvisibility});
-
+    items.push_back({"High Jump", ItemType::Bool, &Features::bHighJump});
+    items.push_back(
+      {"Jump Multiplier", ItemType::Float, nullptr, &Features::fJumpMultiplier, 1.0f, 10.0f, 0.5f}
+    );
+    items.push_back({"Fly", ItemType::Bool, &Features::bFly});
     // SETTINGS
     items.push_back({"-- SETTINGS --", ItemType::Header});
-    items.push_back({"Anti-Cheat Bypass", ItemType::Bool, &Features::bAntiCheatBypass});
+    items.push_back({"Bypass Anti-Cheat", ItemType::Bool, &Features::bAntiCheatBypass});
     items.push_back({"Save Config", ItemType::Action, nullptr, nullptr, 0, 0, 0, []() {
                        Config::Save();
                      }});
@@ -158,8 +158,12 @@ namespace Menu {
         item.isExpanded = !item.isExpanded;
     }
     else if (item.type == ItemType::Bool && item.bValue) {
-      if (dir != 0)
-        *item.bValue = !(*item.bValue);
+      if (dir < 0) {
+        *item.bValue = false;
+      }
+      else if (dir > 0) {
+        *item.bValue = true;
+      }
     }
     else if (item.type == ItemType::Float && item.fValue) {
       if (dir > 0) {
@@ -204,10 +208,11 @@ namespace Menu {
           Interact(1);
           return 0;
         }
-        if (wParam == VK_RETURN || wParam == VK_SPACE) {
-          Interact(1);
-          return 0;
-        }
+        // Disabled Space/Return toggle
+        // if (wParam == VK_RETURN || wParam == VK_SPACE) {
+        //   Interact(1);
+        //   return 0;
+        // }
       }
     }
 
@@ -257,7 +262,30 @@ namespace Menu {
     );
 
     ImGui::CreateContext();
-    ImGui::GetIO().IniFilename = nullptr;
+    ImGuiIO& io    = ImGui::GetIO();
+    io.IniFilename = nullptr;
+
+    ImFontConfig fontConfig;
+    fontConfig.OversampleH = 1;
+    fontConfig.OversampleV = 1;
+    fontConfig.PixelSnapH  = true;
+
+    static const ImWchar ranges[] = {
+      0x0020, 0x00FF,  // Basic Latin + Latin Supplement
+      0x0400, 0x052F,  // Cyrillic + Cyrillic Supplement
+      0x2DE0, 0x2DFF,  // Cyrillic Extended-A
+      0xA640, 0xA69F,  // Cyrillic Extended-B
+      0x3000, 0x303F,  // CJK Symbols and Punctuation
+      0x3040, 0x309F,  // Hiragana
+      0x30A0, 0x30FF,  // Katakana
+      0x31F0, 0x31FF,  // Katakana Phonetic Extensions
+      0xFF00, 0xFFEF,  // Halfwidth and Fullwidth Forms
+      0x4e00, 0x9FAF,  // CJK Ideographs
+      0,
+    };
+
+    // Attempt to load MS Gothic for broad CJK + Cyrillic support
+    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\msgothic.ttc", 16.0f, &fontConfig, ranges);
 
     ImGui_ImplWin32_Init(hGameWindow);
     ImGui_ImplDX11_Init(pDevice, pContext);

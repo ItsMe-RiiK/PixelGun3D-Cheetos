@@ -292,6 +292,15 @@ namespace Offsets {
   }  // namespace ExtractionWeaponSettings
 
   // ==========================================
+  // RPG_Controller (TypeDefIndex: 6055)
+  // ==========================================
+  namespace RPG_Controller {
+    constexpr uintptr_t instance   = 0x0;   // static
+    constexpr uintptr_t jumpHeight = 0x28;  // float
+    constexpr uintptr_t gravity    = 0x2C;  // float
+  }  // namespace RPG_Controller
+
+  // ==========================================
   // IL2CPP Class pointers (resolved at runtime, cached here)
   // These will be populated by il2cpp_resolve_classes()
   // ==========================================
@@ -303,5 +312,6 @@ namespace Offsets {
     inline uintptr_t FPSController       = 0;
     inline uintptr_t CheatDetectedBanner = 0;
     inline uintptr_t ClickerDetector     = 0;
+    inline uintptr_t RPG_Controller      = 0;
   }  // namespace Classes
 }  // namespace Offsets

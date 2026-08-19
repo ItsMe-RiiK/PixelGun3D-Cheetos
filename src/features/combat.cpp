@@ -98,6 +98,9 @@ namespace Combat {
     IL2CPP::WriteField(ws, downKoof, 0.0f);
     IL2CPP::WriteField(ws, recoilCoeffZoom, 0.0f);
     IL2CPP::WriteField(ws, upKoofFireZoom, 0.0f);
+    IL2CPP::WriteField(ws, firstShotScatter, false);
+    // Also zero runtime accumulator (0xAC)
+    IL2CPP::WriteField(ws, 0xAC, 0.0f);
   }
 
   void ApplyNoSpread(void* ws)
@@ -119,6 +122,8 @@ namespace Combat {
     IL2CPP::WriteField(ws, moveScatterCoeffZoom, 0.0f);
     IL2CPP::WriteField(ws, firstShotScatterZoom, false);
     IL2CPP::WriteField(ws, recoilCoeffZoom, 0.0f);
+    // Also zero runtime accumulator (0xC0)
+    IL2CPP::WriteField(ws, 0xC0, 0.0f);
   }
 
   void ApplyRapidFire(void* ws)
@@ -130,6 +135,16 @@ namespace Combat {
     IL2CPP::WriteField(ws, shootDelay, 0.0f);
     IL2CPP::WriteField(ws, bulletDelay, 0.0f);
     IL2CPP::WriteField(ws, DelayTimer, 0.0f);
+
+    auto pmc = IL2CPP::GetLocalPlayerMoveC();
+    if (pmc) {
+      // Force zero currentDelayTimer on PlayerMoveC (0xCE8)
+      IL2CPP::WriteField(pmc, 0xCE8, 0.0f);
+      // Force IsWeaponDelay (0xCEF) to false
+      IL2CPP::WriteField(pmc, 0xCEF, false);
+      // Force WeaponDelayTimeForFire (0xCF0) to 0.0f
+      IL2CPP::WriteField(pmc, 0xCF0, 0.0f);
+    }
   }
 
   void ApplyAOEBullets(void* ws)
@@ -162,6 +177,16 @@ namespace Combat {
     }
   }
 
+  void ApplyAimbot(void* ws)
+  {
+    if (!ws)
+      return;
+    using namespace Offsets::WeaponSounds;
+
+    // Force game's built-in auto-aim/aim-assist on
+    IL2CPP::WriteField(ws, IsActiveAim, true);
+  }
+
   void Tick()
   {
     try {
@@ -171,11 +196,10 @@ namespace Combat {
 
       BackupWeaponSounds(ws);
 
-      if (Features::bNoRecoil)
+      if (Features::bNoRecoil) {
         ApplyNoRecoil(ws);
-
-      if (Features::bNoSpread)
         ApplyNoSpread(ws);
+      }
 
       if (Features::bRapidFire)
         ApplyRapidFire(ws);
@@ -183,12 +207,15 @@ namespace Combat {
       if (Features::bAOEBullets)
         ApplyAOEBullets(ws);
 
+      // if (Features::bAimbot)
+      //   ApplyAimbot(ws);
+
       if (Features::bInstantCharge)
         ApplyInstantCharge(ws);
 
       if (
-        !Features::bNoRecoil && !Features::bNoSpread && !Features::bRapidFire
-        && !Features::bAOEBullets && !Features::bInstantCharge && backup.hasBackup
+        !Features::bNoRecoil && !Features::bRapidFire && !Features::bAOEBullets
+        && !Features::bInstantCharge && !Features::bAimbot && backup.hasBackup
       ) {
         RestoreWeaponSounds(ws);
         backup.hasBackup = false;

@@ -5,8 +5,7 @@ namespace Features {
   inline bool  bAimbot         = false;
   inline float fAimbotFOV      = 15.0f;
   inline bool  bAimbotHeadOnly = true;
-  inline bool  bNoRecoil       = false;
-  inline bool  bNoSpread       = false;
+  inline bool  bNoRecoil       = false;  // Also handle Spread
   inline bool  bRapidFire      = false;
   inline bool  bAOEBullets     = false;
   inline float fAOERadius      = 50.0f;
@@ -16,13 +15,11 @@ namespace Features {
   inline bool bPlayerESP          = false;
   inline bool bPlayerESPTeammates = false;
   inline bool bPlayerESPBoxes     = true;
-  inline bool bPlayerESPHealth    = true;
-  inline bool bPlayerESPNames     = false;
+  inline bool bPlayerESPNames     = true;
   inline bool bSkeletonESP        = false;
 
   // Weapon Mod
   inline bool  bInfiniteAmmo    = false;
-  inline bool  bNoReload        = false;
   inline bool  bCritChance100   = false;
   inline float fCritMultiplier  = 5.0f;
   inline bool  bReach           = false;
@@ -31,8 +28,9 @@ namespace Features {
   // Player Mod
   inline bool  bSpeedHack       = false;
   inline float fSpeedMultiplier = 2.0f;
-  inline bool  bInvisibility    = false;
-  inline bool  bNoFallDamage    = false;
+  inline bool  bHighJump        = false;
+  inline float fJumpMultiplier  = 2.0f;
+  inline bool  bFly             = false;
   inline bool  bGodMode         = false;
   inline bool  bAutoHeal        = false;
 

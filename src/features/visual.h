@@ -21,8 +21,6 @@ namespace Visual {
   {
     Vector2 screenPos;
     Vector2 screenHead;
-    float   health;
-    float   maxHealth;
     float   distance;
     bool    isEnemy;
     bool    isDead;
@@ -42,8 +40,6 @@ namespace Visual {
     void*       drawList,
     Vector2     footScreen,
     Vector2     headScreen,
-    float       health,
-    float       maxHealth,
     bool        isEnemy,
     const char* name,
     float       screenW,

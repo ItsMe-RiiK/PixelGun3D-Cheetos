@@ -42,13 +42,20 @@ namespace Visual {
       return false;
     }
 
-    auto   chars   = reinterpret_cast<char16_t*>(reinterpret_cast<uintptr_t>(il2cppStr) + 0x14);
-    size_t copyLen = (strLen < (outBufSize - 1)) ? strLen : (outBufSize - 1);
-    for (size_t i = 0; i < copyLen; ++i) {
-      outBuf[i] = (chars[i] < 128) ? static_cast<char>(chars[i]) : '?';
+    auto chars = reinterpret_cast<const wchar_t*>(reinterpret_cast<uintptr_t>(il2cppStr) + 0x14);
+
+    // Convert UTF-16 to UTF-8 using WideCharToMultiByte
+    int bytesWritten = WideCharToMultiByte(
+      CP_UTF8, 0, chars, strLen, outBuf, static_cast<int>(outBufSize - 1), nullptr, nullptr
+    );
+
+    if (bytesWritten > 0) {
+      outBuf[bytesWritten] = '\0';
+      return true;
     }
-    outBuf[copyLen] = '\0';
-    return true;
+
+    outBuf[0] = '\0';
+    return false;
   }
 
   bool ResolveUnityMethods()
@@ -262,9 +269,6 @@ namespace Visual {
           continue;  // Skip teammates — ESP team feature is deleted
         }
 
-        float health    = 100.0f;
-        float maxHealth = 100.0f;
-
         // Read player name from nickLabel TextMesh
         char playerName[64] = {0};
         if (Features::bPlayerESPNames && pGetText) {
@@ -278,8 +282,6 @@ namespace Visual {
         PlayerESPData data;
         data.screenPos  = footScreen;
         data.screenHead = headScreen;
-        data.health     = health;
-        data.maxHealth  = maxHealth;
         data.isEnemy    = isEnemy;
         memcpy(data.name, playerName, sizeof(data.name));
         newCache.push_back(data);
@@ -301,19 +303,16 @@ namespace Visual {
     for (const auto& player : cachedPlayers) {
       if (Features::bPlayerESPBoxes) {
         DrawPlayerBox(
-          pDrawList, player.screenPos, player.screenHead, player.health, player.maxHealth,
-          player.isEnemy, player.name[0] ? player.name : nullptr, g_screenW, g_screenH
+          pDrawList, player.screenPos, player.screenHead, player.isEnemy,
+          player.name[0] ? player.name : nullptr, g_screenW, g_screenH
         );
       }
     }
   }
-
   void DrawPlayerBox(
     void*       drawList,
     Vector2     footScreen,
     Vector2     headScreen,
-    float       health,
-    float       maxHealth,
     bool        isEnemy,
     const char* name,
     float       screenW,
@@ -338,23 +337,6 @@ namespace Visual {
     ImDrawList* dl = reinterpret_cast<ImDrawList*>(drawList);
 
     dl->AddRect(ImVec2(left, top), ImVec2(right, bottom), boxColor, 0.0f, 0, 1.5f);
-
-    if (Features::bPlayerESPHealth) {
-      unsigned int healthColor;
-      float        healthPercent = (maxHealth > 0) ? (health / maxHealth) : 0.0f;
-      if (healthPercent > 0.5f)
-        healthColor = 0xFF00FF00;
-      else if (healthPercent > 0.25f)
-        healthColor = 0xFF00FFFF;
-      else
-        healthColor = 0xFF0000FF;
-
-      float hpBarHeight = height * healthPercent;
-      dl->AddRectFilled(
-        ImVec2(left - 6.0f, bottom - hpBarHeight), ImVec2(left - 2.0f, bottom), healthColor
-      );
-      dl->AddRect(ImVec2(left - 6.0f, top), ImVec2(left - 2.0f, bottom), 0xFF000000);
-    }
 
     // Draw name above box
     if (Features::bPlayerESPNames && name && name[0]) {

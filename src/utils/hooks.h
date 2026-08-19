@@ -17,7 +17,8 @@ namespace Hooks {
     int         typeDead,
     const char* weaponId,
     int         someInt,
-    void*       someEnum
+    void*       someEnum,
+    void*       methodInfo
   );
   extern fn_ApplyDamage oApplyDamage;
 
@@ -31,8 +32,30 @@ namespace Hooks {
     int         typeDead,
     const char* weaponId,
     int         someInt,
-    void*       someEnum
+    void*       someEnum,
+    void*       methodInfo
   );
+
+  // ---- MinusLive Hook (God Mode alternative) ----
+  using fn_MinusLive =
+    void (*)(void* thisPtr, float damage, bool isHeadshot, int weaponType, void* methodInfo);
+  extern fn_MinusLive oMinusLive;
+
+  void hkMinusLive(void* thisPtr, float damage, bool isHeadshot, int weaponType, void* methodInfo);
+
+  // ---- MinusLiveReal Hook ----
+  using fn_MinusLiveReal =
+    void (*)(void* thisPtr, float damage, bool isHeadshot, int weaponType, void* methodInfo);
+  extern fn_MinusLiveReal oMinusLiveReal;
+
+  void
+  hkMinusLiveReal(void* thisPtr, float damage, bool isHeadshot, int weaponType, void* methodInfo);
+
+  // ---- Speed Hack Hook ----
+  using fn_MoveSpeedMultiplier = float (*)(void* thisPtr, void* methodInfo);
+  extern fn_MoveSpeedMultiplier oMoveSpeedMultiplier;
+
+  float hkMoveSpeedMultiplier(void* thisPtr, void* methodInfo);
 
   // ---- CheatDetectedBanner Bypass ----
   using fn_CBD_Trigger = void (*)();

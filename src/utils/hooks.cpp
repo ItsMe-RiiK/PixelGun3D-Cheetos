@@ -20,24 +20,54 @@ namespace Hooks {
     int         typeDead,
     const char* weaponId,
     int         someInt,
-    void*       someEnum
+    void*       someEnum,
+    void*       methodInfo
   )
   {
-    // Block damage to local player for god mode OR no fall damage
-    if (Features::bGodMode || Features::bNoFallDamage) {
+    if (Features::bGodMode) {
       auto localPMC = IL2CPP::GetLocalPlayerMoveC();
       if (localPMC && thisPtr) {
         auto thisPMC = IL2CPP::ReadField<void*>(thisPtr, Offsets::PlayerDamageable::playerMoveC);
         if (thisPMC == localPMC) {
-          return;  // Block all damage to self (covers both god mode and fall damage)
+          if (Features::bGodMode) {
+            return;  // God mode blocks all local damage (including fall damage)
+          }
         }
       }
     }
 
     oApplyDamage(
       thisPtr, damage, attacker, collider, hitPoint, damageType, typeDead, weaponId, someInt,
-      someEnum
+      someEnum, methodInfo
     );
+  }
+
+  using fn_OnEventFired =
+    bool (*)(void* thisPtr, uint8_t eventCode, void* eventData, void* methodInfo);
+  fn_OnEventFired oOnEventFired = nullptr;
+
+  bool hkOnEventFired(void* thisPtr, uint8_t eventCode, void* eventData, void* methodInfo)
+  {
+    if (Features::bGodMode) {
+      if (thisPtr != nullptr && thisPtr == IL2CPP::GetLocalPlayerMoveC()) {
+        // Block network damage RPCs
+        // 10 = ApplyDamageRPC, 11 = ApplyDebuffRPC, 24 = GetDamageRPC, 47 = HitByVehicleRPC
+        if (eventCode == 10 || eventCode == 11 || eventCode == 24 || eventCode == 47) {
+          return true;  // Ignore the event
+        }
+      }
+    }
+    return oOnEventFired(thisPtr, eventCode, eventData, methodInfo);
+  }
+
+  fn_MoveSpeedMultiplier oMoveSpeedMultiplier = nullptr;
+  float                  hkMoveSpeedMultiplier(void* thisPtr, void* methodInfo)
+  {
+    float baseSpeed = oMoveSpeedMultiplier(thisPtr, methodInfo);
+    if (Features::bSpeedHack) {
+      return baseSpeed * Features::fSpeedMultiplier;
+    }
+    return baseSpeed;
   }
 
   using fn_PlayerMoveC_Update               = void (*)(void* thisPtr);
@@ -76,12 +106,40 @@ namespace Hooks {
 
     auto gaBase = IL2CPP::gameAssemblyBase;
 
-    auto applyDamageAddr =
+    // 1. Hook ApplyDamage for no fall damage
+    void* pApplyDamage =
       reinterpret_cast<void*>(gaBase + Offsets::PlayerDamageable::ApplyDamage_RVA);
-    MH_CreateHook(
-      applyDamageAddr, reinterpret_cast<void*>(&hkApplyDamage),
-      reinterpret_cast<void**>(&oApplyDamage)
-    );
+    if (
+      MH_CreateHook(pApplyDamage, (void*) &hkApplyDamage, reinterpret_cast<void**>(&oApplyDamage))
+      != MH_OK
+    ) {
+      return false;
+    }
+    MH_EnableHook(pApplyDamage);
+
+    // 2. Hook OnEventFired to block network damage RPCs for God Mode
+    void* pOnEventFired = reinterpret_cast<void*>(gaBase + 0x157D550);  // RVA from dump.cs
+    if (
+      MH_CreateHook(
+        pOnEventFired, (void*) &hkOnEventFired, reinterpret_cast<void**>(&oOnEventFired)
+      )
+      != MH_OK
+    ) {
+      return false;
+    }
+    MH_EnableHook(pOnEventFired);
+
+    // 3. Hook get_MoveSpeedMultiplier for Speed Hack
+    void* pMoveSpeed = reinterpret_cast<void*>(gaBase + 0x9A3ED0);  // RVA from dump.cs
+    if (
+      MH_CreateHook(
+        pMoveSpeed, (void*) &hkMoveSpeedMultiplier, reinterpret_cast<void**>(&oMoveSpeedMultiplier)
+      )
+      != MH_OK
+    ) {
+      return false;
+    }
+    MH_EnableHook(pMoveSpeed);
 
     auto cbdTriggerAddr = reinterpret_cast<void*>(gaBase + Offsets::AntiCheat::CBD_Trigger_RVA);
     MH_CreateHook(

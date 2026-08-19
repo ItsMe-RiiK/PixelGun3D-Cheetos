@@ -20,7 +20,7 @@ title PG3D Trainer — Launcher
 
 echo.
 echo   ╔══════════════════════════════════════════════╗
-echo   ║       PIXEL GUN 3D PC TRAINER v0.0.3         ║
+echo   ║       PIXEL GUN 3D PC TRAINER                ║
 echo   ║       Launcher (Windows)                     ║
 echo   ╚══════════════════════════════════════════════╝
 echo.

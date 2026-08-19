@@ -17,10 +17,10 @@ set "TRIPLET=x64-windows"
 title PG3D Trainer — Build
 
 echo.
-echo   ╔══════════════════════════════════════════════╗
-echo   ║       PIXEL GUN 3D PC TRAINER v1.0           ║
-echo   ║       Build Script (Windows)                  ║
-echo   ╚══════════════════════════════════════════════╝
+echo   ╔════════════════════════════════════════════╗
+echo   ║       PIXEL GUN 3D PC - Builder            ║
+echo   ║       Build Script (Windows)               ║
+echo   ╚════════════════════════════════════════════╝
 echo.
 
 if "%~1"=="" goto Release
@@ -109,8 +109,8 @@ if not exist "%BIN_DIR%\trainer.dll" (
 
 echo.
 echo   [+] Build complete!
-echo   [+]   trainer.dll     -^> %BIN_DIR%\trainer.dll
-echo   [+]   PG3D_Injector   -^> %BIN_DIR%\PG3D_Injector.exe
+echo   [+] trainer.dll     -^> %BIN_DIR%\trainer.dll
+echo   [+] PG3D_Injector   -^> %BIN_DIR%\PG3D_Injector.exe
 echo.
 echo   [*] To launch, run: scripts\launch.bat
 exit /b 0

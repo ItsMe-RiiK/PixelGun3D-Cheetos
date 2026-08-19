@@ -29,8 +29,8 @@ NC='\033[0m'
 banner() {
     echo -e "${PURPLE}"
     echo "  ╔══════════════════════════════════════════════╗"
-    echo "  ║       PIXEL GUN 3D PC TRAINER v0.0.3         ║"
-    echo "  ║       Launcher ($(uname -s))                 ║"
+    echo "  ║       PIXEL GUN 3D PC TRAINER                ║"
+    echo "  ║       Launcher ($(uname -s))                       ║"
     echo "  ╚══════════════════════════════════════════════╝"
     echo -e "${NC}"
 }

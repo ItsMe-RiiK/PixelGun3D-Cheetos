@@ -24,10 +24,10 @@ NC='\033[0m'
 
 banner() {
     echo -e "${PURPLE}"
-    echo "  ╔══════════════════════════════════════════════╗"
-    echo "  ║       PIXEL GUN 3D PC TRAINER v1.0           ║"
-    echo "  ║       Build Script ($(uname -s))                    ║"
-    echo "  ╚══════════════════════════════════════════════╝"
+    echo "  ╔═══════════════════════════════════════════╗"
+    echo "  ║       PIXEL GUN 3D PC - Builder           ║"
+    echo "  ║       Build Script ($(uname -s))          ║"
+    echo "  ╚═══════════════════════════════════════════╝"
     echo -e "${NC}"
 }
 
@@ -53,7 +53,7 @@ check_deps() {
             warn "Install on macOS:"
             echo "    brew install cmake mingw-w64 python3"
         else
-            warn "Install on Arch Linux:"
+            warn "Install on Linux:"
             echo "    sudo pacman -S cmake make mingw-w64-gcc python"
         fi
         echo ""

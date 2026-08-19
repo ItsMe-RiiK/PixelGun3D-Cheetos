@@ -21,9 +21,9 @@ set "LOG_FILE=%LOG_DIR%\validate_%TIMESTAMP%.log"
 title PG3D Offset Validator
 
 echo.
-echo   ╔══════════════════════════════════════════════╗
-echo   ║       PIXEL GUN 3D — Offset Validator         ║
-echo   ╚══════════════════════════════════════════════╝
+echo   ╔═════════════════════════════════════════════╗
+echo   ║       PIXEL GUN 3D — Offset Validator       ║
+echo   ╚═════════════════════════════════════════════╝
 echo.
 
 if "%~1"=="" goto Validate

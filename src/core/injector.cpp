@@ -1,8 +1,3 @@
-// =====================================================
-// Pixel Gun 3D Trainer — Standalone Injector
-// Injects trainer.dll into the game process
-// =====================================================
-
 #include <windows.h>
 #include <tlhelp32.h>
 #include <chrono>
@@ -23,16 +18,24 @@
 
 void SetColor(int color) { SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color); }
 
+#ifndef PROJECT_VERSION
+  #define PROJECT_VERSION "Unknown"
+#endif
+
 void PrintBanner()
 {
   SetColor(COLOR_PURPLE);
-  std::cout << R"(
-    ╔══════════════════════════════════════════════╗
-    ║       PIXEL GUN 3D PC TRAINER v0.0.4         ║
-    ║                                              ║
-    ║       DLL Injector                           ║
-    ╚══════════════════════════════════════════════╝
-    )" << std::endl;
+  std::string title   = std::string("      PIXEL GUN 3D PC TRAINER v") + PROJECT_VERSION;
+  int         padding = 46 - (int) title.length();
+  std::string padStr(padding > 0 ? padding : 0, ' ');
+
+  std::cout << "\n"
+            << "    ╔══════════════════════════════════════════════╗\n"
+            << "    ║" << title << padStr << "║\n"
+            << "    ║                                              ║\n"
+            << "    ║       DLL Injector                           ║\n"
+            << "    ╚══════════════════════════════════════════════╝\n"
+            << std::endl;
   SetColor(COLOR_DEFAULT);
 }
 

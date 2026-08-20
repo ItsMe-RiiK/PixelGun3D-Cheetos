@@ -156,16 +156,10 @@ namespace Menu {
           Interact(1);
           return 0;
         }
-        // Disabled Space/Return toggle
-        // if (wParam == VK_RETURN || wParam == VK_SPACE) {
-        //   Interact(1);
-        //   return 0;
-        // }
       }
     }
 
     if (Settings::bMenuOpen) {
-      // Block game input when menu is open so arrows don't move camera
       switch (msg) {
       case WM_LBUTTONDOWN :
       case WM_LBUTTONUP :
@@ -309,9 +303,14 @@ namespace Menu {
       IM_COL32(100, 50, 200, 255), 0, 0, 2.0f
     );
 
+#ifndef PROJECT_VERSION
+  #define PROJECT_VERSION "Unknown"
+#endif
+
     // Title
+    std::string titleStr = std::string("Pixel Gun 3D Cheat v") + PROJECT_VERSION;
     drawList->AddText(
-      ImVec2(startX + padding, startY + padding), IM_COL32(100, 200, 255, 255), "Pixel Gun 3D Cheat"
+      ImVec2(startX + padding, startY + padding), IM_COL32(100, 200, 255, 255), titleStr.c_str()
     );
 
     float currentY = startY + padding + 30.0f;

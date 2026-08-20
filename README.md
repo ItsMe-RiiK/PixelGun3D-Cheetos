@@ -104,12 +104,5 @@ Whether you compiled the code yourself or downloaded a pre-built Release archive
 2. Open a terminal and run `./runLinux.sh` (if downloaded from Releases) or `./scripts/runLinux.sh` (if built from source).
 *(Note: This requires `protontricks` installed on your system to correctly inject into the Steam Proton prefix).*
 
-## Technical Details
-
-- **Architecture**: Internal DLL injected directly into the game process.
-- **Languages & Libraries**: C++20, MinHook, ImGui, nlohmann/json, Direct3D 11.
-- **Build System**: CMake with MinGW (`x86_64-w64-mingw32`) / vcpkg.
-
-
 ## LICENSE
 This project under [MIT LICENSE](license)

@@ -1,11 +1,11 @@
 #pragma once
-// =====================================================
-// Hooks — MinHook-based function hooking Header
-// =====================================================
-
 #include <windows.h>
 
 namespace Hooks {
+  namespace Settings {
+    inline bool bAntiCheatBypass = true;
+  }
+
   // ---- ApplyDamage Hook (God Mode) ----
   using fn_ApplyDamage = void (*)(
     void*       thisPtr,
@@ -50,12 +50,6 @@ namespace Hooks {
 
   void
   hkMinusLiveReal(void* thisPtr, float damage, bool isHeadshot, int weaponType, void* methodInfo);
-
-  // ---- Speed Hack Hook ----
-  using fn_MoveSpeedMultiplier = float (*)(void* thisPtr, void* methodInfo);
-  extern fn_MoveSpeedMultiplier oMoveSpeedMultiplier;
-
-  float hkMoveSpeedMultiplier(void* thisPtr, void* methodInfo);
 
   // ---- CheatDetectedBanner Bypass ----
   using fn_CBD_Trigger = void (*)();

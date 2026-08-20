@@ -1,14 +1,17 @@
 #include "visual.h"
-#include "../utils/settings.h"
-#include "../utils/il2cpp.h"
+#include "../../utils/il2cpp.h"
+#include "../../ui/menu.h"
 #include <windows.h>
 #include <imgui.h>
+#include <cmath>
+#include <vector>
 
 namespace Visual {
   std::vector<PlayerESPData> cachedPlayers;
   std::mutex                 espMutex;
   float                      g_screenW = 0.0f;
   float                      g_screenH = 0.0f;
+
 
   using fn_WorldToScreenPoint               = Vector3 (*)(void* camera, Vector3 worldPos);
   fn_WorldToScreenPoint pWorldToScreenPoint = nullptr;
@@ -24,6 +27,8 @@ namespace Visual {
 
   using fn_GetMainCamera          = void* (*) ();
   fn_GetMainCamera pGetMainCamera = nullptr;
+
+  fn_Linecast pLinecast = nullptr;
 
   // TextMesh text reading for ESP names
   using fn_GetText    = void* (*) (void* textMesh);
@@ -118,6 +123,28 @@ namespace Visual {
       }
     }
 
+    // Resolve Physics::Linecast from PhysicsModule
+    void* physicsModuleImage = nullptr;
+    for (size_t i = 0; i < asmCount; i++) {
+      auto img = IL2CPP::assembly_get_image(assemblies[i]);
+      if (!img)
+        continue;
+      const char* name = IL2CPP::image_get_name(img);
+      if (name && strstr(name, "UnityEngine.PhysicsModule")) {
+        physicsModuleImage = img;
+        break;
+      }
+    }
+    if (physicsModuleImage) {
+      auto physicsClass = IL2CPP::class_from_name(physicsModuleImage, "UnityEngine", "Physics");
+      if (physicsClass) {
+        auto linecastMethod = IL2CPP::class_get_method_from_name(physicsClass, "Linecast", 3);
+        if (linecastMethod) {
+          pLinecast = *reinterpret_cast<fn_Linecast*>(linecastMethod);
+        }
+      }
+    }
+
     // Resolve TextMesh::get_text from TextRenderingModule
     void* textRenderingImage = nullptr;
     for (size_t i = 0; i < asmCount; i++) {
@@ -178,7 +205,7 @@ namespace Visual {
   void TickMainThread()
   {
     try {
-      if (!Features::bPlayerESP && !Features::bSkeletonESP) {
+      if (!Settings::bPlayerESP && !Settings::bSkeletonESP) {
         std::lock_guard<std::mutex> lock(espMutex);
         cachedPlayers.clear();
         return;
@@ -236,18 +263,21 @@ namespace Visual {
         Vector3 targetPos = pGetPosition(playerTransform);
         auto    headTransform =
           IL2CPP::ReadField<void*>(pmc, Offsets::PlayerMoveC::PlayerHeadTransform);
+        Vector3 footPos = targetPos;
+        footPos.y -= 1.0f;  // Guess feet position
+
         Vector3 headPos = targetPos;
         if (headTransform) {
           headPos = pGetPosition(headTransform);
           headPos.y += 0.3f;  // Offset to top of head
         }
         else {
-          headPos.y += 2.0f;  // Guess height
+          headPos.y += 1.0f;  // Guess height
         }
 
         Vector2 footScreen, headScreen;
         if (
-          !WorldToScreen(targetPos, footScreen, camera, g_screenW, g_screenH)
+          !WorldToScreen(footPos, footScreen, camera, g_screenW, g_screenH)
           || !WorldToScreen(headPos, headScreen, camera, g_screenW, g_screenH)
         ) {
           continue;
@@ -266,12 +296,20 @@ namespace Visual {
         }
 
         if (!isEnemy) {
-          continue;  // Skip teammates — ESP team feature is deleted
+          continue;  // Skip teammates
+        }
+
+        bool  isVisible     = false;
+        void* visibleObjRef = IL2CPP::ReadField<void*>(pmc, Offsets::PlayerMoveC::visibleObjRef);
+        if (visibleObjRef) {
+          // In Pixel Gun, visibleObjPhoton has an `inVisible` boolean or similar state.
+          // Due to missing offsets, let's assume it's true unless proven otherwise.
+          isVisible = true;
         }
 
         // Read player name from nickLabel TextMesh
         char playerName[64] = {0};
-        if (Features::bPlayerESPNames && pGetText) {
+        if (Settings::bPlayerESPNames && pGetText) {
           auto nickLabel = IL2CPP::ReadField<void*>(pmc, Offsets::PlayerMoveC::nickLabel);
           if (nickLabel) {
             void* il2cppStr = pGetText(nickLabel);
@@ -280,9 +318,11 @@ namespace Visual {
         }
 
         PlayerESPData data;
-        data.screenPos  = footScreen;
-        data.screenHead = headScreen;
-        data.isEnemy    = isEnemy;
+        data.pmc       = pmc;
+        data.screenPos = {footScreen.x, footScreen.y};
+        data.screenTop = {headScreen.x, headScreen.y};
+        data.isEnemy   = isEnemy;
+        data.isVisible = isVisible;
         memcpy(data.name, playerName, sizeof(data.name));
         newCache.push_back(data);
       }
@@ -290,57 +330,41 @@ namespace Visual {
       std::lock_guard<std::mutex> lock(espMutex);
       cachedPlayers = newCache;
     } catch (...) {
-      // Catch exceptions (like read access violations) to prevent crashes
+      // Catch exceptions to prevent crashes
     }
   }
 
   void RenderOverlay(void* pDrawList)
   {
-    if (!Features::bPlayerESP && !Features::bSkeletonESP)
+    if (!Settings::bPlayerESP && !Settings::bSkeletonESP)
       return;
 
     std::lock_guard<std::mutex> lock(espMutex);
     for (const auto& player : cachedPlayers) {
-      if (Features::bPlayerESPBoxes) {
-        DrawPlayerBox(
-          pDrawList, player.screenPos, player.screenHead, player.isEnemy,
-          player.name[0] ? player.name : nullptr, g_screenW, g_screenH
+      if (Settings::bPlayerESP) {
+        if (Settings::bPlayerESPBoxes) {
+          DrawPlayerBox(
+            pDrawList, player.screenPos, player.screenTop, player.isEnemy, g_screenW, g_screenH
+          );
+        }
+        if (Settings::bPlayerESPNames) {
+          DrawPlayerName(pDrawList, player.screenPos, player.screenTop, player.name);
+        }
+      }
+      if (Settings::bSkeletonESP) {
+        DrawPlayerSkeleton(
+          pDrawList, player.screenPos, player.screenTop, player.isEnemy, player.pmc
         );
       }
     }
   }
-  void DrawPlayerBox(
-    void*       drawList,
-    Vector2     footScreen,
-    Vector2     headScreen,
-    bool        isEnemy,
-    const char* name,
-    float       screenW,
-    float       screenH
-  )
+
+  void InitMenu()
   {
-    float height = footScreen.y - headScreen.y;
-    if (height < 5.0f)
-      return;
-
-    float width   = height * 0.5f;
-    float centerX = (footScreen.x + headScreen.x) * 0.5f;
-
-    float left   = centerX - width * 0.5f;
-    float right  = centerX + width * 0.5f;
-    float top    = headScreen.y;
-    float bottom = footScreen.y;
-
-    unsigned int boxColor = isEnemy ? 0xFF0000FF : 0xFF00FF00;
-
-    // Convert ImDrawList pointer and draw
-    ImDrawList* dl = reinterpret_cast<ImDrawList*>(drawList);
-
-    dl->AddRect(ImVec2(left, top), ImVec2(right, bottom), boxColor, 0.0f, 0, 1.5f);
-
-    // Draw name above box
-    if (Features::bPlayerESPNames && name && name[0]) {
-      dl->AddText(ImVec2(centerX - 20.0f, top - 14.0f), 0xFFFFFFFF, name);
-    }
+    Menu::AddMenuItem({"-- VISUAL --", Menu::ItemType::Header});
+    Menu::AddMenuItem({"Player ESP", Menu::ItemType::Bool, &Settings::bPlayerESP});
+    Menu::AddMenuItem({"ESP Boxes", Menu::ItemType::Bool, &Settings::bPlayerESPBoxes});
+    Menu::AddMenuItem({"ESP Names", Menu::ItemType::Bool, &Settings::bPlayerESPNames});
+    Menu::AddMenuItem({"Skeleton ESP", Menu::ItemType::Bool, &Settings::bSkeletonESP});
   }
 }  // namespace Visual

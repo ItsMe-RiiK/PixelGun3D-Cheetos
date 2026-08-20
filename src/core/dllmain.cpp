@@ -1,12 +1,6 @@
-// =====================================================
-// Pixel Gun 3D PC Trainer — DLL Entry Point
-// Injected via standalone injector
-// Hooks D3D11 Present for ImGui overlay
-// =====================================================
-
 #include "../utils/config.h"
-#include "../utils/settings.h"
 #include "../utils/hooks.h"
+#include "../utils/il2cpp.h"
 #include "../utils/il2cpp.h"
 #include "../ui/menu.h"
 
@@ -20,7 +14,7 @@
 #include <MinHook.h>
 
 // Feature modules
-#include "../features/visual.h"
+#include "../features/visual/visual.h"
 
 // ---- D3D11 Present Hook via VTable ----
 namespace DX11Hook {
@@ -47,7 +41,7 @@ namespace DX11Hook {
       Menu::Render();
 
       // Draw ESP (on the background overlay)
-      if (Features::bPlayerESP || Features::bSkeletonESP) {
+      if (Visual::Settings::bPlayerESP || Visual::Settings::bSkeletonESP) {
         // Get screen dimensions
         DXGI_SWAP_CHAIN_DESC desc;
         pSwapChain->GetDesc(&desc);

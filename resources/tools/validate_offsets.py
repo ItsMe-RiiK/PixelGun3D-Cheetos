@@ -6,106 +6,125 @@ import os
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 DUMP_FILE = os.path.join(PROJECT_ROOT, "resources", "dumped", "dump.cs")
 OFFSETS_FILE = os.path.join(PROJECT_ROOT, "src", "utils", "offsets.h")
-IL2CPP_FILE = os.path.join(PROJECT_ROOT, "src", "utils", "il2cpp.cpp")
 
-def parse_offsets_h():
-    offsets = {}
-    current_namespace = ""
-    with open(OFFSETS_FILE, "r") as f:
-        for line in f:
-            line = line.strip()
-            ns_match = re.match(r'namespace\s+(\w+)\s*\{', line)
-            if ns_match:
-                current_namespace = ns_match.group(1)
-                offsets[current_namespace] = []
-                continue
-            
-            constexpr_match = re.search(r'constexpr\s+uintptr_t\s+(\w+)\s*=\s*(0x[0-9a-fA-F]+);', line)
-            if constexpr_match:
-                offsets[current_namespace].append((constexpr_match.group(1), constexpr_match.group(2)))
-    return offsets
-
-def parse_il2cpp_cpp():
-    classes = {}
-    with open(IL2CPP_FILE, "r") as f:
-        for line in f:
-            match = re.search(r'Offsets::Classes::(\w+)\s*=\s*reinterpret_cast<uintptr_t>\(GetClass\("([^"]+)"\)\);', line)
-            if match:
-                classes[match.group(1)] = match.group(2)
-    return classes
-
-def run_validation():
+def run_update():
     if not os.path.exists(DUMP_FILE):
         print(f"Error: dump.cs not found at {DUMP_FILE}")
         sys.exit(1)
 
-    print("=== Parsing offsets.h & il2cpp.cpp ===")
-    offsets = parse_offsets_h()
-    il2cpp_classes = parse_il2cpp_cpp()
-
-    print("\n=== Validating IL2CPP Class Mapping ===")
-    with open(DUMP_FILE, "r", encoding="utf-8") as f:
-        dump_content = f.read()
-
-    mismatches = 0
-    for cpp_name, game_name in il2cpp_classes.items():
-        if game_name in dump_content:
-            print(f"[UNCHANGED] Class '{game_name}' ({cpp_name}) found.")
-        else:
-            print(f"[CHANGED/MISSING] Class '{game_name}' ({cpp_name}) NOT found!")
-            mismatches += 1
-
-    print("\n=== Validating Field & RVA Offsets ===")
-    
-    with open(DUMP_FILE, "r", encoding="utf-8") as f:
-        lines = f.readlines()
-        
-    classes_lines = {}
+    print("=== Parsing dump.cs ===")
+    class_data = {}
     current_class = ""
-    for line in lines:
-        class_match = re.search(r'class\s+(\w+)\s*.*//\s*TypeDefIndex:\s*\d+', line)
-        if class_match:
-            current_class = class_match.group(1)
-            classes_lines[current_class] = []
-        elif current_class != "":
-            classes_lines[current_class].append(line)
+    pending_rva = None
 
+    with open(DUMP_FILE, "r", encoding="utf-8") as f:
+        for line in f:
+            # Check for class declaration
+            class_match = re.search(r'class\s+(\w+)\s*.*//\s*TypeDefIndex:\s*\d+', line)
+            if class_match:
+                current_class = class_match.group(1)
+                if current_class not in class_data:
+                    class_data[current_class] = {"fields": {}, "methods": {}}
+                continue
+
+            if not current_class:
+                continue
+
+            # Check for fields
+            # e.g., public int ammoInClip; // 0x6C
+            field_match = re.search(r'\s+(\w+);\s*//\s*(0x[0-9a-fA-F]+)', line)
+            if field_match:
+                class_data[current_class]["fields"][field_match.group(1)] = field_match.group(2)
+                continue
+
+            # Check for methods
+            # e.g., // RVA: 0x1DB8410 Offset: 0x1DB7810
+            rva_match = re.search(r'//\s*RVA:\s*(0x[0-9a-fA-F]+)', line)
+            if rva_match:
+                pending_rva = rva_match.group(1)
+                continue
+
+            if pending_rva:
+                # Next line contains method signature
+                # e.g., public void ApplyDamage(...)
+                # e.g., private static void ShowBanner()
+                method_match = re.search(r'(?:[\w<>\[\]\.,]+\s+)+(\w+)\s*\(', line)
+                if method_match:
+                    class_data[current_class]["methods"][method_match.group(1)] = pending_rva
+                pending_rva = None
+
+    print(f"Parsed {len(class_data)} classes from dump.cs.")
+
+    print("\n=== Updating offsets.h ===")
+    
     ns_to_class = {
         "WeaponManager": "WeaponManager",
         "PlayerMoveC": "Player_move_c",
         "WeaponSounds": "WeaponSounds",
         "PlayerDamageable": "PlayerDamageable",
-        "FPSController": "FirstPersonControlSharp",
-        "InnerWeaponPars": "InnerWeaponPars",
-        "ExtractionWeaponSettings": "ExtractionWeaponSettings"
+        "Object": "Object",
+        "AntiCheat": "CheatDetectedBanner",
     }
 
-    # For offset checking, we just verify the exact hexadecimal offset exists in dump.cs
-    # Because field names get obfuscated
-    for ns, fields in offsets.items():
-        if not fields: continue
-        target_class = ns_to_class.get(ns)
+    with open(OFFSETS_FILE, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+
+    current_ns = ""
+    updated_lines = []
+    updates_count = 0
+    missing_count = 0
+
+    for line in lines:
+        # Match start of namespace
+        ns_match = re.match(r'\s*namespace\s+(\w+)\s*\{', line)
+        if ns_match:
+            current_ns = ns_match.group(1)
+            updated_lines.append(line)
+            continue
         
-        for name, val_hex in fields:
-            if name.endswith("_RVA"):
-                method_name = name.replace("_RVA", "")
-                if f"// RVA: {val_hex}" not in dump_content:
-                    print(f"[CHANGED/MISSING] {ns}::{name}: Method RVA {val_hex} not found in dump.cs")
-                    mismatches += 1
-                else:
-                    print(f"[UNCHANGED] {ns}::{name} ({val_hex})")
+        # Match end of namespace
+        if "}" in line and "namespace" in line:
+            current_ns = ""
+
+        # Match a constexpr uintptr_t variable
+        constexpr_match = re.search(r'(constexpr\s+uintptr_t\s+(\w+)\s*=\s*)(0x[0-9a-fA-F]+)(;.*)', line)
+        if constexpr_match and current_ns in ns_to_class:
+            prefix = constexpr_match.group(1)
+            var_name = constexpr_match.group(2)
+            old_hex = constexpr_match.group(3)
+            suffix = constexpr_match.group(4)
+            
+            target_class = ns_to_class[current_ns]
+            new_hex = None
+
+            if var_name.endswith("_RVA"):
+                method_name = var_name.replace("_RVA", "")
+                if current_ns == "AntiCheat" and method_name.startswith("CBD_"):
+                    method_name = method_name.replace("CBD_", "")
+                
+                new_hex = class_data.get(target_class, {}).get("methods", {}).get(method_name)
             else:
-                if val_hex not in dump_content:
-                     print(f"[CHANGED/MISSING] {ns}::{name}: Offset {val_hex} not found in dump.cs")
-                     mismatches += 1
+                new_hex = class_data.get(target_class, {}).get("fields", {}).get(var_name)
+
+            if new_hex:
+                if new_hex.lower() != old_hex.lower():
+                    print(f"[UPDATED] {current_ns}::{var_name}: {old_hex} -> {new_hex}")
+                    line = f"{prefix}{new_hex}{suffix}\n"
+                    updates_count += 1
                 else:
-                    print(f"[UNCHANGED] {ns}::{name} ({val_hex})")
+                    print(f"[OK] {current_ns}::{var_name} is up-to-date ({old_hex}).")
+            else:
+                if var_name != "StaticInstance":
+                    print(f"[WARNING] {current_ns}::{var_name} NOT FOUND in dump.cs (class {target_class})!")
+                    missing_count += 1
+
+        updated_lines.append(line)
+
+    with open(OFFSETS_FILE, "w", encoding="utf-8") as f:
+        f.writelines(updated_lines)
 
     print("\n==================================")
-    if mismatches == 0:
-        print("[SUCCESS] All offsets and IL2CPP classes are valid against dump.cs!")
-    else:
-        print(f"[WARNING] Found {mismatches} mismatch(es)!")
+    print(f"[SUCCESS] Updated offsets.h with {updates_count} changes. {missing_count} fields missing.")
 
 if __name__ == "__main__":
-    run_validation()
+    run_update()

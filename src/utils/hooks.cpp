@@ -1,11 +1,10 @@
 #include "hooks.h"
 #include <MinHook.h>
-#include "../utils/settings.h"
 #include "il2cpp.h"
-#include "../features/visual.h"
-#include "../features/combat.h"
-#include "../features/weaponmod.h"
-#include "../features/playermod.h"
+#include "../features/visual/visual.h"
+#include "../features/combat/combat.h"
+#include "../features/weaponmod/weaponmod.h"
+#include "../features/playermod/playermod.h"
 
 namespace Hooks {
   fn_ApplyDamage oApplyDamage = nullptr;
@@ -24,16 +23,8 @@ namespace Hooks {
     void*       methodInfo
   )
   {
-    if (Features::bGodMode) {
-      auto localPMC = IL2CPP::GetLocalPlayerMoveC();
-      if (localPMC && thisPtr) {
-        auto thisPMC = IL2CPP::ReadField<void*>(thisPtr, Offsets::PlayerDamageable::playerMoveC);
-        if (thisPMC == localPMC) {
-          if (Features::bGodMode) {
-            return;  // God mode blocks all local damage (including fall damage)
-          }
-        }
-      }
+    if (PlayerMod::OnApplyDamage(thisPtr)) {
+      return;
     }
 
     oApplyDamage(
@@ -48,26 +39,10 @@ namespace Hooks {
 
   bool hkOnEventFired(void* thisPtr, uint8_t eventCode, void* eventData, void* methodInfo)
   {
-    if (Features::bGodMode) {
-      if (thisPtr != nullptr && thisPtr == IL2CPP::GetLocalPlayerMoveC()) {
-        // Block network damage RPCs
-        // 10 = ApplyDamageRPC, 11 = ApplyDebuffRPC, 24 = GetDamageRPC, 47 = HitByVehicleRPC
-        if (eventCode == 10 || eventCode == 11 || eventCode == 24 || eventCode == 47) {
-          return true;  // Ignore the event
-        }
-      }
+    if (PlayerMod::OnEventFired(thisPtr, eventCode)) {
+      return true;
     }
     return oOnEventFired(thisPtr, eventCode, eventData, methodInfo);
-  }
-
-  fn_MoveSpeedMultiplier oMoveSpeedMultiplier = nullptr;
-  float                  hkMoveSpeedMultiplier(void* thisPtr, void* methodInfo)
-  {
-    float baseSpeed = oMoveSpeedMultiplier(thisPtr, methodInfo);
-    if (Features::bSpeedHack) {
-      return baseSpeed * Features::fSpeedMultiplier;
-    }
-    return baseSpeed;
   }
 
   using fn_PlayerMoveC_Update               = void (*)(void* thisPtr);
@@ -75,19 +50,17 @@ namespace Hooks {
 
   void hkPlayerMoveC_Update(void* thisPtr)
   {
-    // Run the game's original Update first
-    if (oPlayerMoveC_Update) {
-      oPlayerMoveC_Update(thisPtr);
-    }
-
-    // Apply our mods AFTER the game's Update so our values don't get overwritten
+    // Apply our mods BEFORE the game's Update so our values are ready when the game processes shooting
     if (thisPtr == IL2CPP::GetLocalPlayerMoveC()) {
-      if (Features::bPlayerESP || Features::bSkeletonESP) {
-        Visual::TickMainThread();
-      }
+      Visual::TickMainThread();
       Combat::Tick();
       WeaponMod::Tick();
       PlayerMod::Tick();
+    }
+
+    // Run the game's original Update
+    if (oPlayerMoveC_Update) {
+      oPlayerMoveC_Update(thisPtr);
     }
   }
 
@@ -129,17 +102,6 @@ namespace Hooks {
     }
     MH_EnableHook(pOnEventFired);
 
-    // 3. Hook get_MoveSpeedMultiplier for Speed Hack
-    void* pMoveSpeed = reinterpret_cast<void*>(gaBase + 0x9A3ED0);  // RVA from dump.cs
-    if (
-      MH_CreateHook(
-        pMoveSpeed, (void*) &hkMoveSpeedMultiplier, reinterpret_cast<void**>(&oMoveSpeedMultiplier)
-      )
-      != MH_OK
-    ) {
-      return false;
-    }
-    MH_EnableHook(pMoveSpeed);
 
     auto cbdTriggerAddr = reinterpret_cast<void*>(gaBase + Offsets::AntiCheat::CBD_Trigger_RVA);
     MH_CreateHook(

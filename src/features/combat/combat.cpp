@@ -1,11 +1,13 @@
 #include "combat.h"
-#include "../utils/settings.h"
-#include "../utils/il2cpp.h"
+#include "../weaponmod/weaponmod.h"
+#include "../../utils/il2cpp.h"
+#include "../visual/visual.h"
+#include "../../ui/menu.h"
 
 namespace Combat {
   struct WeaponSoundsBackup
   {
-    float tekKoof;
+    float currentSpreadCoef;
     float upKoofFire;
     float downKoofFirst;
     float downKoof;
@@ -37,7 +39,7 @@ namespace Combat {
     lastWeaponSounds = ws;
 
     using namespace Offsets::WeaponSounds;
-    backup.tekKoof              = IL2CPP::ReadField<float>(ws, tekKoof);
+    backup.currentSpreadCoef    = IL2CPP::ReadField<float>(ws, tekKoof);
     backup.upKoofFire           = IL2CPP::ReadField<float>(ws, upKoofFire);
     backup.downKoofFirst        = IL2CPP::ReadField<float>(ws, downKoofFirst);
     backup.downKoof             = IL2CPP::ReadField<float>(ws, downKoof);
@@ -65,7 +67,7 @@ namespace Combat {
       return;
 
     using namespace Offsets::WeaponSounds;
-    IL2CPP::WriteField(ws, tekKoof, backup.tekKoof);
+    IL2CPP::WriteField(ws, tekKoof, backup.currentSpreadCoef);
     IL2CPP::WriteField(ws, upKoofFire, backup.upKoofFire);
     IL2CPP::WriteField(ws, downKoofFirst, backup.downKoofFirst);
     IL2CPP::WriteField(ws, downKoof, backup.downKoof);
@@ -86,107 +88,6 @@ namespace Combat {
     IL2CPP::WriteField(ws, sectorsAOERadius, backup.sectorsAOERadius);
   }
 
-  void ApplyNoRecoil(void* ws)
-  {
-    if (!ws)
-      return;
-    using namespace Offsets::WeaponSounds;
-
-    IL2CPP::WriteField(ws, tekKoof, 0.0f);
-    IL2CPP::WriteField(ws, upKoofFire, 0.0f);
-    IL2CPP::WriteField(ws, downKoofFirst, 0.0f);
-    IL2CPP::WriteField(ws, downKoof, 0.0f);
-    IL2CPP::WriteField(ws, recoilCoeffZoom, 0.0f);
-    IL2CPP::WriteField(ws, upKoofFireZoom, 0.0f);
-    IL2CPP::WriteField(ws, firstShotScatter, false);
-    // Also zero runtime accumulator (0xAC)
-    IL2CPP::WriteField(ws, 0xAC, 0.0f);
-  }
-
-  void ApplyNoSpread(void* ws)
-  {
-    if (!ws)
-      return;
-    using namespace Offsets::WeaponSounds;
-
-    IL2CPP::WriteField(ws, tekKoof, 0.0f);
-    IL2CPP::WriteField(ws, upKoofFire, 0.0f);
-    IL2CPP::WriteField(ws, downKoofFirst, 0.0f);
-    IL2CPP::WriteField(ws, downKoof, 0.0f);
-    IL2CPP::WriteField(ws, moveScatterCoeff, 0.0f);
-    IL2CPP::WriteField(ws, firstShotScatter, false);
-
-    IL2CPP::WriteField(ws, upKoofFireZoom, 0.0f);
-    IL2CPP::WriteField(ws, downKoofFirstZoom, 0.0f);
-    IL2CPP::WriteField(ws, downKoofZoom, 0.0f);
-    IL2CPP::WriteField(ws, moveScatterCoeffZoom, 0.0f);
-    IL2CPP::WriteField(ws, firstShotScatterZoom, false);
-    IL2CPP::WriteField(ws, recoilCoeffZoom, 0.0f);
-    // Also zero runtime accumulator (0xC0)
-    IL2CPP::WriteField(ws, 0xC0, 0.0f);
-  }
-
-  void ApplyRapidFire(void* ws)
-  {
-    if (!ws)
-      return;
-    using namespace Offsets::WeaponSounds;
-
-    IL2CPP::WriteField(ws, shootDelay, 0.0f);
-    IL2CPP::WriteField(ws, bulletDelay, 0.0f);
-    IL2CPP::WriteField(ws, DelayTimer, 0.0f);
-
-    auto pmc = IL2CPP::GetLocalPlayerMoveC();
-    if (pmc) {
-      // Force zero currentDelayTimer on PlayerMoveC (0xCE8)
-      IL2CPP::WriteField(pmc, 0xCE8, 0.0f);
-      // Force IsWeaponDelay (0xCEF) to false
-      IL2CPP::WriteField(pmc, 0xCEF, false);
-      // Force WeaponDelayTimeForFire (0xCF0) to 0.0f
-      IL2CPP::WriteField(pmc, 0xCF0, 0.0f);
-    }
-  }
-
-  void ApplyAOEBullets(void* ws)
-  {
-    if (!ws)
-      return;
-    using namespace Offsets::WeaponSounds;
-
-    IL2CPP::WriteField(ws, isSectorsAOE, true);
-    IL2CPP::WriteField(ws, sectorsAOEAngleFront, 360.0f);
-    IL2CPP::WriteField(ws, sectorsAOEAngleBack, 360.0f);
-    IL2CPP::WriteField(ws, sectorsAOERadius, Features::fAOERadius);
-    IL2CPP::WriteField(ws, sectorsAOEDmgMultFront, 1.0f);
-    IL2CPP::WriteField(ws, sectorsAOEDmgMultSide, 1.0f);
-    IL2CPP::WriteField(ws, sectorsAOEDmgMultBack, 1.0f);
-
-    if (IL2CPP::ReadField<bool>(ws, bazooka)) {
-      IL2CPP::WriteField(ws, bazookaExplosionRadius, Features::fAOERadius);
-    }
-  }
-
-  void ApplyInstantCharge(void* ws)
-  {
-    if (!ws)
-      return;
-    using namespace Offsets::WeaponSounds;
-
-    if (IL2CPP::ReadField<bool>(ws, isCharging)) {
-      IL2CPP::WriteField(ws, chargeTime, 0.001f);
-    }
-  }
-
-  void ApplyAimbot(void* ws)
-  {
-    if (!ws)
-      return;
-    using namespace Offsets::WeaponSounds;
-
-    // Force game's built-in auto-aim/aim-assist on
-    IL2CPP::WriteField(ws, IsActiveAim, true);
-  }
-
   void Tick()
   {
     try {
@@ -196,33 +97,32 @@ namespace Combat {
 
       BackupWeaponSounds(ws);
 
-      if (Features::bNoRecoil) {
-        ApplyNoRecoil(ws);
-        ApplyNoSpread(ws);
+      if (backup.hasBackup) {
+        RestoreWeaponSounds(ws);
       }
 
-      if (Features::bRapidFire)
-        ApplyRapidFire(ws);
+      bool anyActive = false;
 
-      if (Features::bAOEBullets)
+      if (Settings::bAOEBullets) {
         ApplyAOEBullets(ws);
+        anyActive = true;
+      }
 
-      // if (Features::bAimbot)
-      //   ApplyAimbot(ws);
-
-      if (Features::bInstantCharge)
-        ApplyInstantCharge(ws);
-
-      if (
-        !Features::bNoRecoil && !Features::bRapidFire && !Features::bAOEBullets
-        && !Features::bInstantCharge && !Features::bAimbot && backup.hasBackup
-      ) {
-        RestoreWeaponSounds(ws);
+      if (!anyActive) {
         backup.hasBackup = false;
         lastWeaponSounds = nullptr;
       }
     } catch (...) {
       // Prevent crash on invalid pointer read
     }
+  }
+
+  void InitMenu()
+  {
+    Menu::AddMenuItem({"-- COMBAT --", Menu::ItemType::Header});
+    Menu::AddMenuItem({"AOE Bullets", Menu::ItemType::Bool, &Settings::bAOEBullets});
+    Menu::AddMenuItem(
+      {"AOE Radius", Menu::ItemType::Float, nullptr, &Settings::fAOERadius, 5.0f, 200.0f, 5.0f}
+    );
   }
 }  // namespace Combat

@@ -14,12 +14,7 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 
 | Feature | Description | Status |
 | :--- | :--- | :--- |
-| **Aimbot** | Adjustable FOV, Target Head Only | <span title="Maintenance">🚧</span> |
-| **No Recoil** | Eliminates weapon recoil | <span title="Maintenance">🚧</span> |
-| **No Spread** | Eliminates bullet spread | <span title="Maintenance">🚧</span> |
-| **Rapid Fire** | Increases firing rate | <span title="Maintenance">🚧</span> |
 | **AOE Bullets** | Area of Effect with adjustable radius | <span title="Work">✅</span> |
-| **Instant Charge** | Weapon need to charge cooldown to attack | <span title="Maintenance">🚧</span> |
 
 </details>
 
@@ -29,7 +24,7 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 | Feature | Description | Status |
 | :--- | :--- | :--- |
 | **Player ESP** | Box, Health, Name | <span title="Work">✅</span> |
-| **Skeleton ESP** | Draws player skeletons | <span title="Maintenance">🚧</span> |
+| **Skeleton ESP** | Draws player skeletons |  <span title="Work">✅</span>|
 
 </details>
 
@@ -39,9 +34,9 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 | Feature | Description | Status |
 | :--- | :--- | :--- |
 | **Infinite Ammo** | Unlimited ammunition | <span title="Work">✅</span> |
-| **No Reload** | Removes reload delays | <span title="Maintenance">🚧</span> |
 | **Guaranteed Criticals** | 100% Crit Chance with adjustable multiplier | <span title="Work">✅</span> |
-| **Reach** | Extended melee range | <span title="Maintenance">🚧</span> |
+| **Reach** | Extended melee range |  <span title="Work">✅</span>|
+| **Wallshot** | Pass the wall or any object when shooting | <span title="Maintenance">⚠️</span> |
 
 </details>
 
@@ -50,11 +45,10 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 
 | Feature | Description | Status |
 | :--- | :--- | :--- |
-| **Speed Hack** | Adjustable movement speed multiplier | <span title="Maintenance">🚧</span> |
-| **Invisibility** | Hides the player model | <span title="Maintenance">🚧</span> |
-| **No Fall Damage** | Prevents damage from falling | <span title="Maintenance">🚧</span> |
-| **God Mode** | invulnerability state when in spawn protection | <span title="Maintenance">🚧</span> |
+| **God Mode** | Invicible | <span title="Work">✅</span> |
 | **Auto Heal** | Automatically regenerates health | <span title="Work">✅</span> |
+| **High Jump** | Adjustable jump multiplier | <span title="Work">✅</span> |
+| **Fly** | Enable fly mode | <span title="Work">✅</span> |
 
 </details>
 
@@ -119,8 +113,3 @@ Whether you compiled the code yourself or downloaded a pre-built Release archive
 
 ## LICENSE
 This project under [MIT LICENSE](license)
-
-## Disclaimer
-This project is created for **educational and reverse engineering purposes only**. It demonstrates memory manipulation, function hooking, and DirectX overlay techniques.
-Any use of this project for cheating or hacking in online games is illegal and unethical. and we dont take any responsibility for the actions of users who use this project for cheating or hacking in online games.
-

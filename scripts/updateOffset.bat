@@ -1,7 +1,7 @@
 @echo off
 REM =====================================================
-REM Pixel Gun 3D Trainer — Offset Validator & Updater
-REM Runs validate_offsets.py and logs results
+REM Pixel Gun 3D Trainer — Offset Auto-Updater
+REM Runs validate_offsets.py to update offsets.h from dump.cs
 REM =====================================================
 
 setlocal enabledelayedexpansion
@@ -18,11 +18,11 @@ for /f "tokens=2 delims==" %%I in ('wmic os get localdatetime /value') do set "D
 set "TIMESTAMP=%DT:~0,8%_%DT:~8,6%"
 set "LOG_FILE=%LOG_DIR%\validate_%TIMESTAMP%.log"
 
-title PG3D Offset Validator
+title PG3D Offset Updater
 
 echo.
 echo   ╔═════════════════════════════════════════════╗
-echo   ║       PIXEL GUN 3D — Offset Validator       ║
+echo   ║       PIXEL GUN 3D — Offset Updater         ║
 echo   ╚═════════════════════════════════════════════╝
 echo.
 
@@ -80,30 +80,37 @@ REM =====================================================
 call :Preflight
 if %errorlevel% neq 0 exit /b 1
 
-echo   [*] Running offset validation...
+echo   [*] Running offset auto-updater...
 echo.
 
 REM Create log directory
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%"
 
-REM Run validator and log
+REM Run updater and log
 %PYTHON% "%VALIDATOR%" > "%LOG_FILE%" 2>&1
 type "%LOG_FILE%"
 
 echo.
 
-REM Check for mismatches
-findstr /C:"[CHANGED/MISSING]" "%LOG_FILE%" >nul 2>&1
+REM Check for results
+findstr /C:"[UPDATED]" "%LOG_FILE%" >nul 2>&1
 if %errorlevel% equ 0 (
-    echo   [!] Validation found mismatches! Review the output above.
+    echo   [+] Offsets were successfully updated! Review the output above.
+)
+findstr /C:"[WARNING]" "%LOG_FILE%" >nul 2>&1
+if %errorlevel% equ 0 (
+    echo   [!] Some offsets were not found. Review the output above.
     echo.
-    echo   [!] You need to update the offsets in:
+    echo   [!] You may need to check the obfuscated field names in:
     echo       %PROJECT_ROOT%\src\utils\offsets.h
-    echo       %PROJECT_ROOT%\src\utils\il2cpp.cpp
     echo.
-    echo   [!] Use the dump files in %DUMPED_DIR%\ as reference.
-) else (
-    echo   [+] All offsets are valid!
+)
+findstr /C:"[UPDATED]" "%LOG_FILE%" >nul 2>&1
+if %errorlevel% neq 0 (
+    findstr /C:"[WARNING]" "%LOG_FILE%" >nul 2>&1
+    if %errorlevel% neq 0 (
+        echo   [+] All offsets are already up-to-date!
+    )
 )
 
 echo   [+] Log saved to: %LOG_FILE%
@@ -160,7 +167,7 @@ for %%F in (dump.cs il2cpp.h script.json stringliteral.json) do (
 echo.
 echo   [+] Dump files updated!
 echo.
-echo   [*] Running validation against new dumps...
+echo   [*] Running auto-updater against new dumps...
 echo.
 
 goto Validate
@@ -172,8 +179,8 @@ REM =====================================================
 echo   Usage: %~nx0 ^<command^> [args]
 echo.
 echo   Commands:
-echo     validate         — Validate current offsets against dump.cs
-echo     update ^<path^>    — Update dump files from a directory and re-validate
+echo     validate         — Run auto-updater against dump.cs
+echo     update ^<path^>    — Update dump files from a directory and run auto-updater
 echo     help             — Show this help message
 echo.
 echo   Examples:

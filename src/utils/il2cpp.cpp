@@ -22,6 +22,7 @@ namespace IL2CPP {
   using fn_il2cpp_field_get_offset            = size_t (*)(void* field);
   using fn_il2cpp_type_get_object             = void* (*) (void* type);
   using fn_il2cpp_class_get_type              = void* (*) (void* klass);
+  using fn_il2cpp_object_get_class            = void* (*) (void* obj);
 
   // Globals
   HMODULE   hGameAssembly       = nullptr;
@@ -43,6 +44,7 @@ namespace IL2CPP {
   fn_il2cpp_field_get_offset            ptr_field_get_offset            = nullptr;
   fn_il2cpp_class_get_type              ptr_class_get_type              = nullptr;
   fn_il2cpp_type_get_object             ptr_type_get_object             = nullptr;
+  fn_il2cpp_object_get_class            ptr_object_get_class            = nullptr;
 
   bool Init()
   {
@@ -69,6 +71,7 @@ namespace IL2CPP {
     RESOLVE(class_get_fields);
     RESOLVE(field_get_name);
     RESOLVE(field_get_offset);
+    RESOLVE(object_get_class);
 
     ptr_class_get_type = reinterpret_cast<fn_il2cpp_class_get_type>(
       GetProcAddress(hGameAssembly, "il2cpp_class_get_type")
@@ -138,6 +141,38 @@ namespace IL2CPP {
     return ptr_class_get_method_from_name ? ptr_class_get_method_from_name(klass, name, argsCount)
                                           : nullptr;
   }
+  void* class_get_fields(void* klass, void** iter)
+  {
+    return ptr_class_get_fields ? ptr_class_get_fields(klass, iter) : nullptr;
+  }
+  const char* field_get_name(void* field)
+  {
+    return ptr_field_get_name ? ptr_field_get_name(field) : nullptr;
+  }
+  size_t field_get_offset(void* field)
+  {
+    return ptr_field_get_offset ? ptr_field_get_offset(field) : 0;
+  }
+  size_t GetFieldOffset(void* klass, const char* name)
+  {
+    if (!klass || !name)
+      return 0;
+    void* iter = nullptr;
+    while (void* field = class_get_fields(klass, &iter)) {
+      const char* fieldName = field_get_name(field);
+      if (fieldName && strcmp(fieldName, name) == 0) {
+        return field_get_offset(field);
+      }
+    }
+    return 0;
+  }
+
+  void* object_get_class(void* obj)
+  {
+    if (!obj || !ptr_object_get_class)
+      return nullptr;
+    return ptr_object_get_class(obj);
+  }
 
   void* GetSystemTypeForClass(void* klass)
   {
@@ -163,6 +198,132 @@ namespace IL2CPP {
     if (!pFindObjectsOfType || !type)
       return nullptr;
     return pFindObjectsOfType(type);
+  }
+
+  Vector3 GetTransformPosition(void* transform)
+  {
+    if (!transform)
+      return {0, 0, 0};
+
+    using fn_GetPosition               = Vector3 (*)(void*);
+    static fn_GetPosition pGetPosition = nullptr;
+    if (!pGetPosition) {
+      void* coreModuleImage = nullptr;
+      auto  domain          = domain_get();
+      if (domain) {
+        size_t asmCount   = 0;
+        auto   assemblies = domain_get_assemblies(domain, &asmCount);
+        if (assemblies) {
+          for (size_t i = 0; i < asmCount; i++) {
+            auto img = assembly_get_image(assemblies[i]);
+            if (
+              img && image_get_name(img) && strstr(image_get_name(img), "UnityEngine.CoreModule")
+            ) {
+              coreModuleImage = img;
+              break;
+            }
+          }
+        }
+      }
+      if (coreModuleImage) {
+        void* transformClass = class_from_name(coreModuleImage, "UnityEngine", "Transform");
+        if (transformClass) {
+          void* method = class_get_method_from_name(transformClass, "get_position", 0);
+          if (method) {
+            pGetPosition = reinterpret_cast<fn_GetPosition>(*reinterpret_cast<void**>(method));
+          }
+        }
+      }
+    }
+
+    if (pGetPosition) {
+      return pGetPosition(transform);
+    }
+    return {0, 0, 0};
+  }
+
+  void SetTransformPosition(void* transform, float x, float y, float z)
+  {
+    if (!transform)
+      return;
+
+    using fn_SetPosition = void (*)(void*, Vector3);
+
+    static fn_SetPosition pSetPosition = nullptr;
+    if (!pSetPosition) {
+      void* coreModuleImage = nullptr;
+      auto  domain          = domain_get();
+      if (domain) {
+        size_t asmCount   = 0;
+        auto   assemblies = domain_get_assemblies(domain, &asmCount);
+        if (assemblies) {
+          for (size_t i = 0; i < asmCount; i++) {
+            auto img = assembly_get_image(assemblies[i]);
+            if (
+              img && image_get_name(img) && strstr(image_get_name(img), "UnityEngine.CoreModule")
+            ) {
+              coreModuleImage = img;
+              break;
+            }
+          }
+        }
+      }
+      if (coreModuleImage) {
+        void* transformClass = class_from_name(coreModuleImage, "UnityEngine", "Transform");
+        if (transformClass) {
+          void* method = class_get_method_from_name(transformClass, "set_position", 1);
+          if (method) {
+            pSetPosition = reinterpret_cast<fn_SetPosition>(*reinterpret_cast<void**>(method));
+          }
+        }
+      }
+    }
+
+    if (pSetPosition) {
+      Vector3 pos = {x, y, z};
+      pSetPosition(transform, pos);
+    }
+  }
+
+  void LookAt(void* transform, void* targetTransform)
+  {
+    if (!transform || !targetTransform)
+      return;
+
+    using fn_LookAt          = void (*)(void*, void*);
+    static fn_LookAt pLookAt = nullptr;
+    if (!pLookAt) {
+      void* coreModuleImage = nullptr;
+      auto  domain          = domain_get();
+      if (domain) {
+        size_t asmCount   = 0;
+        auto   assemblies = domain_get_assemblies(domain, &asmCount);
+        if (assemblies) {
+          for (size_t i = 0; i < asmCount; i++) {
+            auto img = assembly_get_image(assemblies[i]);
+            if (
+              img && image_get_name(img) && strstr(image_get_name(img), "UnityEngine.CoreModule")
+            ) {
+              coreModuleImage = img;
+              break;
+            }
+          }
+        }
+      }
+      if (coreModuleImage) {
+        void* transformClass = class_from_name(coreModuleImage, "UnityEngine", "Transform");
+        if (transformClass) {
+          void* method = class_get_method_from_name(transformClass, "LookAt", 1);
+          if (method) {
+            pLookAt = reinterpret_cast<fn_LookAt>(*reinterpret_cast<void**>(method));
+          }
+        }
+      }
+    }
+
+    if (pLookAt) {
+      pLookAt(transform, targetTransform);
+    }
   }
 
   std::vector<void*> GetPlayers()
@@ -204,12 +365,10 @@ namespace IL2CPP {
     Offsets::Classes::PlayerMoveC      = reinterpret_cast<uintptr_t>(GetClass("Player_move_c"));
     Offsets::Classes::WeaponSounds     = reinterpret_cast<uintptr_t>(GetClass("WeaponSounds"));
     Offsets::Classes::PlayerDamageable = reinterpret_cast<uintptr_t>(GetClass("PlayerDamageable"));
-    Offsets::Classes::FPSController =
-      reinterpret_cast<uintptr_t>(GetClass("FirstPersonControlSharp"));
+
     Offsets::Classes::CheatDetectedBanner =
       reinterpret_cast<uintptr_t>(GetClass("CheatDetectedBanner"));
     Offsets::Classes::ClickerDetector = reinterpret_cast<uintptr_t>(GetClass("ClickerDetector"));
-    Offsets::Classes::RPG_Controller  = reinterpret_cast<uintptr_t>(GetClass("RPG_Controller"));
 
     return Offsets::Classes::WeaponManager != 0 && Offsets::Classes::PlayerMoveC != 0
         && Offsets::Classes::WeaponSounds != 0;
@@ -240,10 +399,10 @@ namespace IL2CPP {
 
   void* GetCurrentWeaponSounds()
   {
-    auto wm = GetWeaponManagerInstance();
-    if (!wm)
+    auto pmc = GetLocalPlayerMoveC();
+    if (!pmc)
       return nullptr;
-    return ReadField<void*>(wm, Offsets::WeaponManager::currentWeaponSounds);
+    return ReadField<void*>(pmc, Offsets::PlayerMoveC::weaponSoundsRef);
   }
 
   void* GetLocalPlayerDamageable()

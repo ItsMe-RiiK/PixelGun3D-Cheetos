@@ -26,7 +26,7 @@ banner() {
     echo -e "${PURPLE}"
     echo "  ╔═══════════════════════════════════════════╗"
     echo "  ║       PIXEL GUN 3D PC - Builder           ║"
-    echo "  ║       Build Script ($(uname -s))             ║"
+    echo "  ║       Build Script ($(uname -s))                ║"
     echo "  ╚═══════════════════════════════════════════╝"
     echo -e "${NC}"
 }

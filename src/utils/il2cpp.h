@@ -1,8 +1,4 @@
 #pragma once
-// =====================================================
-// IL2CPP Runtime Helper Header
-// =====================================================
-
 #include "offsets.h"
 #include <windows.h>
 #include <vector>
@@ -27,6 +23,11 @@ namespace IL2CPP {
   const char* image_get_name(void* image);
   void*       class_from_name(void* image, const char* namespaze, const char* name);
   void*       class_get_method_from_name(void* klass, const char* name, int argsCount);
+  void*       class_get_fields(void* klass, void** iter);
+  const char* field_get_name(void* field);
+  size_t      field_get_offset(void* field);
+  size_t      GetFieldOffset(void* klass, const char* name);
+  void*       object_get_class(void* obj);
 
   // Field Access
   template<typename T>
@@ -62,8 +63,15 @@ namespace IL2CPP {
   }
 
   // Unity Helpers
-  void* GetSystemTypeForClass(void* klass);
-  void* FindObjectsOfType(void* type);
+  struct Vector3
+  {
+    float x, y, z;
+  };
+  void*   GetSystemTypeForClass(void* klass);
+  void*   FindObjectsOfType(void* type);
+  Vector3 GetTransformPosition(void* transform);
+  void    SetTransformPosition(void* transform, float x, float y, float z);
+  void    LookAt(void* transform, void* targetTransform);
 
   // Player tracking
   std::vector<void*> GetPlayers();

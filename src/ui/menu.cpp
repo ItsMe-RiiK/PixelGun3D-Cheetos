@@ -1,6 +1,10 @@
 #include "menu.h"
-#include "../utils/settings.h"
 #include "../utils/config.h"
+#include "../features/combat/combat.h"
+#include "../features/visual/visual.h"
+#include "../features/playermod/playermod.h"
+#include "../features/weaponmod/weaponmod.h"
+#include "../utils/hooks.h"
 
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
@@ -20,90 +24,34 @@ namespace Menu {
 
   bool initialized = false;
 
-  enum class ItemType {
-    Header,
-    Bool,
-    Float,
-    Action
-  };
-
-  struct MenuItem
-  {
-    std::string name;
-    ItemType    type;
-    bool*       bValue = nullptr;
-    float*      fValue = nullptr;
-    float       fMin   = 0.0f;
-    float       fMax   = 0.0f;
-    float       fStep  = 0.0f;
-    void (*action)()   = nullptr;
-    bool isExpanded    = true;
-  };
+  namespace Settings {
+    inline bool bMenuOpen = true;
+  }
 
   std::vector<MenuItem> items;
   int                   selectedIndex = 0;
   int                   scrollOffset  = 0;
 
+  void AddMenuItem(const MenuItem& item) { items.push_back(item); }
+
   void SetupItems()
   {
     items.clear();
-    // COMBAT
-    items.push_back({"-- COMBAT --", ItemType::Header});
-    items.push_back({"No Recoil & Spread", ItemType::Bool, &Features::bNoRecoil});
-    // Suspending Aimbot (but keeping it in menu)
-    items.push_back({"Aimbot [Suspended]", ItemType::Bool, &Features::bAimbot});
-    items.push_back(
-      {"Aimbot FOV", ItemType::Float, nullptr, &Features::fAimbotFOV, 1.0f, 90.0f, 1.0f}
-    );
-    items.push_back({"Aimbot Head Only", ItemType::Bool, &Features::bAimbotHeadOnly});
-    items.push_back({"Rapid Fire", ItemType::Bool, &Features::bRapidFire});
-    items.push_back({"AOE Bullets", ItemType::Bool, &Features::bAOEBullets});
-    items.push_back(
-      {"AOE Radius", ItemType::Float, nullptr, &Features::fAOERadius, 5.0f, 200.0f, 5.0f}
-    );
-    items.push_back({"Instant Charge", ItemType::Bool, &Features::bInstantCharge});
 
-    // VISUAL
-    items.push_back({"-- VISUAL --", ItemType::Header});
-    items.push_back({"Player ESP", ItemType::Bool, &Features::bPlayerESP});
-    items.push_back({"ESP Boxes", ItemType::Bool, &Features::bPlayerESPBoxes});
-    items.push_back({"ESP Names", ItemType::Bool, &Features::bPlayerESPNames});
-    items.push_back({"Skeleton ESP", ItemType::Bool, &Features::bSkeletonESP});
+    Combat::InitMenu();
+    Visual::InitMenu();
+    WeaponMod::InitMenu();
+    PlayerMod::InitMenu();
 
-    // WEAPON
-    items.push_back({"-- WEAPON --", ItemType::Header});
-    items.push_back({"Infinite Ammo", ItemType::Bool, &Features::bInfiniteAmmo});
-    items.push_back({"100% Crit Chance", ItemType::Bool, &Features::bCritChance100});
-    items.push_back(
-      {"Crit Multiplier", ItemType::Float, nullptr, &Features::fCritMultiplier, 1.0f, 20.0f, 1.0f}
-    );
-    items.push_back({"Extended Reach", ItemType::Bool, &Features::bReach});
-    items.push_back(
-      {"Reach Multiplier", ItemType::Float, nullptr, &Features::fReachMultiplier, 1.0f, 20.0f, 1.0f}
-    );
-
-    // PLAYER
-    items.push_back({"-- PLAYER --", ItemType::Header});
-    items.push_back({"God Mode", ItemType::Bool, &Features::bGodMode});
-    items.push_back({"Auto Heal", ItemType::Bool, &Features::bAutoHeal});
-    items.push_back({"Speed Hack", ItemType::Bool, &Features::bSpeedHack});
-    items.push_back(
-      {"Speed Multiplier", ItemType::Float, nullptr, &Features::fSpeedMultiplier, 1.0f, 10.0f, 0.5f}
-    );
-    items.push_back({"High Jump", ItemType::Bool, &Features::bHighJump});
-    items.push_back(
-      {"Jump Multiplier", ItemType::Float, nullptr, &Features::fJumpMultiplier, 1.0f, 10.0f, 0.5f}
-    );
-    items.push_back({"Fly", ItemType::Bool, &Features::bFly});
     // SETTINGS
-    items.push_back({"-- SETTINGS --", ItemType::Header});
-    items.push_back({"Bypass Anti-Cheat", ItemType::Bool, &Features::bAntiCheatBypass});
-    items.push_back({"Save Config", ItemType::Action, nullptr, nullptr, 0, 0, 0, []() {
-                       Config::Save();
-                     }});
-    items.push_back({"Load Config", ItemType::Action, nullptr, nullptr, 0, 0, 0, []() {
-                       Config::Load();
-                     }});
+    AddMenuItem({"-- SETTINGS --", ItemType::Header});
+    AddMenuItem({"Bypass Anti-Cheat", ItemType::Bool, &Hooks::Settings::bAntiCheatBypass});
+    AddMenuItem({"Save Config", ItemType::Action, nullptr, nullptr, 0, 0, 0, []() {
+                   Config::Save();
+                 }});
+    AddMenuItem({"Load Config", ItemType::Action, nullptr, nullptr, 0, 0, 0, []() {
+                   Config::Load();
+                 }});
   }
 
   std::vector<int> GetVisibleIndices()
@@ -187,11 +135,11 @@ namespace Menu {
   {
     if (msg == WM_KEYDOWN) {
       if (wParam == VK_INSERT) {
-        Features::bMenuOpen = !Features::bMenuOpen;
+        Settings::bMenuOpen = !Settings::bMenuOpen;
         return 0;
       }
 
-      if (Features::bMenuOpen) {
+      if (Settings::bMenuOpen) {
         if (wParam == VK_UP) {
           MoveSelection(-1);
           return 0;
@@ -216,7 +164,7 @@ namespace Menu {
       }
     }
 
-    if (Features::bMenuOpen) {
+    if (Settings::bMenuOpen) {
       // Block game input when menu is open so arrows don't move camera
       switch (msg) {
       case WM_LBUTTONDOWN :
@@ -300,7 +248,7 @@ namespace Menu {
 
   void Render()
   {
-    if (!Features::bMenuOpen)
+    if (!Settings::bMenuOpen)
       return;
 
     auto drawList = ImGui::GetBackgroundDrawList();
@@ -363,8 +311,7 @@ namespace Menu {
 
     // Title
     drawList->AddText(
-      ImVec2(startX + padding, startY + padding), IM_COL32(100, 200, 255, 255),
-      "Pixel Gun 3D Trainer [Arrow Keys to Navigate]"
+      ImVec2(startX + padding, startY + padding), IM_COL32(100, 200, 255, 255), "Pixel Gun 3D Cheat"
     );
 
     float currentY = startY + padding + 30.0f;

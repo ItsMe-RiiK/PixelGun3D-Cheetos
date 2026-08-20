@@ -1,5 +1,9 @@
 #include "config.h"
-#include "settings.h"
+#include "../features/combat/combat.h"
+#include "../features/visual/visual.h"
+#include "../features/playermod/playermod.h"
+#include "../features/weaponmod/weaponmod.h"
+#include "hooks.h"
 #include <nlohmann/json.hpp>
 #include <fstream>
 
@@ -24,39 +28,31 @@ namespace Config {
     nlohmann::json j;
 
     // Combat
-    j["combat"]["aimbot"]         = Features::bAimbot;
-    j["combat"]["aimbot_fov"]     = Features::fAimbotFOV;
-    j["combat"]["aimbot_head"]    = Features::bAimbotHeadOnly;
-    j["combat"]["no_recoil"]      = Features::bNoRecoil;
-    j["combat"]["rapid_fire"]     = Features::bRapidFire;
-    j["combat"]["aoe_bullets"]    = Features::bAOEBullets;
-    j["combat"]["aoe_radius"]     = Features::fAOERadius;
-    j["combat"]["instant_charge"] = Features::bInstantCharge;
+    j["combat"]["aoe_bullets"] = Combat::Settings::bAOEBullets;
+    j["combat"]["aoe_radius"]  = Combat::Settings::fAOERadius;
 
     // Visual
-    j["visual"]["player_esp"]    = Features::bPlayerESP;
-    j["visual"]["esp_teammates"] = Features::bPlayerESPTeammates;
-    j["visual"]["esp_boxes"]     = Features::bPlayerESPBoxes;
-    j["visual"]["esp_names"]     = Features::bPlayerESPNames;
-    j["visual"]["skeleton_esp"]  = Features::bSkeletonESP;
+    j["visual"]["player_esp"]   = Visual::Settings::bPlayerESP;
+    j["visual"]["esp_boxes"]    = Visual::Settings::bPlayerESPBoxes;
+    j["visual"]["esp_names"]    = Visual::Settings::bPlayerESPNames;
+    j["visual"]["skeleton_esp"] = Visual::Settings::bSkeletonESP;
 
     // Weapon Mod
-    j["weaponmod"]["infinite_ammo"]   = Features::bInfiniteAmmo;
-    j["weaponmod"]["crit_chance"]     = Features::bCritChance100;
-    j["weaponmod"]["crit_multiplier"] = Features::fCritMultiplier;
-    j["weaponmod"]["reach"]           = Features::bReach;
-    j["weaponmod"]["reach_mult"]      = Features::fReachMultiplier;
+    j["weaponmod"]["infinite_ammo"]   = WeaponMod::Settings::bInfiniteAmmo;
+    j["weaponmod"]["wallshot"]        = WeaponMod::Settings::bWallshot;
+    j["weaponmod"]["crit_chance"]     = WeaponMod::Settings::bCritChance100;
+    j["weaponmod"]["crit_multiplier"] = WeaponMod::Settings::fCritMultiplier;
+    j["weaponmod"]["reach"]           = WeaponMod::Settings::bReach;
+    j["weaponmod"]["reach_mult"]      = WeaponMod::Settings::fReachMultiplier;
 
-    j["playermod"]["speed_hack"]       = Features::bSpeedHack;
-    j["playermod"]["speed_multiplier"] = Features::fSpeedMultiplier;
-    j["playermod"]["high_jump"]        = Features::bHighJump;
-    j["playermod"]["jump_multiplier"]  = Features::fJumpMultiplier;
-    j["playermod"]["fly"]              = Features::bFly;
-    j["playermod"]["god_mode"]         = Features::bGodMode;
-    j["playermod"]["auto_heal"]        = Features::bAutoHeal;
+    j["playermod"]["high_jump"]       = PlayerMod::Settings::bHighJump;
+    j["playermod"]["jump_multiplier"] = PlayerMod::Settings::fJumpMultiplier;
+    j["playermod"]["fly"]             = PlayerMod::Settings::bFly;
+    j["playermod"]["god_mode"]        = PlayerMod::Settings::bGodMode;
+    j["playermod"]["auto_heal"]       = PlayerMod::Settings::bAutoHeal;
 
     // System
-    j["system"]["anticheat_bypass"] = Features::bAntiCheatBypass;
+    j["system"]["anticheat_bypass"] = Hooks::Settings::bAntiCheatBypass;
 
     std::ofstream file(configPath);
     if (file.is_open()) {
@@ -90,39 +86,31 @@ namespace Config {
   var = j[section][key].get<float>()
 
     // Combat
-    LOAD_BOOL("combat", "aimbot", Features::bAimbot);
-    LOAD_FLOAT("combat", "aimbot_fov", Features::fAimbotFOV);
-    LOAD_BOOL("combat", "aimbot_head", Features::bAimbotHeadOnly);
-    LOAD_BOOL("combat", "no_recoil", Features::bNoRecoil);
-    LOAD_BOOL("combat", "rapid_fire", Features::bRapidFire);
-    LOAD_BOOL("combat", "aoe_bullets", Features::bAOEBullets);
-    LOAD_FLOAT("combat", "aoe_radius", Features::fAOERadius);
-    LOAD_BOOL("combat", "instant_charge", Features::bInstantCharge);
+    LOAD_BOOL("combat", "aoe_bullets", Combat::Settings::bAOEBullets);
+    LOAD_FLOAT("combat", "aoe_radius", Combat::Settings::fAOERadius);
 
     // Visual
-    LOAD_BOOL("visual", "player_esp", Features::bPlayerESP);
-    LOAD_BOOL("visual", "esp_teammates", Features::bPlayerESPTeammates);
-    LOAD_BOOL("visual", "esp_boxes", Features::bPlayerESPBoxes);
-    LOAD_BOOL("visual", "esp_names", Features::bPlayerESPNames);
-    LOAD_BOOL("visual", "skeleton_esp", Features::bSkeletonESP);
+    LOAD_BOOL("visual", "player_esp", Visual::Settings::bPlayerESP);
+    LOAD_BOOL("visual", "esp_boxes", Visual::Settings::bPlayerESPBoxes);
+    LOAD_BOOL("visual", "esp_names", Visual::Settings::bPlayerESPNames);
+    LOAD_BOOL("visual", "skeleton_esp", Visual::Settings::bSkeletonESP);
 
     // Weapon Mod
-    LOAD_BOOL("weaponmod", "infinite_ammo", Features::bInfiniteAmmo);
-    LOAD_BOOL("weaponmod", "crit_chance", Features::bCritChance100);
-    LOAD_FLOAT("weaponmod", "crit_multiplier", Features::fCritMultiplier);
-    LOAD_BOOL("weaponmod", "reach", Features::bReach);
-    LOAD_FLOAT("weaponmod", "reach_mult", Features::fReachMultiplier);
+    LOAD_BOOL("weaponmod", "infinite_ammo", WeaponMod::Settings::bInfiniteAmmo);
+    LOAD_BOOL("weaponmod", "wallshot", WeaponMod::Settings::bWallshot);
+    LOAD_BOOL("weaponmod", "crit_chance", WeaponMod::Settings::bCritChance100);
+    LOAD_FLOAT("weaponmod", "crit_multiplier", WeaponMod::Settings::fCritMultiplier);
+    LOAD_BOOL("weaponmod", "reach", WeaponMod::Settings::bReach);
+    LOAD_FLOAT("weaponmod", "reach_mult", WeaponMod::Settings::fReachMultiplier);
 
-    LOAD_BOOL("playermod", "speed_hack", Features::bSpeedHack);
-    LOAD_FLOAT("playermod", "speed_multiplier", Features::fSpeedMultiplier);
-    LOAD_BOOL("playermod", "high_jump", Features::bHighJump);
-    LOAD_FLOAT("playermod", "jump_multiplier", Features::fJumpMultiplier);
-    LOAD_BOOL("playermod", "fly", Features::bFly);
-    LOAD_BOOL("playermod", "god_mode", Features::bGodMode);
-    LOAD_BOOL("playermod", "auto_heal", Features::bAutoHeal);
+    LOAD_BOOL("playermod", "high_jump", PlayerMod::Settings::bHighJump);
+    LOAD_FLOAT("playermod", "jump_multiplier", PlayerMod::Settings::fJumpMultiplier);
+    LOAD_BOOL("playermod", "fly", PlayerMod::Settings::bFly);
+    LOAD_BOOL("playermod", "god_mode", PlayerMod::Settings::bGodMode);
+    LOAD_BOOL("playermod", "auto_heal", PlayerMod::Settings::bAutoHeal);
 
     // System
-    LOAD_BOOL("system", "anticheat_bypass", Features::bAntiCheatBypass);
+    LOAD_BOOL("system", "anticheat_bypass", Hooks::Settings::bAntiCheatBypass);
 
 #undef LOAD_BOOL
 #undef LOAD_FLOAT

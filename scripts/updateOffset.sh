@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =====================================================
-# Pixel Gun 3D Trainer — Offset Validator & Updater
-# Runs validate_offsets.py and logs results
+# Pixel Gun 3D Trainer — Offset Auto-Updater
+# Runs validate_offsets.py to update offsets.h from dump.cs
 # =====================================================
 
 set -euo pipefail
@@ -26,7 +26,7 @@ NC='\033[0m'
 banner() {
     echo -e "${PURPLE}"
     echo "  ╔═════════════════════════════════════════════╗"
-    echo "  ║       PIXEL GUN 3D — Offset Validator       ║"
+    echo "  ║       PIXEL GUN 3D — Offset Updater         ║"
     echo "  ╚═════════════════════════════════════════════╝"
     echo -e "${NC}"
 }
@@ -76,28 +76,32 @@ preflight() {
 
 # --- Validate ---
 validate() {
-    info "Running offset validation..."
+    info "Running offset auto-updater..."
     echo ""
 
     # Create log directory
     mkdir -p "$LOG_DIR"
 
-    # Run validator and tee to log
+    # Run updater and tee to log
     python3 "$VALIDATOR" 2>&1 | tee "$LOG_FILE"
 
     echo ""
 
-    # Check for mismatches in log
-    if grep -q "\[CHANGED/MISSING\]" "$LOG_FILE"; then
-        warn "Validation found mismatches! Review the output above."
+    # Check log for results
+    if grep -q "\[UPDATED\]" "$LOG_FILE"; then
+        success "Offsets were successfully updated! Review the output above."
+    fi
+
+    if grep -q "\[WARNING\]" "$LOG_FILE"; then
+        warn "Some offsets were not found. Review the output above."
         echo ""
-        warn "You need to update the offsets in:"
+        warn "You may need to check the obfuscated field names in:"
         echo "    $PROJECT_ROOT/src/utils/offsets.h"
-        echo "    $PROJECT_ROOT/src/utils/il2cpp.cpp"
         echo ""
-        warn "Use the dump files in $DUMPED_DIR/ as reference."
-    else
-        success "All offsets are valid!"
+    fi
+
+    if ! grep -q "\[UPDATED\]" "$LOG_FILE" && ! grep -q "\[WARNING\]" "$LOG_FILE"; then
+        success "All offsets are already up-to-date!"
     fi
 
     success "Log saved to: $LOG_FILE"
@@ -150,7 +154,7 @@ update_dumps() {
     echo ""
     success "Dump files updated!"
     echo ""
-    info "Running validation against new dumps..."
+    info "Running auto-updater against new dumps..."
     echo ""
 
     validate
@@ -173,8 +177,8 @@ main() {
             echo "  Usage: $0 <command> [args]"
             echo ""
             echo "  Commands:"
-            echo "    validate         — Validate current offsets against dump.cs"
-            echo "    update <path>    — Update dump files from a directory and re-validate"
+            echo "    validate         — Run auto-updater against dump.cs"
+            echo "    update <path>    — Update dump files from a directory and run auto-updater"
             echo "    help             — Show this help message"
             echo ""
             echo "  Examples:"

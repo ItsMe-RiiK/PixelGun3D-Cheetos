@@ -36,7 +36,7 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 | **Infinite Ammo** | Unlimited ammunition | <span title="Work">✅</span> |
 | **Guaranteed Criticals** | 100% Crit Chance with adjustable multiplier | <span title="Work">✅</span> |
 | **Reach** | Extended melee range |  <span title="Work">✅</span>|
-| **Wallshot** | Pass the wall or any object when shooting | <span title="Maintenance">⚠️</span> |
+| **Wallshot** | Shoot from behind the wall | <span title="Maintenance">⚠️</span> |
 
 </details>
 
@@ -99,7 +99,7 @@ Whether you compiled the code yourself or downloaded a pre-built Release archive
 1. Start the game via Steam.
 2. Click `runWindows.bat` (if downloaded from Releases) or `scripts\runWindows.bat` (if built from source).
 
-**On Linux (Proton/Wine):**
+**Linux or macOS (Proton/Wine):**
 1. Start the game via Steam.
 2. Open a terminal and run `./runLinux.sh` (if downloaded from Releases) or `./scripts/runLinux.sh` (if built from source).
 *(Note: This requires `protontricks` installed on your system to correctly inject into the Steam Proton prefix).*

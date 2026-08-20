@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
-project(PG3DTrainer VERSION 0.0.3 LANGUAGES CXX C RC)
+file(READ "vcpkg.json" VCPKG_JSON_CONTENT)
+string(JSON VCPKG_PROJECT_VERSION GET "${VCPKG_JSON_CONTENT}" "version")
+
+project(PG3DTrainer VERSION ${VCPKG_PROJECT_VERSION} LANGUAGES CXX C RC)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,6 +25,7 @@ add_library(trainer SHARED
     ${FEATURE_SRC}
 )
 target_include_directories(trainer PRIVATE src)
+target_compile_definitions(trainer PRIVATE "PROJECT_VERSION=\"${PROJECT_VERSION}\"")
 
 # Link vcpkg libraries
 target_link_libraries(trainer PRIVATE
@@ -48,6 +52,7 @@ add_executable(injector
     src/core/injector.cpp
     resources/injector.rc
 )
+target_compile_definitions(injector PRIVATE "PROJECT_VERSION=\"${PROJECT_VERSION}\"")
 set_target_properties(injector PROPERTIES
     OUTPUT_NAME "PG3D_Injector"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"

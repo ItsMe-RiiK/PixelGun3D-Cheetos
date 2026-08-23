@@ -7,15 +7,12 @@ project(PG3DTrainer VERSION ${VCPKG_PROJECT_VERSION} LANGUAGES CXX C RC)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Global output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-# Global compile definitions
 add_compile_definitions("PROJECT_VERSION=\"${PROJECT_VERSION}\"")
 
-# Find packages using vcpkg
 find_package(minhook CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)

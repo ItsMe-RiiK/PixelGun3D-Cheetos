@@ -7,6 +7,14 @@ project(PG3DTrainer VERSION ${VCPKG_PROJECT_VERSION} LANGUAGES CXX C RC)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Global output directories
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+# Global compile definitions
+add_compile_definitions("PROJECT_VERSION=\"${PROJECT_VERSION}\"")
+
 # Find packages using vcpkg
 find_package(minhook CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
@@ -25,7 +33,6 @@ add_library(trainer SHARED
     ${FEATURE_SRC}
 )
 target_include_directories(trainer PRIVATE src)
-target_compile_definitions(trainer PRIVATE "PROJECT_VERSION=\"${PROJECT_VERSION}\"")
 
 # Link vcpkg libraries
 target_link_libraries(trainer PRIVATE
@@ -38,13 +45,6 @@ target_link_libraries(trainer PRIVATE
     dwmapi
 )
 
-# Output as trainer.dll
-set_target_properties(trainer PROPERTIES
-    OUTPUT_NAME "trainer"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-)
-
 # ============================================
 # Standalone Injector (console app)
 # ============================================
@@ -52,18 +52,17 @@ add_executable(injector
     src/core/injector.cpp
     resources/injector.rc
 )
-target_compile_definitions(injector PRIVATE "PROJECT_VERSION=\"${PROJECT_VERSION}\"")
 set_target_properties(injector PROPERTIES
     OUTPUT_NAME "PG3D_Injector"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
+
 if(MINGW)
     target_link_options(injector PRIVATE -static)
     target_link_options(trainer PRIVATE -static)
 endif()
 
 # ============================================
-# Post-build: Copy DLL next to injector
+# Post-build: Copy DLL next to injector (for multi-config generators)
 # ============================================
 add_custom_command(TARGET trainer POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different

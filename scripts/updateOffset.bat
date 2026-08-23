@@ -16,7 +16,7 @@ set "LOG_DIR=%PROJECT_ROOT%\resources\logs"
 REM Generate timestamp
 for /f "tokens=2 delims==" %%I in ('wmic os get localdatetime /value') do set "DT=%%I"
 set "TIMESTAMP=%DT:~0,8%_%DT:~8,6%"
-set "LOG_FILE=%LOG_DIR%\validate_%TIMESTAMP%.log"
+set "LOG_FILE=%LOG_DIR%\validate.log"
 
 title PG3D Offset Updater
 

@@ -13,7 +13,7 @@ DUMPED_DIR="$PROJECT_ROOT/resources/dumped"
 VALIDATOR="$TOOLS_DIR/validate_offsets.py"
 LOG_DIR="$PROJECT_ROOT/resources/logs"
 TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
-LOG_FILE="$LOG_DIR/validate_${TIMESTAMP}.log"
+LOG_FILE="$LOG_DIR/validate.log"
 
 # --- Colors ---
 RED='\033[0;31m'

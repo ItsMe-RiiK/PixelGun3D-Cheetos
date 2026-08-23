@@ -1,6 +1,6 @@
 {
     "name": "pg3dtrainer",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "dependencies": [
         "minhook",
         {

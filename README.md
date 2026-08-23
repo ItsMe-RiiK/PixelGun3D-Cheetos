@@ -8,14 +8,6 @@
 An internal cheat for **Pixel Gun 3D (PC Edition)**
 
 ## Features
-
-<details>
-<summary><b>Combat</b></summary>
-
-| Feature | Description | Status |
-| :--- | :--- | :--- |
-| **AOE Bullets** | Area of Effect with adjustable radius | <span title="Work">✅</span> |
-
 </details>
 
 <details>
@@ -38,6 +30,7 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 | **Reach** | Extended melee range |  <span title="Work">✅</span>|
 | **Wallshot** | Shoot from behind the wall | <span title="Maintenance">⚠️</span> |
 | **Auto Headshot** | Automatically headshot | <span title="Work">✅</span> |
+| **AOE Bullets** | Area of Effect with adjustable radius | <span title="Work">✅</span> |
 
 </details>
 

@@ -54,25 +54,14 @@ namespace Hooks {
     // Apply our mods BEFORE the game's Update so our values are ready when the game processes shooting
     bool isLocalPlayer = false;
     if (thisPtr) {
-      static size_t mySkinNameOffset = 0;
-      static size_t isMineOffset     = 0;
-      static bool   offsetsResolved  = false;
+      Offsets::PlayerMoveC::InitDynamicOffsets();
+      Offsets::SkinName::InitDynamicOffsets();
 
-      if (!offsetsResolved) {
-        mySkinNameOffset = IL2CPP::GetFieldOffset(
-          reinterpret_cast<void*>(Offsets::Classes::PlayerMoveC), "mySkinName"
-        );
-        void* skinNameClass = IL2CPP::GetClass("SkinName", "");
-        if (skinNameClass) {
-          isMineOffset = IL2CPP::GetFieldOffset(skinNameClass, "isMine");
-        }
-        offsetsResolved = true;
-      }
-
-      if (mySkinNameOffset > 0 && isMineOffset > 0) {
-        void* skinName = IL2CPP::SafeReadField<void*>(thisPtr, mySkinNameOffset);
+      if (Offsets::PlayerMoveC::mySkinNameOffset > 0 && Offsets::SkinName::isMineOffset > 0) {
+        void* skinName =
+          IL2CPP::SafeReadField<void*>(thisPtr, Offsets::PlayerMoveC::mySkinNameOffset);
         if (skinName) {
-          isLocalPlayer = IL2CPP::SafeReadField<bool>(skinName, isMineOffset);
+          isLocalPlayer = IL2CPP::SafeReadField<bool>(skinName, Offsets::SkinName::isMineOffset);
         }
       }
       else {

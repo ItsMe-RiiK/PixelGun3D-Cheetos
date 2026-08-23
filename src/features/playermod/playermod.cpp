@@ -12,8 +12,8 @@ namespace PlayerMod {
       if (Settings::bHighJump)
         ApplyHighJump();
 
-      if (Settings::bFly)
-        ApplyFly();
+      ApplyFly();
+      ApplySpeedHack();
     } catch (...) {
       // Prevent crash
     }
@@ -29,6 +29,13 @@ namespace PlayerMod {
       {"Jump Multiplier", Menu::ItemType::Float, nullptr, &Settings::fJumpMultiplier, 1.0f, 10.0f,
        0.5f}
     );
+    Menu::AddMenuItem({"Speed Hack", Menu::ItemType::Bool, &Settings::bSpeedHack});
+    Menu::AddMenuItem(
+      {"Speed Multiplier", Menu::ItemType::Float, nullptr, &Settings::fSpeedHack, 1.1f, 10.0f, 0.5f}
+    );
     Menu::AddMenuItem({"Fly", Menu::ItemType::Bool, &Settings::bFly});
+    Menu::AddMenuItem(
+      {"Fly Speed", Menu::ItemType::Float, nullptr, &Settings::fFlySpeed, 0.1f, 2.0f, 0.1f}
+    );
   }
 }  // namespace PlayerMod

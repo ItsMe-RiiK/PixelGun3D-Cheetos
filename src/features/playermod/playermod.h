@@ -6,8 +6,11 @@ namespace PlayerMod {
     inline bool  bHighJump       = false;
     inline float fJumpMultiplier = 2.0f;
     inline bool  bFly            = false;
+    inline float fFlySpeed       = 0.25f;
     inline bool  bGodMode        = false;
     inline bool  bAutoHeal       = false;
+    inline bool  bSpeedHack      = false;
+    inline float fSpeedHack      = 2.0f;
   }  // namespace Settings
 
   void InitMenu();
@@ -17,6 +20,7 @@ namespace PlayerMod {
   void ApplyHighJump();
   void ApplyFly();
   void ApplyAutoHeal();
+  void ApplySpeedHack();
 
   // Hook overrides
   bool OnApplyDamage(void* thisPtr);

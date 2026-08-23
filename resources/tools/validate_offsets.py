@@ -56,7 +56,7 @@ def run_update():
     print(f"Parsed {len(class_data)} classes from dump.cs.")
 
     print("\n=== Updating offsets.h ===")
-    
+
     ns_to_class = {
         "WeaponManager": "WeaponManager",
         "PlayerMoveC": "Player_move_c",
@@ -64,6 +64,8 @@ def run_update():
         "PlayerDamageable": "PlayerDamageable",
         "Object": "Object",
         "AntiCheat": "CheatDetectedBanner",
+        "WeaponContainer": "WeaponContainer",
+        "ItemRecord": "ItemRecord",
     }
 
     with open(OFFSETS_FILE, "r", encoding="utf-8") as f:
@@ -81,7 +83,7 @@ def run_update():
             current_ns = ns_match.group(1)
             updated_lines.append(line)
             continue
-        
+
         # Match end of namespace
         if "}" in line and "namespace" in line:
             current_ns = ""
@@ -93,7 +95,7 @@ def run_update():
             var_name = constexpr_match.group(2)
             old_hex = constexpr_match.group(3)
             suffix = constexpr_match.group(4)
-            
+
             target_class = ns_to_class[current_ns]
             new_hex = None
 
@@ -101,7 +103,7 @@ def run_update():
                 method_name = var_name.replace("_RVA", "")
                 if current_ns == "AntiCheat" and method_name.startswith("CBD_"):
                     method_name = method_name.replace("CBD_", "")
-                
+
                 new_hex = class_data.get(target_class, {}).get("methods", {}).get(method_name)
             else:
                 new_hex = class_data.get(target_class, {}).get("fields", {}).get(var_name)
@@ -115,13 +117,58 @@ def run_update():
                     print(f"[OK] {current_ns}::{var_name} is up-to-date ({old_hex}).")
             else:
                 if var_name != "StaticInstance":
-                    print(f"[WARNING] {current_ns}::{var_name} NOT FOUND in dump.cs (class {target_class})!")
-                    missing_count += 1
+                    # Fallback check: is the old_hex still present in the class under ANY obfuscated name?
+                    found_obf_name = None
+                    search_dict = class_data.get(target_class, {}).get("methods", {}) if var_name.endswith("_RVA") else class_data.get(target_class, {}).get("fields", {})
+
+                    for obf_name, obf_hex in search_dict.items():
+                        if obf_hex.lower() == old_hex.lower():
+                            found_obf_name = obf_name
+                            break
+
+                    if found_obf_name:
+                        print(f"[OK] {current_ns}::{var_name} is up-to-date ({old_hex} via obfuscated '{found_obf_name}').")
+                    else:
+                        print(f"[WARNING] {current_ns}::{var_name} NOT FOUND in dump.cs (class {target_class})!")
+                        missing_count += 1
 
         updated_lines.append(line)
 
     with open(OFFSETS_FILE, "w", encoding="utf-8") as f:
         f.writelines(updated_lines)
+
+    print("\n=== Validating dynamic offsets in il2cpp.cpp ===")
+    il2cpp_file = os.path.join(PROJECT_ROOT, "src", "utils", "il2cpp.cpp")
+    if os.path.exists(il2cpp_file):
+        with open(il2cpp_file, "r", encoding="utf-8") as f:
+            content = f.read()
+            matches = re.finditer(r'(\w+)\s*=\s*IL2CPP::ResolveFieldOffset\([^,]+,\s*\{([^}]+)\}', content)
+            for m in matches:
+                var_name = m.group(1)
+                names_str = m.group(2)
+                names = re.findall(r'"([^"]+)"', names_str)
+
+                found = False
+                for name in names:
+                    if var_name == "liveAmmoOffset":
+                        for cls, data in class_data.items():
+                            if name in data.get("fields", {}):
+                                found = True
+                                print(f"[OK] Dynamic offset LiveWeapon::{var_name} resolved via '{name}' (found in {cls})")
+                                break
+                    else:
+                        if name in class_data.get("WeaponSounds", {}).get("fields", {}):
+                            found = True
+                            print(f"[OK] Dynamic offset WeaponSounds::{var_name} resolved via '{name}'")
+                            break
+                    if found:
+                        break
+                if not found:
+                    if var_name == "liveAmmoOffset":
+                        print(f"[WARNING] Dynamic offset LiveWeapon::{var_name} NOT FOUND in dump.cs (tried: {names})!")
+                    else:
+                        print(f"[WARNING] Dynamic offset WeaponSounds::{var_name} NOT FOUND in dump.cs (tried: {names})!")
+                    missing_count += 1
 
     print("\n==================================")
     print(f"[SUCCESS] Updated offsets.h with {updates_count} changes. {missing_count} fields missing.")

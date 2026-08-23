@@ -370,6 +370,10 @@ namespace IL2CPP {
       reinterpret_cast<uintptr_t>(GetClass("CheatDetectedBanner"));
     Offsets::Classes::ClickerDetector = reinterpret_cast<uintptr_t>(GetClass("ClickerDetector"));
 
+    Offsets::Classes::SkinName = reinterpret_cast<uintptr_t>(GetClass("SkinName"));
+    Offsets::Classes::FirstPersonControlSharp =
+      reinterpret_cast<uintptr_t>(GetClass("FirstPersonControlSharp"));
+
     return Offsets::Classes::WeaponManager != 0 && Offsets::Classes::PlayerMoveC != 0
         && Offsets::Classes::WeaponSounds != 0;
   }
@@ -384,9 +388,7 @@ namespace IL2CPP {
     if (!staticData)
       return nullptr;
 
-    return SafeReadField<void*>(
-      staticData, Offsets::WeaponManager::StaticInstance
-    );
+    return SafeReadField<void*>(staticData, Offsets::WeaponManager::StaticInstance);
   }
 
   void* GetLocalPlayerMoveC()
@@ -394,22 +396,24 @@ namespace IL2CPP {
     auto wm = GetWeaponManagerInstance();
     if (wm) {
       void* myPMC = SafeReadField<void*>(wm, Offsets::WeaponManager::myPlayerMoveC);
-      if (myPMC) return myPMC;
+      if (myPMC)
+        return myPMC;
     }
 
     // Fallback for Battle Royale and Free Mode
-    static size_t mySkinNameOffset = GetFieldOffset(reinterpret_cast<void*>(Offsets::Classes::PlayerMoveC), "mySkinName");
-    static void* skinNameClass = GetClass("SkinName", "");
-    static size_t isMineOffset = skinNameClass ? GetFieldOffset(skinNameClass, "isMine") : 0;
+    Offsets::PlayerMoveC::InitDynamicOffsets();
+    Offsets::SkinName::InitDynamicOffsets();
 
-    if (mySkinNameOffset > 0 && isMineOffset > 0) {
+    if (Offsets::PlayerMoveC::mySkinNameOffset > 0 && Offsets::SkinName::isMineOffset > 0) {
       auto players = GetPlayers();
       for (auto pmc : players) {
-        if (!pmc) continue;
-        void* skinName = SafeReadField<void*>(pmc, mySkinNameOffset);
+        if (!pmc)
+          continue;
+        void* skinName = SafeReadField<void*>(pmc, Offsets::PlayerMoveC::mySkinNameOffset);
         if (skinName) {
-          bool isMine = SafeReadField<bool>(skinName, isMineOffset);
-          if (isMine) return pmc;
+          bool isMine = SafeReadField<bool>(skinName, Offsets::SkinName::isMineOffset);
+          if (isMine)
+            return pmc;
         }
       }
     }
@@ -434,6 +438,55 @@ namespace IL2CPP {
   }
 }  // namespace IL2CPP
 
+namespace Offsets { namespace PlayerMoveC {
+  void InitDynamicOffsets()
+  {
+    if (dynamicOffsetsResolved)
+      return;
+
+    void* pmcClass = (void*) Offsets::Classes::PlayerMoveC;
+    if (!pmcClass)
+      return;
+
+    mySkinNameOffset       = IL2CPP::ResolveFieldOffset(pmcClass, {"mySkinName"});
+    dynamicOffsetsResolved = true;
+  }
+}}  // namespace Offsets::PlayerMoveC
+
+namespace Offsets { namespace SkinName {
+  void InitDynamicOffsets()
+  {
+    if (dynamicOffsetsResolved)
+      return;
+
+    void* skinNameClass = (void*) Offsets::Classes::SkinName;
+    if (!skinNameClass)
+      return;
+
+    isMineOffset             = IL2CPP::ResolveFieldOffset(skinNameClass, {"isMine"});
+    firstPersonControlOffset = IL2CPP::ResolveFieldOffset(skinNameClass, {"firstPersonControl"});
+
+    dynamicOffsetsResolved = true;
+  }
+}}  // namespace Offsets::SkinName
+
+namespace Offsets { namespace FirstPersonControlSharp {
+  void InitDynamicOffsets()
+  {
+    if (dynamicOffsetsResolved)
+      return;
+
+    void* fpcClass = (void*) Offsets::Classes::FirstPersonControlSharp;
+    if (!fpcClass)
+      return;
+
+    velocityDownFallMultiplierOffset =
+      IL2CPP::ResolveFieldOffset(fpcClass, {"velocityDownFallMultiplier"});
+
+    dynamicOffsetsResolved = true;
+  }
+}}  // namespace Offsets::FirstPersonControlSharp
+
 namespace Offsets { namespace WeaponSounds {
   void InitDynamicOffsets()
   {
@@ -444,13 +497,6 @@ namespace Offsets { namespace WeaponSounds {
     if (!wsClass)
       return;
 
-    isWallBreakingOffset = IL2CPP::ResolveFieldOffset(wsClass, {"isWallBraking", "wallBraking"});
-
-    wallBreakingDamageMultiplierOffset = IL2CPP::ResolveFieldOffset(
-      wsClass, {"wallBrakingDamageMultiplier", "damageWallBrakingMultiplier",
-                "damageMultiplierThroughWall", "damageWallMultiplier"}
-    );
-
     breakoutOffset      = IL2CPP::ResolveFieldOffset(wsClass, {"bulletBreakout"});
     superBreakoutOffset = IL2CPP::ResolveFieldOffset(wsClass, {"bulletSuperBreakout"});
 
@@ -458,9 +504,7 @@ namespace Offsets { namespace WeaponSounds {
       wsClass, {"isUnlimitedAmmo"}, Offsets::WeaponSounds::isUnlimitedAmmo
     );
 
-    canAffectAlliesOffset = IL2CPP::ResolveFieldOffset(
-      wsClass, {"canAffectAllies"}
-    );
+    canAffectAlliesOffset = IL2CPP::ResolveFieldOffset(wsClass, {"canAffectAllies"});
 
     dynamicOffsetsResolved = true;
   }

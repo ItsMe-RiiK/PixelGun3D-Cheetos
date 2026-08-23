@@ -23,6 +23,12 @@ namespace Offsets {
     constexpr uintptr_t nickLabel           = 0x418;      // TextMesh*
     constexpr uintptr_t playerBodyRenderer  = 0x488;      // SkinnedMeshRenderer*
     constexpr uintptr_t OnEventFired_RVA    = 0x157D550;  // In Player_move_c
+
+    // Dynamic offsets resolved at runtime
+    inline size_t mySkinNameOffset       = 0;
+    inline bool   dynamicOffsetsResolved = false;
+
+    void InitDynamicOffsets();
   }  // namespace PlayerMoveC
 
   // ==========================================
@@ -65,15 +71,17 @@ namespace Offsets {
     constexpr uintptr_t sectorsAOERadius       = 0x49C;  // float
     constexpr uintptr_t lengthShootFromPrefab  = 0x594;  // float
     constexpr uintptr_t shootDistanceIfZoom    = 0x4CC;  // float
+    constexpr uintptr_t ignoreBarrier          = 0x134;  // bool
+    constexpr uintptr_t railgun                = 0x1E4;  // bool
+    constexpr uintptr_t railgunStopAtWall      = 0x1F0;  // bool
+    constexpr uintptr_t inShopEffects          = 0x5B0;  // List<int>
 
     // Dynamic offsets resolved at runtime
-    inline size_t isWallBreakingOffset               = 0;
-    inline size_t wallBreakingDamageMultiplierOffset = 0;
-    inline size_t breakoutOffset                     = 0;
-    inline size_t superBreakoutOffset                = 0;
-    inline size_t isUnlimitedAmmoOffset              = 0;
-    inline size_t canAffectAlliesOffset              = 0;
-    inline bool   dynamicOffsetsResolved             = false;
+    inline size_t breakoutOffset         = 0;
+    inline size_t superBreakoutOffset    = 0;
+    inline size_t isUnlimitedAmmoOffset  = 0;
+    inline size_t canAffectAlliesOffset  = 0;
+    inline bool   dynamicOffsetsResolved = false;
 
     void InitDynamicOffsets();
   }  // namespace WeaponSounds
@@ -117,6 +125,29 @@ namespace Offsets {
   }  // namespace LiveWeapon
 
   // ==========================================
+  // SkinName (TypeDefIndex: 6028)
+  // ==========================================
+  namespace SkinName {
+    inline size_t isMineOffset             = 0;
+    inline size_t firstPersonControlOffset = 0;
+    inline bool   dynamicOffsetsResolved   = false;
+
+    void InitDynamicOffsets();
+  }  // namespace SkinName
+
+  // ==========================================
+  // FirstPersonControlSharp (TypeDefIndex: 6617)
+  // ==========================================
+  namespace FirstPersonControlSharp {
+    constexpr uintptr_t set_MoveSpeedMultiplier_RVA = 0x9A3EE0;
+
+    inline size_t velocityDownFallMultiplierOffset = 0;
+    inline bool   dynamicOffsetsResolved           = false;
+
+    void InitDynamicOffsets();
+  }  // namespace FirstPersonControlSharp
+
+  // ==========================================
   // IL2CPP Internal Structures
   // ==========================================
   namespace IL2CPPStructs {
@@ -124,17 +155,21 @@ namespace Offsets {
     constexpr uintptr_t stringCharsOffset  = 0x14;
     constexpr uintptr_t arrayLengthOffset  = 0x18;
     constexpr uintptr_t arrayDataOffset    = 0x20;
+
+    // System.Collections.Generic.List<T>
+    constexpr uintptr_t listItemsOffset = 0x10;
+    constexpr uintptr_t listSizeOffset  = 0x18;
   }  // namespace IL2CPPStructs
 
   // ==========================================
-  // UnityEngine.Object (TypeDefIndex: 12345)
+  // Object (TypeDefIndex: 12345)
   // ==========================================
   namespace Object {
     constexpr uintptr_t FindObjectsOfType_RVA = 0x476E060;
   }
 
   // ==========================================
-  // Anti-Cheat Systems
+  // CheatDetectedBanner (TypeDefIndex: 9999)
   // ==========================================
   namespace AntiCheat {
     constexpr uintptr_t CBD_Trigger_RVA    = 0x218B940;  // static trigger method
@@ -147,11 +182,13 @@ namespace Offsets {
   // IL2CPP Class pointers (resolved at runtime, cached here)
   // ==========================================
   namespace Classes {
-    inline uintptr_t WeaponManager       = 0;
-    inline uintptr_t PlayerMoveC         = 0;
-    inline uintptr_t WeaponSounds        = 0;
-    inline uintptr_t PlayerDamageable    = 0;
-    inline uintptr_t CheatDetectedBanner = 0;
-    inline uintptr_t ClickerDetector     = 0;
+    inline uintptr_t WeaponManager           = 0;
+    inline uintptr_t PlayerMoveC             = 0;
+    inline uintptr_t WeaponSounds            = 0;
+    inline uintptr_t PlayerDamageable        = 0;
+    inline uintptr_t CheatDetectedBanner     = 0;
+    inline uintptr_t ClickerDetector         = 0;
+    inline uintptr_t SkinName                = 0;
+    inline uintptr_t FirstPersonControlSharp = 0;
   }  // namespace Classes
 }  // namespace Offsets

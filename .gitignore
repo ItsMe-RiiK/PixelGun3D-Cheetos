@@ -3,6 +3,8 @@ analysis/
 dumped/
 .vscode/
 logs/
+.agents/
+graphify-out/
 
 compile_commands.json
 .clangd

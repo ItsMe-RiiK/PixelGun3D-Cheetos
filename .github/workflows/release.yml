@@ -54,8 +54,8 @@ jobs:
             tag=$(echo "$release" | jq -r .tagName)
             name=$(echo "$release" | jq -r .name)
             
-            # Skip the current tag
-            if [ "$tag" = "${{ steps.version.outputs.tag }}" ]; then
+            # Skip the current major version
+            if [ "$tag" = "${{ steps.version.outputs.major }}" ]; then
               continue
             fi
             
@@ -66,13 +66,34 @@ jobs:
               old_major="$tag"
             fi
             
-            # Archive if the old major version is different from the current major version
-            # AND it doesn't already have [Archived]
-            if [ "$old_major" != "$current_major" ] && [[ "$name" != *"[Archived]"* ]]; then
-              echo "Archiving older major release $tag..."
+            # Archive any release that is NOT the current major version
+            if [[ "$name" != *"[Archived]"* ]]; then
+              echo "Archiving older release $tag..."
               gh release edit "$tag" --title "[Archived] $name" || true
             fi
           done
+
+      - name: Cleanup Old Tags
+        run: |
+          # Fetch all tags from remote
+          git fetch --tags
+          
+          # List all full version tags (v*.*.*), sorted by version number
+          tags=$(git tag -l "v*.*.*" | sort -V)
+          
+          # Count total tags
+          tag_count=$(echo "$tags" | wc -l)
+          
+          # If more than 2 tags exist, delete the older ones
+          if [ "$tag_count" -gt 2 ]; then
+            tags_to_delete=$(echo "$tags" | head -n -2)
+            for t in $tags_to_delete; do
+              echo "Deleting old tag: $t"
+              git push origin --delete "$t" || true
+            done
+          else
+            echo "Only $tag_count full version tags exist. Keeping them all."
+          fi
 
       - name: Generate Release Notes
         id: release_notes
@@ -110,7 +131,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ steps.version.outputs.tag }}
+          tag_name: ${{ steps.version.outputs.major }}
           name: PG3D ${{ steps.version.outputs.major }}
           body_path: release_notes.md
           files: PG3D-Release-${{ steps.version.outputs.tag }}.zip

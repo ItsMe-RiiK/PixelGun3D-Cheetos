@@ -35,8 +35,8 @@ namespace Config {
     j["visual"]["skeleton_esp"] = Visual::Settings::bSkeletonESP;
 
     // Weapon Mod
-    j["weaponmod"]["infinite_ammo"]   = WeaponMod::Settings::bInfiniteAmmo;
-    j["weaponmod"]["wallshot"]        = WeaponMod::Settings::bWallshot;
+    j["weaponmod"]["infinite_ammo"] = WeaponMod::Settings::bInfiniteAmmo;
+    // j["weaponmod"]["wallshot"]        = WeaponMod::Settings::bWallshot;
     j["weaponmod"]["crit_chance"]     = WeaponMod::Settings::bCritChance100;
     j["weaponmod"]["crit_multiplier"] = WeaponMod::Settings::fCritMultiplier;
     j["weaponmod"]["reach"]           = WeaponMod::Settings::bReach;
@@ -94,7 +94,7 @@ namespace Config {
 
     // Weapon Mod
     LOAD_BOOL("weaponmod", "infinite_ammo", WeaponMod::Settings::bInfiniteAmmo);
-    LOAD_BOOL("weaponmod", "wallshot", WeaponMod::Settings::bWallshot);
+    // LOAD_BOOL("weaponmod", "wallshot", WeaponMod::Settings::bWallshot);
     LOAD_BOOL("weaponmod", "crit_chance", WeaponMod::Settings::bCritChance100);
     LOAD_FLOAT("weaponmod", "crit_multiplier", WeaponMod::Settings::fCritMultiplier);
     LOAD_BOOL("weaponmod", "reach", WeaponMod::Settings::bReach);

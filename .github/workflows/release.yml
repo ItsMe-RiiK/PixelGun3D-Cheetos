@@ -54,8 +54,8 @@ jobs:
             tag=$(echo "$release" | jq -r .tagName)
             name=$(echo "$release" | jq -r .name)
             
-            # Skip the current major version
-            if [ "$tag" = "${{ steps.version.outputs.major }}" ]; then
+            # Skip the exact current tag we are building
+            if [ "$tag" = "${{ steps.version.outputs.tag }}" ]; then
               continue
             fi
             
@@ -66,10 +66,12 @@ jobs:
               old_major="$tag"
             fi
             
-            # Archive any release that is NOT the current major version
-            if [[ "$name" != *"[Archived]"* ]]; then
-              echo "Archiving older release $tag..."
-              gh release edit "$tag" --title "[Archived] $name" || true
+            # Archive older releases of the SAME major version
+            if [ "$old_major" = "$current_major" ]; then
+              if [[ "$name" != *"[Archived]"* ]]; then
+                echo "Archiving older release $tag..."
+                gh release edit "$tag" --title "[Archived] $name" || true
+              fi
             fi
           done
 
@@ -131,7 +133,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ steps.version.outputs.major }}
-          name: PG3D ${{ steps.version.outputs.major }}
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: PG3D ${{ steps.version.outputs.tag }}
           body_path: release_notes.md
           files: PG3D-Release-${{ steps.version.outputs.tag }}.zip

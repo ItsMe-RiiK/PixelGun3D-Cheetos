@@ -2,12 +2,26 @@
 
 namespace WeaponMod {
   namespace Settings {
-    inline bool  bInfiniteAmmo    = false;
-    inline bool  bWallshot        = false;
-    inline bool  bCritChance100   = false;
-    inline float fCritMultiplier  = 5.0f;
+    // Infinite Ammo
+    inline bool bInfiniteAmmo = false;
+
+    // Wallshot
+    inline bool bWallshot = false;
+
+    // Crit
+    inline bool  bCritChance100  = false;
+    inline float fCritMultiplier = 1.0f;
+
+    // Reach
     inline bool  bReach           = false;
-    inline float fReachMultiplier = 5.0f;
+    inline float fReachMultiplier = 1.0f;
+
+    // AOE Bullets
+    inline bool  bAOEBullets = false;
+    inline float fAOERadius  = 50.0f;
+
+    // Auto Headshot
+    inline bool bAutoHeadshot = false;
   }  // namespace Settings
 
   struct WeaponModBackup
@@ -25,7 +39,18 @@ namespace WeaponMod {
     float radiusRoundMelee;
     float lengthShootFromPrefab;
     float shootDistanceIfZoom;
-    bool  hasBackup;
+
+    // AOE Bullets
+    bool  isSectorsAOE;
+    float sectorsAOEAngleFront;
+    float sectorsAOEAngleBack;
+    float sectorsAOERadius;
+    float sectorsAOEDmgMultFront;
+    float sectorsAOEDmgMultSide;
+    float sectorsAOEDmgMultBack;
+    float bazookaExplosionRadius;
+
+    bool hasBackup;
   };
 
   extern WeaponModBackup backup;
@@ -39,4 +64,6 @@ namespace WeaponMod {
   void ApplyWallshot(void* ws);
   void ApplyCritChance(void* ws);
   void ApplyReach(void* ws);
+  void ApplyAOEBullets(void* ws);
+  void ApplyAutoHeadshot(void* thisPtr, int& damageType);
 }  // namespace WeaponMod

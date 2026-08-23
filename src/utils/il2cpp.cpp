@@ -384,17 +384,37 @@ namespace IL2CPP {
     if (!staticData)
       return nullptr;
 
-    return *reinterpret_cast<void**>(
-      reinterpret_cast<uintptr_t>(staticData) + Offsets::WeaponManager::StaticInstance
+    return SafeReadField<void*>(
+      staticData, Offsets::WeaponManager::StaticInstance
     );
   }
 
   void* GetLocalPlayerMoveC()
   {
     auto wm = GetWeaponManagerInstance();
-    if (!wm)
-      return nullptr;
-    return ReadField<void*>(wm, Offsets::WeaponManager::myPlayerMoveC);
+    if (wm) {
+      void* myPMC = SafeReadField<void*>(wm, Offsets::WeaponManager::myPlayerMoveC);
+      if (myPMC) return myPMC;
+    }
+
+    // Fallback for Battle Royale and Free Mode
+    static size_t mySkinNameOffset = GetFieldOffset(reinterpret_cast<void*>(Offsets::Classes::PlayerMoveC), "mySkinName");
+    static void* skinNameClass = GetClass("SkinName", "");
+    static size_t isMineOffset = skinNameClass ? GetFieldOffset(skinNameClass, "isMine") : 0;
+
+    if (mySkinNameOffset > 0 && isMineOffset > 0) {
+      auto players = GetPlayers();
+      for (auto pmc : players) {
+        if (!pmc) continue;
+        void* skinName = SafeReadField<void*>(pmc, mySkinNameOffset);
+        if (skinName) {
+          bool isMine = SafeReadField<bool>(skinName, isMineOffset);
+          if (isMine) return pmc;
+        }
+      }
+    }
+
+    return nullptr;
   }
 
   void* GetCurrentWeaponSounds()
@@ -413,3 +433,49 @@ namespace IL2CPP {
     return ReadField<void*>(pmc, Offsets::PlayerMoveC::playerDamageable);
   }
 }  // namespace IL2CPP
+
+namespace Offsets { namespace WeaponSounds {
+  void InitDynamicOffsets()
+  {
+    if (dynamicOffsetsResolved)
+      return;
+
+    void* wsClass = (void*) Offsets::Classes::WeaponSounds;
+    if (!wsClass)
+      return;
+
+    isWallBreakingOffset = IL2CPP::ResolveFieldOffset(wsClass, {"isWallBraking", "wallBraking"});
+
+    wallBreakingDamageMultiplierOffset = IL2CPP::ResolveFieldOffset(
+      wsClass, {"wallBrakingDamageMultiplier", "damageWallBrakingMultiplier",
+                "damageMultiplierThroughWall", "damageWallMultiplier"}
+    );
+
+    breakoutOffset      = IL2CPP::ResolveFieldOffset(wsClass, {"bulletBreakout"});
+    superBreakoutOffset = IL2CPP::ResolveFieldOffset(wsClass, {"bulletSuperBreakout"});
+
+    isUnlimitedAmmoOffset = IL2CPP::ResolveFieldOffset(
+      wsClass, {"isUnlimitedAmmo"}, Offsets::WeaponSounds::isUnlimitedAmmo
+    );
+
+    canAffectAlliesOffset = IL2CPP::ResolveFieldOffset(
+      wsClass, {"canAffectAllies"}
+    );
+
+    dynamicOffsetsResolved = true;
+  }
+}}  // namespace Offsets::WeaponSounds
+
+namespace Offsets { namespace LiveWeapon {
+  void InitDynamicOffsets(void* charWeaponClass)
+  {
+    if (dynamicOffsetsResolved || !charWeaponClass)
+      return;
+
+    liveAmmoOffset = IL2CPP::ResolveFieldOffset(
+      charWeaponClass, {"ammo", "currentAmmoInBackpack"}, Offsets::LiveWeapon::ammoFallback
+    );
+
+    dynamicOffsetsResolved = true;
+  }
+}}  // namespace Offsets::LiveWeapon

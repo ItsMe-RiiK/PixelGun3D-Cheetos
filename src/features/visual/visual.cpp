@@ -9,8 +9,9 @@
 namespace Visual {
   std::vector<PlayerESPData> cachedPlayers;
   std::mutex                 espMutex;
-  float                      g_screenW = 0.0f;
-  float                      g_screenH = 0.0f;
+  float                      g_screenW      = 0.0f;
+  float                      g_screenH      = 0.0f;
+  uint64_t                   lastVisualTick = 0;
 
 
   using fn_WorldToScreenPoint               = Vector3 (*)(void* camera, Vector3 worldPos);
@@ -41,13 +42,17 @@ namespace Visual {
     if (!il2cppStr || outBufSize == 0)
       return false;
 
-    int strLen = *reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(il2cppStr) + 0x10);
+    int strLen = *reinterpret_cast<int*>(
+      reinterpret_cast<uintptr_t>(il2cppStr) + Offsets::IL2CPPStructs::stringLengthOffset
+    );
     if (strLen <= 0 || strLen > 256) {
       outBuf[0] = '\0';
       return false;
     }
 
-    auto chars = reinterpret_cast<const wchar_t*>(reinterpret_cast<uintptr_t>(il2cppStr) + 0x14);
+    auto chars = reinterpret_cast<const wchar_t*>(
+      reinterpret_cast<uintptr_t>(il2cppStr) + Offsets::IL2CPPStructs::stringCharsOffset
+    );
 
     // Convert UTF-16 to UTF-8 using WideCharToMultiByte
     int bytesWritten = WideCharToMultiByte(
@@ -225,44 +230,42 @@ namespace Visual {
       }
 
       auto localPMC = IL2CPP::GetLocalPlayerMoveC();
-      if (!localPMC) {
-        std::lock_guard<std::mutex> lock(espMutex);
-        cachedPlayers.clear();
-        return;
-      }
 
-      auto localTransform =
-        IL2CPP::ReadField<void*>(localPMC, Offsets::PlayerMoveC::myPlayerTransform);
-      if (!localTransform)
-        return;
-
-      Vector3 localPos = pGetPosition(localTransform);
-
+      lastVisualTick = GetTickCount64();
       std::vector<PlayerESPData> newCache;
       auto                       players = IL2CPP::GetPlayers();
+
+      static void* pIsDeadMethod    = nullptr;
+      static void* pIsEnemyToMethod = nullptr;
+      if (!pIsDeadMethod)
+        pIsDeadMethod =
+          reinterpret_cast<void*>(IL2CPP::GetMethodAddress(Offsets::PlayerDamageable::IsDead_RVA));
+      if (!pIsEnemyToMethod)
+        pIsEnemyToMethod = reinterpret_cast<void*>(
+          IL2CPP::GetMethodAddress(Offsets::PlayerDamageable::IsEnemyTo_RVA)
+        );
+
       for (auto pmc : players) {
         if (!pmc || pmc == localPMC)
           continue;
 
         auto playerTransform =
-          IL2CPP::ReadField<void*>(pmc, Offsets::PlayerMoveC::myPlayerTransform);
+          IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::myPlayerTransform);
         if (!playerTransform)
           continue;
 
         // Skip dead players
-        auto damageable = IL2CPP::ReadField<void*>(pmc, Offsets::PlayerMoveC::playerDamageable);
+        auto damageable = IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::playerDamageable);
         if (damageable) {
           using fn_IsDead = bool (*)(void*);
-          auto isDead     = reinterpret_cast<fn_IsDead>(
-            IL2CPP::GetMethodAddress(Offsets::PlayerDamageable::IsDead_RVA)
-          );
+          auto isDead     = reinterpret_cast<fn_IsDead>(pIsDeadMethod);
           if (isDead && isDead(damageable))
             continue;
         }
 
         Vector3 targetPos = pGetPosition(playerTransform);
         auto    headTransform =
-          IL2CPP::ReadField<void*>(pmc, Offsets::PlayerMoveC::PlayerHeadTransform);
+          IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::PlayerHeadTransform);
         Vector3 footPos = targetPos;
         footPos.y -= 1.0f;  // Guess feet position
 
@@ -285,11 +288,13 @@ namespace Visual {
 
         // Is enemy? IsEnemyTo takes Player_move_c* as parameter (not PlayerDamageable*)
         bool isEnemy = true;
-        if (damageable) {
+
+        if (Settings::bTreatAllAsEnemies) {
+          isEnemy = true;
+        }
+        else if (damageable && localPMC) {
           using fn_IsEnemyTo = bool (*)(void*, void*);
-          auto isEnemyTo     = reinterpret_cast<fn_IsEnemyTo>(
-            IL2CPP::GetMethodAddress(Offsets::PlayerDamageable::IsEnemyTo_RVA)
-          );
+          auto isEnemyTo     = reinterpret_cast<fn_IsEnemyTo>(pIsEnemyToMethod);
           if (isEnemyTo) {
             isEnemy = isEnemyTo(damageable, localPMC);
           }
@@ -299,8 +304,9 @@ namespace Visual {
           continue;  // Skip teammates
         }
 
-        bool  isVisible     = false;
-        void* visibleObjRef = IL2CPP::ReadField<void*>(pmc, Offsets::PlayerMoveC::visibleObjRef);
+        bool  isVisible = false;
+        void* visibleObjRef =
+          IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::visibleObjRef);
         if (visibleObjRef) {
           // In Pixel Gun, visibleObjPhoton has an `inVisible` boolean or similar state.
           // Due to missing offsets, let's assume it's true unless proven otherwise.
@@ -310,7 +316,7 @@ namespace Visual {
         // Read player name from nickLabel TextMesh
         char playerName[64] = {0};
         if (Settings::bPlayerESPNames && pGetText) {
-          auto nickLabel = IL2CPP::ReadField<void*>(pmc, Offsets::PlayerMoveC::nickLabel);
+          auto nickLabel = IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::nickLabel);
           if (nickLabel) {
             void* il2cppStr = pGetText(nickLabel);
             ReadIL2CPPString(il2cppStr, playerName, sizeof(playerName));
@@ -331,6 +337,8 @@ namespace Visual {
       cachedPlayers = newCache;
     } catch (...) {
       // Catch exceptions to prevent crashes
+      std::lock_guard<std::mutex> lock(espMutex);
+      cachedPlayers.clear();
     }
   }
 
@@ -338,6 +346,12 @@ namespace Visual {
   {
     if (!Settings::bPlayerESP && !Settings::bSkeletonESP)
       return;
+
+    if (GetTickCount64() - lastVisualTick > 1000) {
+      std::lock_guard<std::mutex> lock(espMutex);
+      cachedPlayers.clear();
+      return;
+    }
 
     std::lock_guard<std::mutex> lock(espMutex);
     for (const auto& player : cachedPlayers) {
@@ -366,5 +380,8 @@ namespace Visual {
     Menu::AddMenuItem({"ESP Boxes", Menu::ItemType::Bool, &Settings::bPlayerESPBoxes});
     Menu::AddMenuItem({"ESP Names", Menu::ItemType::Bool, &Settings::bPlayerESPNames});
     Menu::AddMenuItem({"Skeleton ESP", Menu::ItemType::Bool, &Settings::bSkeletonESP});
+    Menu::AddMenuItem(
+      {"Treat All as Enemies", Menu::ItemType::Bool, &Settings::bTreatAllAsEnemies}
+    );
   }
 }  // namespace Visual

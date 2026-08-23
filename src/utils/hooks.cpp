@@ -2,7 +2,6 @@
 #include <MinHook.h>
 #include "il2cpp.h"
 #include "../features/visual/visual.h"
-#include "../features/combat/combat.h"
 #include "../features/weaponmod/weaponmod.h"
 #include "../features/playermod/playermod.h"
 
@@ -26,6 +25,8 @@ namespace Hooks {
     if (PlayerMod::OnApplyDamage(thisPtr)) {
       return;
     }
+
+    WeaponMod::ApplyAutoHeadshot(thisPtr, damageType);
 
     oApplyDamage(
       thisPtr, damage, attacker, collider, hitPoint, damageType, typeDead, weaponId, someInt,
@@ -51,9 +52,36 @@ namespace Hooks {
   void hkPlayerMoveC_Update(void* thisPtr)
   {
     // Apply our mods BEFORE the game's Update so our values are ready when the game processes shooting
-    if (thisPtr == IL2CPP::GetLocalPlayerMoveC()) {
+    bool isLocalPlayer = false;
+    if (thisPtr) {
+      static size_t mySkinNameOffset = 0;
+      static size_t isMineOffset     = 0;
+      static bool   offsetsResolved  = false;
+
+      if (!offsetsResolved) {
+        mySkinNameOffset = IL2CPP::GetFieldOffset(
+          reinterpret_cast<void*>(Offsets::Classes::PlayerMoveC), "mySkinName"
+        );
+        void* skinNameClass = IL2CPP::GetClass("SkinName", "");
+        if (skinNameClass) {
+          isMineOffset = IL2CPP::GetFieldOffset(skinNameClass, "isMine");
+        }
+        offsetsResolved = true;
+      }
+
+      if (mySkinNameOffset > 0 && isMineOffset > 0) {
+        void* skinName = IL2CPP::SafeReadField<void*>(thisPtr, mySkinNameOffset);
+        if (skinName) {
+          isLocalPlayer = IL2CPP::SafeReadField<bool>(skinName, isMineOffset);
+        }
+      }
+      else {
+        isLocalPlayer = (thisPtr == IL2CPP::GetLocalPlayerMoveC());
+      }
+    }
+
+    if (isLocalPlayer) {
       Visual::TickMainThread();
-      Combat::Tick();
       WeaponMod::Tick();
       PlayerMod::Tick();
     }
@@ -91,7 +119,7 @@ namespace Hooks {
     MH_EnableHook(pApplyDamage);
 
     // 2. Hook OnEventFired to block network damage RPCs for God Mode
-    void* pOnEventFired = reinterpret_cast<void*>(gaBase + 0x157D550);  // RVA from dump.cs
+    void* pOnEventFired = reinterpret_cast<void*>(gaBase + Offsets::PlayerMoveC::OnEventFired_RVA);
     if (
       MH_CreateHook(
         pOnEventFired, (void*) &hkOnEventFired, reinterpret_cast<void**>(&oOnEventFired)

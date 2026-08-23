@@ -1,6 +1,5 @@
 #include "menu.h"
 #include "../utils/config.h"
-#include "../features/combat/combat.h"
 #include "../features/visual/visual.h"
 #include "../features/playermod/playermod.h"
 #include "../features/weaponmod/weaponmod.h"
@@ -38,7 +37,6 @@ namespace Menu {
   {
     items.clear();
 
-    Combat::InitMenu();
     Visual::InitMenu();
     WeaponMod::InitMenu();
     PlayerMod::InitMenu();

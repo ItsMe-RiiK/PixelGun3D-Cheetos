@@ -1,5 +1,4 @@
 #include "config.h"
-#include "../features/combat/combat.h"
 #include "../features/visual/visual.h"
 #include "../features/playermod/playermod.h"
 #include "../features/weaponmod/weaponmod.h"
@@ -26,10 +25,8 @@ namespace Config {
       return;
 
     nlohmann::json j;
-
-    // Combat
-    j["combat"]["aoe_bullets"] = Combat::Settings::bAOEBullets;
-    j["combat"]["aoe_radius"]  = Combat::Settings::fAOERadius;
+    j["weapon"]["aoe_bullets"] = WeaponMod::Settings::bAOEBullets;
+    j["weapon"]["aoe_radius"]  = WeaponMod::Settings::fAOERadius;
 
     // Visual
     j["visual"]["player_esp"]   = Visual::Settings::bPlayerESP;
@@ -44,6 +41,7 @@ namespace Config {
     j["weaponmod"]["crit_multiplier"] = WeaponMod::Settings::fCritMultiplier;
     j["weaponmod"]["reach"]           = WeaponMod::Settings::bReach;
     j["weaponmod"]["reach_mult"]      = WeaponMod::Settings::fReachMultiplier;
+    j["weaponmod"]["autohs"]          = WeaponMod::Settings::bAutoHeadshot;
 
     j["playermod"]["high_jump"]       = PlayerMod::Settings::bHighJump;
     j["playermod"]["jump_multiplier"] = PlayerMod::Settings::fJumpMultiplier;
@@ -85,9 +83,8 @@ namespace Config {
   if (j.contains(section) && j[section].contains(key)) \
   var = j[section][key].get<float>()
 
-    // Combat
-    LOAD_BOOL("combat", "aoe_bullets", Combat::Settings::bAOEBullets);
-    LOAD_FLOAT("combat", "aoe_radius", Combat::Settings::fAOERadius);
+    LOAD_BOOL("weapon", "aoe_bullets", WeaponMod::Settings::bAOEBullets);
+    LOAD_FLOAT("weapon", "aoe_radius", WeaponMod::Settings::fAOERadius);
 
     // Visual
     LOAD_BOOL("visual", "player_esp", Visual::Settings::bPlayerESP);
@@ -102,6 +99,7 @@ namespace Config {
     LOAD_FLOAT("weaponmod", "crit_multiplier", WeaponMod::Settings::fCritMultiplier);
     LOAD_BOOL("weaponmod", "reach", WeaponMod::Settings::bReach);
     LOAD_FLOAT("weaponmod", "reach_mult", WeaponMod::Settings::fReachMultiplier);
+    LOAD_BOOL("weaponmod", "autohs", WeaponMod::Settings::bAutoHeadshot);
 
     LOAD_BOOL("playermod", "high_jump", PlayerMod::Settings::bHighJump);
     LOAD_FLOAT("playermod", "jump_multiplier", PlayerMod::Settings::fJumpMultiplier);

@@ -15,46 +15,21 @@ namespace WeaponMod {
 
     using namespace Offsets::WeaponSounds;
 
+    Offsets::WeaponSounds::InitDynamicOffsets();
+
     // Ammo
-    static size_t isUnlimitedAmmoOffset = 0;
-    if (isUnlimitedAmmoOffset == 0) {
-      isUnlimitedAmmoOffset =
-        IL2CPP::GetFieldOffset((void*) Offsets::Classes::WeaponSounds, "isUnlimitedAmmo");
-      if (isUnlimitedAmmoOffset == 0)
-        isUnlimitedAmmoOffset = Offsets::WeaponSounds::isUnlimitedAmmo;
-    }
     backup.isUnlimitedAmmo = IL2CPP::ReadField<bool>(ws, isUnlimitedAmmoOffset);
     backup.ammoInClip      = IL2CPP::ReadField<int>(ws, Offsets::WeaponSounds::ammoInClip);
 
     // Wallshot
-    void*         wsClass              = (void*) Offsets::Classes::WeaponSounds;
-    static size_t isWallBreakingOffset = IL2CPP::GetFieldOffset(wsClass, "isWallBraking");
-    if (!isWallBreakingOffset)
-      isWallBreakingOffset = IL2CPP::GetFieldOffset(wsClass, "wallBraking");
-    if (isWallBreakingOffset)
-      backup.isWallBreaking = IL2CPP::ReadField<bool>(ws, isWallBreakingOffset);
-
-    static size_t wallBreakingDamageMultiplierOffset =
-      IL2CPP::GetFieldOffset(wsClass, "wallBrakingDamageMultiplier");
-    if (!wallBreakingDamageMultiplierOffset)
-      wallBreakingDamageMultiplierOffset =
-        IL2CPP::GetFieldOffset(wsClass, "damageWallBrakingMultiplier");
-    if (!wallBreakingDamageMultiplierOffset)
-      wallBreakingDamageMultiplierOffset =
-        IL2CPP::GetFieldOffset(wsClass, "damageMultiplierThroughWall");
-    if (!wallBreakingDamageMultiplierOffset)
-      wallBreakingDamageMultiplierOffset = IL2CPP::GetFieldOffset(wsClass, "damageWallMultiplier");
-    if (wallBreakingDamageMultiplierOffset)
-      backup.wallBreakingDamageMultiplier =
-        IL2CPP::ReadField<float>(ws, wallBreakingDamageMultiplierOffset);
-
-    static size_t breakoutOffset = IL2CPP::GetFieldOffset(wsClass, "bulletBreakout");
-    if (breakoutOffset)
-      backup.bulletBreakout = IL2CPP::ReadField<bool>(ws, breakoutOffset);
-
-    static size_t superBreakoutOffset = IL2CPP::GetFieldOffset(wsClass, "bulletSuperBreakout");
-    if (superBreakoutOffset)
-      backup.bulletSuperBreakout = IL2CPP::ReadField<bool>(ws, superBreakoutOffset);
+    backup.isWallBreaking =
+      IL2CPP::ReadFieldIfValid(ws, isWallBreakingOffset, backup.isWallBreaking);
+    backup.wallBreakingDamageMultiplier = IL2CPP::ReadFieldIfValid(
+      ws, wallBreakingDamageMultiplierOffset, backup.wallBreakingDamageMultiplier
+    );
+    backup.bulletBreakout = IL2CPP::ReadFieldIfValid(ws, breakoutOffset, backup.bulletBreakout);
+    backup.bulletSuperBreakout =
+      IL2CPP::ReadFieldIfValid(ws, superBreakoutOffset, backup.bulletSuperBreakout);
 
     backup.isPiercingMelee = IL2CPP::ReadField<bool>(ws, Offsets::WeaponSounds::isPiercingMelee);
     backup.distancePiercingMelee =
@@ -66,8 +41,18 @@ namespace WeaponMod {
 
     // Reach
     backup.radiusRoundMelee      = IL2CPP::ReadField<float>(ws, radiusRoundMelee);
-    backup.lengthShootFromPrefab = IL2CPP::ReadField<float>(ws, 0x594);
-    backup.shootDistanceIfZoom   = IL2CPP::ReadField<float>(ws, 0x4CC);
+    backup.lengthShootFromPrefab = IL2CPP::ReadField<float>(ws, lengthShootFromPrefab);
+    backup.shootDistanceIfZoom   = IL2CPP::ReadField<float>(ws, shootDistanceIfZoom);
+
+    // AOE Bullets
+    backup.isSectorsAOE           = IL2CPP::ReadField<bool>(ws, isSectorsAOE);
+    backup.sectorsAOEAngleFront   = IL2CPP::ReadField<float>(ws, sectorsAOEAngleFront);
+    backup.sectorsAOEAngleBack    = IL2CPP::ReadField<float>(ws, sectorsAOEAngleBack);
+    backup.sectorsAOERadius       = IL2CPP::ReadField<float>(ws, sectorsAOERadius);
+    backup.sectorsAOEDmgMultFront = IL2CPP::ReadField<float>(ws, sectorsAOEDmgMultFront);
+    backup.sectorsAOEDmgMultSide  = IL2CPP::ReadField<float>(ws, sectorsAOEDmgMultSide);
+    backup.sectorsAOEDmgMultBack  = IL2CPP::ReadField<float>(ws, sectorsAOEDmgMultBack);
+    backup.bazookaExplosionRadius = IL2CPP::ReadField<float>(ws, bazookaExplosionRadius);
 
     backup.hasBackup = true;
   }
@@ -79,47 +64,19 @@ namespace WeaponMod {
 
     using namespace Offsets::WeaponSounds;
 
+    Offsets::WeaponSounds::InitDynamicOffsets();
+
     // Ammo
-    static size_t isUnlimitedAmmoOffset = 0;
-    if (isUnlimitedAmmoOffset == 0) {
-      isUnlimitedAmmoOffset =
-        IL2CPP::GetFieldOffset((void*) Offsets::Classes::WeaponSounds, "isUnlimitedAmmo");
-      if (isUnlimitedAmmoOffset == 0)
-        isUnlimitedAmmoOffset = Offsets::WeaponSounds::isUnlimitedAmmo;
-    }
     IL2CPP::WriteField(ws, isUnlimitedAmmoOffset, backup.isUnlimitedAmmo);
     IL2CPP::WriteField(ws, Offsets::WeaponSounds::ammoInClip, backup.ammoInClip);
 
     // Wallshot
-    void*         wsClass              = (void*) Offsets::Classes::WeaponSounds;
-    static size_t isWallBreakingOffset = IL2CPP::GetFieldOffset(wsClass, "isWallBraking");
-    if (!isWallBreakingOffset)
-      isWallBreakingOffset = IL2CPP::GetFieldOffset(wsClass, "wallBraking");
-    if (isWallBreakingOffset)
-      IL2CPP::WriteField(ws, isWallBreakingOffset, backup.isWallBreaking);
-
-    static size_t wallBreakingDamageMultiplierOffset =
-      IL2CPP::GetFieldOffset(wsClass, "wallBrakingDamageMultiplier");
-    if (!wallBreakingDamageMultiplierOffset)
-      wallBreakingDamageMultiplierOffset =
-        IL2CPP::GetFieldOffset(wsClass, "damageWallBrakingMultiplier");
-    if (!wallBreakingDamageMultiplierOffset)
-      wallBreakingDamageMultiplierOffset =
-        IL2CPP::GetFieldOffset(wsClass, "damageMultiplierThroughWall");
-    if (!wallBreakingDamageMultiplierOffset)
-      wallBreakingDamageMultiplierOffset = IL2CPP::GetFieldOffset(wsClass, "damageWallMultiplier");
-    if (wallBreakingDamageMultiplierOffset)
-      IL2CPP::WriteField(
-        ws, wallBreakingDamageMultiplierOffset, backup.wallBreakingDamageMultiplier
-      );
-
-    static size_t breakoutOffset = IL2CPP::GetFieldOffset(wsClass, "bulletBreakout");
-    if (breakoutOffset)
-      IL2CPP::WriteField(ws, breakoutOffset, backup.bulletBreakout);
-
-    static size_t superBreakoutOffset = IL2CPP::GetFieldOffset(wsClass, "bulletSuperBreakout");
-    if (superBreakoutOffset)
-      IL2CPP::WriteField(ws, superBreakoutOffset, backup.bulletSuperBreakout);
+    IL2CPP::WriteFieldIfValid(ws, isWallBreakingOffset, backup.isWallBreaking);
+    IL2CPP::WriteFieldIfValid(
+      ws, wallBreakingDamageMultiplierOffset, backup.wallBreakingDamageMultiplier
+    );
+    IL2CPP::WriteFieldIfValid(ws, breakoutOffset, backup.bulletBreakout);
+    IL2CPP::WriteFieldIfValid(ws, superBreakoutOffset, backup.bulletSuperBreakout);
 
     IL2CPP::WriteField(ws, Offsets::WeaponSounds::isPiercingMelee, backup.isPiercingMelee);
     IL2CPP::WriteField(
@@ -132,8 +89,18 @@ namespace WeaponMod {
 
     // Reach
     IL2CPP::WriteField(ws, radiusRoundMelee, backup.radiusRoundMelee);
-    IL2CPP::WriteField(ws, 0x594, backup.lengthShootFromPrefab);
-    IL2CPP::WriteField(ws, 0x4CC, backup.shootDistanceIfZoom);
+    IL2CPP::WriteField(ws, lengthShootFromPrefab, backup.lengthShootFromPrefab);
+    IL2CPP::WriteField(ws, shootDistanceIfZoom, backup.shootDistanceIfZoom);
+
+    // AOE Bullets
+    IL2CPP::WriteField(ws, isSectorsAOE, backup.isSectorsAOE);
+    IL2CPP::WriteField(ws, sectorsAOEAngleFront, backup.sectorsAOEAngleFront);
+    IL2CPP::WriteField(ws, sectorsAOEAngleBack, backup.sectorsAOEAngleBack);
+    IL2CPP::WriteField(ws, sectorsAOERadius, backup.sectorsAOERadius);
+    IL2CPP::WriteField(ws, sectorsAOEDmgMultFront, backup.sectorsAOEDmgMultFront);
+    IL2CPP::WriteField(ws, sectorsAOEDmgMultSide, backup.sectorsAOEDmgMultSide);
+    IL2CPP::WriteField(ws, sectorsAOEDmgMultBack, backup.sectorsAOEDmgMultBack);
+    IL2CPP::WriteField(ws, bazookaExplosionRadius, backup.bazookaExplosionRadius);
   }
 
   void Tick()
@@ -149,27 +116,19 @@ namespace WeaponMod {
         RestoreWeaponSounds(ws);
       }
 
-      bool anyActive = false;
-
-      if (Settings::bInfiniteAmmo) {
+      if (Settings::bInfiniteAmmo)
         ApplyInfiniteAmmo(ws);
-        anyActive = true;
-      }
-
-      if (Settings::bWallshot) {
+      if (Settings::bWallshot)
         ApplyWallshot(ws);
-        anyActive = true;
-      }
-
-      if (Settings::bCritChance100) {
+      if (Settings::bCritChance100)
         ApplyCritChance(ws);
-        anyActive = true;
-      }
-
-      if (Settings::bReach) {
+      if (Settings::bReach)
         ApplyReach(ws);
-        anyActive = true;
-      }
+      if (Settings::bAOEBullets)
+        ApplyAOEBullets(ws);
+
+      bool anyActive = Settings::bInfiniteAmmo || Settings::bWallshot || Settings::bCritChance100
+                    || Settings::bReach || Settings::bAOEBullets;
 
       if (!anyActive) {
         backup.hasBackup = false;
@@ -194,6 +153,11 @@ namespace WeaponMod {
     Menu::AddMenuItem(
       {"Reach Multiplier", Menu::ItemType::Float, nullptr, &Settings::fReachMultiplier, 1.0f, 20.0f,
        1.0f}
+    );
+    Menu::AddMenuItem({"Auto Headshot", Menu::ItemType::Bool, &Settings::bAutoHeadshot});
+    Menu::AddMenuItem({"AOE Bullets", Menu::ItemType::Bool, &Settings::bAOEBullets});
+    Menu::AddMenuItem(
+      {"AOE Radius", Menu::ItemType::Float, nullptr, &Settings::fAOERadius, 5.0f, 200.0f, 5.0f}
     );
   }
 }  // namespace WeaponMod

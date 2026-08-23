@@ -4,10 +4,11 @@
 
 namespace Visual {
   namespace Settings {
-    inline bool bPlayerESP      = false;
-    inline bool bPlayerESPBoxes = true;
-    inline bool bPlayerESPNames = true;
-    inline bool bSkeletonESP    = false;
+    inline bool bPlayerESP         = false;
+    inline bool bPlayerESPBoxes    = true;
+    inline bool bPlayerESPNames    = true;
+    inline bool bSkeletonESP       = false;
+    inline bool bTreatAllAsEnemies = false;
   }  // namespace Settings
 
   struct Vector3

@@ -29,13 +29,27 @@ namespace IL2CPP {
   size_t      GetFieldOffset(void* klass, const char* name);
   void*       object_get_class(void* obj);
 
-  // Field Access
   template<typename T>
   inline T ReadField(void* obj, uintptr_t offset)
   {
     if (!obj)
       return T{};
     return *reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(obj) + offset);
+  }
+
+  template<typename T>
+  inline T SafeReadField(void* obj, uintptr_t offset)
+  {
+    if (!obj)
+      return T{};
+    void* ptr = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(obj) + offset);
+    if (IsBadReadPtr(ptr, sizeof(T)))
+      return T{};
+    try {
+      return *reinterpret_cast<T*>(ptr);
+    } catch (...) {
+      return T{};
+    }
   }
 
   template<typename T>
@@ -46,20 +60,50 @@ namespace IL2CPP {
     *reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(obj) + offset) = value;
   }
 
+  template<typename T>
+  inline T ReadFieldIfValid(void* obj, uintptr_t offset, T defaultValue = T{})
+  {
+    if (offset > 0)
+      return ReadField<T>(obj, offset);
+    return defaultValue;
+  }
+
+  template<typename T>
+  inline void WriteFieldIfValid(void* obj, uintptr_t offset, T value)
+  {
+    if (offset > 0)
+      WriteField<T>(obj, offset, value);
+  }
+
+  inline size_t
+  ResolveFieldOffset(void* klass, const std::vector<const char*>& names, size_t fallback = 0)
+  {
+    for (const char* name : names) {
+      size_t offset = GetFieldOffset(klass, name);
+      if (offset > 0)
+        return offset;
+    }
+    return fallback;
+  }
+
   // Array Access
   template<typename T>
   inline T* GetArrayElements(void* arrayObj)
   {
     if (!arrayObj)
       return nullptr;
-    return reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(arrayObj) + 0x20);
+    return reinterpret_cast<T*>(
+      reinterpret_cast<uintptr_t>(arrayObj) + Offsets::IL2CPPStructs::arrayDataOffset
+    );
   }
 
   inline size_t GetArrayLength(void* arrayObj)
   {
     if (!arrayObj)
       return 0;
-    return *reinterpret_cast<size_t*>(reinterpret_cast<uintptr_t>(arrayObj) + 0x18);
+    return *reinterpret_cast<size_t*>(
+      reinterpret_cast<uintptr_t>(arrayObj) + Offsets::IL2CPPStructs::arrayLengthOffset
+    );
   }
 
   // Unity Helpers

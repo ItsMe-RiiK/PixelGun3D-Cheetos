@@ -63,6 +63,23 @@ struct ProcessResult
   std::wstring matchedName;
 };
 
+bool IsExactMatch(const std::wstring& exeName)
+{
+  for (const auto& name : GAME_PROCESS_NAMES) {
+    if (_wcsicmp(exeName.c_str(), name.c_str()) == 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool IsPartialMatch(const std::wstring& exeName)
+{
+  std::wstring lower = ToLower(exeName);
+  return lower.find(L"pixel") != std::wstring::npos && lower.find(L"gun") != std::wstring::npos
+      && lower.find(L".exe") != std::wstring::npos;
+}
+
 ProcessResult FindGameProcess()
 {
   HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -72,40 +89,23 @@ ProcessResult FindGameProcess()
   PROCESSENTRY32W pe;
   pe.dwSize = sizeof(pe);
 
-  // First pass: exact name match (case-insensitive)
-  if (Process32FirstW(snapshot, &pe)) {
-    do {
-      for (const auto& name : GAME_PROCESS_NAMES) {
-        if (_wcsicmp(pe.szExeFile, name.c_str()) == 0) {
-          ProcessResult result;
-          result.pid         = pe.th32ProcessID;
-          result.matchedName = pe.szExeFile;
-          CloseHandle(snapshot);
-          return result;
-        }
-      }
-    } while (Process32NextW(snapshot, &pe));
-  }
+  ProcessResult partialMatch;
 
-  // Second pass: partial match — any .exe containing "pixel" and "gun"
   if (Process32FirstW(snapshot, &pe)) {
     do {
-      std::wstring lower = ToLower(pe.szExeFile);
-      if (
-        lower.find(L"pixel") != std::wstring::npos && lower.find(L"gun") != std::wstring::npos
-        && lower.find(L".exe") != std::wstring::npos
-      ) {
-        ProcessResult result;
-        result.pid         = pe.th32ProcessID;
-        result.matchedName = pe.szExeFile;
+      if (IsExactMatch(pe.szExeFile)) {
         CloseHandle(snapshot);
-        return result;
+        return {pe.th32ProcessID, pe.szExeFile};
+      }
+
+      if (partialMatch.pid == 0 && IsPartialMatch(pe.szExeFile)) {
+        partialMatch = {pe.th32ProcessID, pe.szExeFile};
       }
     } while (Process32NextW(snapshot, &pe));
   }
 
   CloseHandle(snapshot);
-  return {};
+  return partialMatch;
 }
 
 // Check if a module is loaded in the target process

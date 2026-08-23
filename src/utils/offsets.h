@@ -14,14 +14,15 @@ namespace Offsets {
   // Player_move_c (TypeDefIndex: 1241)
   // ==========================================
   namespace PlayerMoveC {
-    constexpr uintptr_t charWeaponCurrent   = 0xBE8;  // current weapon struct
-    constexpr uintptr_t myPlayerTransform   = 0x3F8;  // Transform*
-    constexpr uintptr_t PlayerHeadTransform = 0x4B0;  // Transform*
-    constexpr uintptr_t weaponSoundsRef     = 0x6C0;  // WeaponSounds* (current)
-    constexpr uintptr_t playerDamageable    = 0x6E8;  // PlayerDamageable*
-    constexpr uintptr_t visibleObjRef       = 0x7C8;  // visibleObjPhoton*
-    constexpr uintptr_t nickLabel           = 0x418;  // TextMesh*
-    constexpr uintptr_t playerBodyRenderer  = 0x488;  // SkinnedMeshRenderer*
+    constexpr uintptr_t charWeaponCurrent   = 0xBE8;      // current weapon struct
+    constexpr uintptr_t myPlayerTransform   = 0x3F8;      // Transform*
+    constexpr uintptr_t PlayerHeadTransform = 0x4B0;      // Transform*
+    constexpr uintptr_t weaponSoundsRef     = 0x6C0;      // WeaponSounds* (current)
+    constexpr uintptr_t playerDamageable    = 0x6E8;      // PlayerDamageable*
+    constexpr uintptr_t visibleObjRef       = 0x7C8;      // visibleObjPhoton*
+    constexpr uintptr_t nickLabel           = 0x418;      // TextMesh*
+    constexpr uintptr_t playerBodyRenderer  = 0x488;      // SkinnedMeshRenderer*
+    constexpr uintptr_t OnEventFired_RVA    = 0x157D550;  // In Player_move_c
   }  // namespace PlayerMoveC
 
   // ==========================================
@@ -64,6 +65,17 @@ namespace Offsets {
     constexpr uintptr_t sectorsAOERadius       = 0x49C;  // float
     constexpr uintptr_t lengthShootFromPrefab  = 0x594;  // float
     constexpr uintptr_t shootDistanceIfZoom    = 0x4CC;  // float
+
+    // Dynamic offsets resolved at runtime
+    inline size_t isWallBreakingOffset               = 0;
+    inline size_t wallBreakingDamageMultiplierOffset = 0;
+    inline size_t breakoutOffset                     = 0;
+    inline size_t superBreakoutOffset                = 0;
+    inline size_t isUnlimitedAmmoOffset              = 0;
+    inline size_t canAffectAlliesOffset              = 0;
+    inline bool   dynamicOffsetsResolved             = false;
+
+    void InitDynamicOffsets();
   }  // namespace WeaponSounds
 
   // ==========================================
@@ -75,6 +87,44 @@ namespace Offsets {
     constexpr uintptr_t IsDead_RVA      = 0x1DB9940;
     constexpr uintptr_t IsEnemyTo_RVA   = 0x1DB9960;
   }  // namespace PlayerDamageable
+
+  // ==========================================
+  // ItemRecord (TypeDefIndex: 6461)
+  // ==========================================
+  namespace ItemRecord {
+    constexpr uintptr_t ammoInClip      = 0x20;
+    constexpr uintptr_t isUnlimitedAmmo = 0x6C;
+  }  // namespace ItemRecord
+
+  // ==========================================
+  // WeaponContainer (TypeDefIndex: 7682)
+  // ==========================================
+  namespace WeaponContainer {
+    constexpr uintptr_t initialAmmo = 0x5C;
+  }
+
+  // ==========================================
+  // Live Weapon (Dynamic resolution fallback)
+  // ==========================================
+  namespace LiveWeapon {
+    constexpr uintptr_t ammoFallback = 0x48;
+
+    // Dynamic offsets resolved at runtime
+    inline size_t liveAmmoOffset         = 0;
+    inline bool   dynamicOffsetsResolved = false;
+
+    void InitDynamicOffsets(void* charWeaponClass);
+  }  // namespace LiveWeapon
+
+  // ==========================================
+  // IL2CPP Internal Structures
+  // ==========================================
+  namespace IL2CPPStructs {
+    constexpr uintptr_t stringLengthOffset = 0x10;
+    constexpr uintptr_t stringCharsOffset  = 0x14;
+    constexpr uintptr_t arrayLengthOffset  = 0x18;
+    constexpr uintptr_t arrayDataOffset    = 0x20;
+  }  // namespace IL2CPPStructs
 
   // ==========================================
   // UnityEngine.Object (TypeDefIndex: 12345)

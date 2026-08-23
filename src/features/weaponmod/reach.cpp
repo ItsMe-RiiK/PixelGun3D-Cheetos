@@ -16,8 +16,8 @@ namespace WeaponMod {
     }
     else {
       // Guns
-      IL2CPP::WriteField(ws, 0x594, 9999.0f);  // lengthShootFromPrefab
-      IL2CPP::WriteField(ws, 0x4CC, 9999.0f);  // shootDistanceIfZoom
+      IL2CPP::WriteField(ws, lengthShootFromPrefab, 9999.0f);  // lengthShootFromPrefab
+      IL2CPP::WriteField(ws, shootDistanceIfZoom, 9999.0f);    // shootDistanceIfZoom
     }
   }
 }  // namespace WeaponMod

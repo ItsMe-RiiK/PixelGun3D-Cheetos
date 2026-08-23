@@ -107,6 +107,23 @@ jobs:
             -f tag_name="${{ steps.version.outputs.tag }}" \
             --jq .body >> release_notes.md || echo "See commits for full changelog." >> release_notes.md
 
+      - name: Cleanup Old Release Assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if the release exists first
+          if gh release view ${{ steps.version.outputs.major }} > /dev/null 2>&1; then
+            echo "Release ${{ steps.version.outputs.major }} exists. Cleaning up old assets..."
+            # Get list of asset names
+            assets=$(gh release view ${{ steps.version.outputs.major }} --json assets -q '.assets[].name') || assets=""
+            for asset in $assets; do
+              echo "Deleting old asset: $asset"
+              gh release delete-asset ${{ steps.version.outputs.major }} "$asset" -y || true
+            done
+          else
+            echo "Release ${{ steps.version.outputs.major }} does not exist yet."
+          fi
+
       - name: Create Release Archive
         run: |
           # Create a root folder for the archive

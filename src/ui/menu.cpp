@@ -3,6 +3,7 @@
 #include "../features/visual/visual.h"
 #include "../features/playermod/playermod.h"
 #include "../features/weaponmod/weaponmod.h"
+#include "../features/currency/lottery.h"
 #include "../utils/hooks.h"
 
 #include <imgui.h>
@@ -43,13 +44,25 @@ namespace Menu
     WeaponMod::InitMenu();
     PlayerMod::InitMenu();
 
+    //CURRENCY / LOTTERY
+    AddMenuItem({"-- LOTTERY --", ItemType::Header});
+    AddMenuItem({"Enable Lottery Modifier", ItemType::Bool, &LotteryMod::bEnableLotteryModifier});
+    AddMenuItem(
+      {"Chest Price", ItemType::Int, nullptr, nullptr, &LotteryMod::iChestPrice, 0.0f, 0.0f, 0.0f, -15000, 15000, 10}
+    );
+    AddMenuItem({"Modify Chest Output", ItemType::Bool, &LotteryMod::bModifyChestOutput});
+    AddMenuItem(
+      {"Chest Output Amount", ItemType::Int, nullptr, nullptr, &LotteryMod::iChestOutputAmount, 0.0f, 0.0f, 0.0f,
+       -99999, 99999, 10}
+    );
+
     // SETTINGS
     AddMenuItem({"-- SETTINGS --", ItemType::Header});
     AddMenuItem({"Bypass Anti-Cheat", ItemType::Bool, &Hooks::Settings::bAntiCheatBypass});
-    AddMenuItem({"Save Config", ItemType::Action, nullptr, nullptr, 0, 0, 0, []() {
+    AddMenuItem({"Save Config", ItemType::Action, nullptr, nullptr, nullptr, 0.0f, 0.0f, 0.0f, 0, 0, 0, []() {
                    Config::Save();
                  }});
-    AddMenuItem({"Load Config", ItemType::Action, nullptr, nullptr, 0, 0, 0, []() {
+    AddMenuItem({"Load Config", ItemType::Action, nullptr, nullptr, nullptr, 0.0f, 0.0f, 0.0f, 0, 0, 0, []() {
                    Config::Load();
                  }});
   }
@@ -123,6 +136,18 @@ namespace Menu
         *item.fValue -= item.fStep;
         if (*item.fValue < item.fMin)
           *item.fValue = item.fMin;
+      }
+    }
+    else if (item.type == ItemType::Int && item.iValue) {
+      if (dir > 0) {
+        *item.iValue += item.iStep;
+        if (*item.iValue > item.iMax)
+          *item.iValue = item.iMax;
+      }
+      else if (dir < 0) {
+        *item.iValue -= item.iStep;
+        if (*item.iValue < item.iMin)
+          *item.iValue = item.iMin;
       }
     }
     else if (item.type == ItemType::Action && item.action) {
@@ -199,9 +224,8 @@ namespace Menu
     sc->GetDesc(&desc);
     hGameWindow = desc.OutputWindow;
 
-    oWndProc = reinterpret_cast<WNDPROC>(
-      SetWindowLongPtr(hGameWindow, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WndProc))
-    );
+    oWndProc =
+      reinterpret_cast<WNDPROC>(SetWindowLongPtr(hGameWindow, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WndProc)));
 
     ImGui::CreateContext();
     ImGuiIO& io    = ImGui::GetIO();
@@ -260,14 +284,13 @@ namespace Menu
       return;
 
     // Calculate how many items can fit on screen safely
-    float availableHeight =
-      screenH - startY - (padding * 2) - 30.0f - 20.0f;  // 20.0f bottom margin
-    int maxVisibleItems = static_cast<int>(availableHeight / rowHeight);
+    float availableHeight = screenH - startY - (padding * 2) - 30.0f - 20.0f;  // 20.0f bottom margin
+    int   maxVisibleItems = static_cast<int>(availableHeight / rowHeight);
     if (maxVisibleItems < 5)
       maxVisibleItems = 5;
 
     // Find current selected index in visible list
-    auto it = std::find(visibleIndices.begin(), visibleIndices.end(), selectedIndex);
+    auto it                   = std::find(visibleIndices.begin(), visibleIndices.end(), selectedIndex);
     int  selectedVisibleIndex = 0;
     if (it != visibleIndices.end()) {
       selectedVisibleIndex = std::distance(visibleIndices.begin(), it);
@@ -295,12 +318,10 @@ namespace Menu
 
     // Draw background
     drawList->AddRectFilled(
-      ImVec2(startX, startY), ImVec2(startX + width, startY + totalHeight),
-      IM_COL32(20, 20, 25, 230)
+      ImVec2(startX, startY), ImVec2(startX + width, startY + totalHeight), IM_COL32(20, 20, 25, 230)
     );
     drawList->AddRect(
-      ImVec2(startX, startY), ImVec2(startX + width, startY + totalHeight),
-      IM_COL32(100, 50, 200, 255), 0, 0, 2.0f
+      ImVec2(startX, startY), ImVec2(startX + width, startY + totalHeight), IM_COL32(100, 50, 200, 255), 0, 0, 2.0f
     );
 
 #ifndef PROJECT_VERSION
@@ -309,9 +330,7 @@ namespace Menu
 
     // Title
     std::string titleStr = std::string("Pixel Gun 3D Cheat v") + PROJECT_VERSION;
-    drawList->AddText(
-      ImVec2(startX + padding, startY + padding), IM_COL32(100, 200, 255, 255), titleStr.c_str()
-    );
+    drawList->AddText(ImVec2(startX + padding, startY + padding), IM_COL32(100, 200, 255, 255), titleStr.c_str());
 
     float currentY = startY + padding + 30.0f;
 
@@ -323,8 +342,7 @@ namespace Menu
       if (actualIndex == selectedIndex) {
         // Draw selection highlight
         drawList->AddRectFilled(
-          ImVec2(startX, currentY), ImVec2(startX + width, currentY + rowHeight),
-          IM_COL32(80, 40, 160, 180)
+          ImVec2(startX, currentY), ImVec2(startX + width, currentY + rowHeight), IM_COL32(80, 40, 160, 180)
         );
         textColor = IM_COL32(255, 255, 255, 255);
       }
@@ -332,29 +350,28 @@ namespace Menu
       if (item.type == ItemType::Header) {
         textColor              = IM_COL32(150, 150, 150, 255);
         std::string headerName = item.name + (item.isExpanded ? " [-]" : " [+]");
-        drawList->AddText(
-          ImVec2(startX + width / 2 - 40, currentY + 2), textColor, headerName.c_str()
-        );
+        drawList->AddText(ImVec2(startX + width / 2 - 40, currentY + 2), textColor, headerName.c_str());
       }
       else {
         drawList->AddText(ImVec2(startX + padding, currentY + 2), textColor, item.name.c_str());
 
         if (item.type == ItemType::Bool && item.bValue) {
-          const char* valStr = *item.bValue ? "[ ON ]" : "[ OFF ]";
-          ImU32 valColor = *item.bValue ? IM_COL32(50, 255, 50, 255) : IM_COL32(255, 50, 50, 255);
+          const char* valStr   = *item.bValue ? "[ ON ]" : "[ OFF ]";
+          ImU32       valColor = *item.bValue ? IM_COL32(50, 255, 50, 255) : IM_COL32(255, 50, 50, 255);
           drawList->AddText(ImVec2(startX + width - 60, currentY + 2), valColor, valStr);
         }
         else if (item.type == ItemType::Float && item.fValue) {
           char buf[32];
           snprintf(buf, sizeof(buf), "< %.2f >", *item.fValue);
-          drawList->AddText(
-            ImVec2(startX + width - 80, currentY + 2), IM_COL32(255, 255, 100, 255), buf
-          );
+          drawList->AddText(ImVec2(startX + width - 80, currentY + 2), IM_COL32(255, 255, 100, 255), buf);
+        }
+        else if (item.type == ItemType::Int && item.iValue) {
+          char buf[32];
+          snprintf(buf, sizeof(buf), "< %d >", *item.iValue);
+          drawList->AddText(ImVec2(startX + width - 80, currentY + 2), IM_COL32(255, 255, 100, 255), buf);
         }
         else if (item.type == ItemType::Action) {
-          drawList->AddText(
-            ImVec2(startX + width - 80, currentY + 2), IM_COL32(200, 200, 200, 255), "[ ENTER ]"
-          );
+          drawList->AddText(ImVec2(startX + width - 80, currentY + 2), IM_COL32(200, 200, 200, 255), "[ ENTER ]");
         }
       }
 

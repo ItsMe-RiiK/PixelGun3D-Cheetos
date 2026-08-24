@@ -192,6 +192,15 @@ namespace Offsets
   }  // namespace AntiCheat
 
   // ==========================================
+  // Lottery
+  // ==========================================
+  namespace Lottery
+  {
+    constexpr uintptr_t PriceModifier_RVA    = 0x81CF90;
+    constexpr uintptr_t LotteryDropCount_RVA = 0xCF0160;
+  }  // namespace Lottery
+
+  // ==========================================
   // IL2CPP Class pointers (resolved at runtime, cached here)
   // ==========================================
   namespace Classes

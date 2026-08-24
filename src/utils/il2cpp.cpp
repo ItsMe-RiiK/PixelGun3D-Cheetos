@@ -7,13 +7,9 @@ namespace IL2CPP
   using fn_il2cpp_domain_get_assemblies       = void** (*) (void* domain, size_t* size);
   using fn_il2cpp_assembly_get_image          = void* (*) (void* assembly);
   using fn_il2cpp_image_get_name              = const char* (*) (void* image);
-  using fn_il2cpp_class_from_name             = void* (*) (void*       image,
-                                                           const char* namespaze,
-                                                           const char* name);
+  using fn_il2cpp_class_from_name             = void* (*) (void* image, const char* namespaze, const char* name);
   using fn_il2cpp_class_get_static_field_data = void* (*) (void* klass);
-  using fn_il2cpp_class_get_method_from_name  = void* (*) (void*       klass,
-                                                           const char* name,
-                                                           int         argsCount);
+  using fn_il2cpp_class_get_method_from_name  = void* (*) (void* klass, const char* name, int argsCount);
   using fn_il2cpp_field_static_get_value      = void (*)(void* field, void* value);
   using fn_il2cpp_runtime_object_init         = void (*)(void* obj);
   using fn_il2cpp_object_new                  = void* (*) (void* klass);
@@ -74,12 +70,10 @@ namespace IL2CPP
     RESOLVE(field_get_offset);
     RESOLVE(object_get_class);
 
-    ptr_class_get_type = reinterpret_cast<fn_il2cpp_class_get_type>(
-      GetProcAddress(hGameAssembly, "il2cpp_class_get_type")
-    );
-    ptr_type_get_object = reinterpret_cast<fn_il2cpp_type_get_object>(
-      GetProcAddress(hGameAssembly, "il2cpp_type_get_object")
-    );
+    ptr_class_get_type =
+      reinterpret_cast<fn_il2cpp_class_get_type>(GetProcAddress(hGameAssembly, "il2cpp_class_get_type"));
+    ptr_type_get_object =
+      reinterpret_cast<fn_il2cpp_type_get_object>(GetProcAddress(hGameAssembly, "il2cpp_type_get_object"));
 
 #undef RESOLVE
 
@@ -129,32 +123,22 @@ namespace IL2CPP
   {
     return ptr_assembly_get_image ? ptr_assembly_get_image(assembly) : nullptr;
   }
-  const char* image_get_name(void* image)
-  {
-    return ptr_image_get_name ? ptr_image_get_name(image) : nullptr;
-  }
-  void* class_from_name(void* image, const char* namespaze, const char* name)
+  const char* image_get_name(void* image) { return ptr_image_get_name ? ptr_image_get_name(image) : nullptr; }
+  void*       class_from_name(void* image, const char* namespaze, const char* name)
   {
     return ptr_class_from_name ? ptr_class_from_name(image, namespaze, name) : nullptr;
   }
   void* class_get_method_from_name(void* klass, const char* name, int argsCount)
   {
-    return ptr_class_get_method_from_name ? ptr_class_get_method_from_name(klass, name, argsCount)
-                                          : nullptr;
+    return ptr_class_get_method_from_name ? ptr_class_get_method_from_name(klass, name, argsCount) : nullptr;
   }
   void* class_get_fields(void* klass, void** iter)
   {
     return ptr_class_get_fields ? ptr_class_get_fields(klass, iter) : nullptr;
   }
-  const char* field_get_name(void* field)
-  {
-    return ptr_field_get_name ? ptr_field_get_name(field) : nullptr;
-  }
-  size_t field_get_offset(void* field)
-  {
-    return ptr_field_get_offset ? ptr_field_get_offset(field) : 0;
-  }
-  size_t GetFieldOffset(void* klass, const char* name)
+  const char* field_get_name(void* field) { return ptr_field_get_name ? ptr_field_get_name(field) : nullptr; }
+  size_t      field_get_offset(void* field) { return ptr_field_get_offset ? ptr_field_get_offset(field) : 0; }
+  size_t      GetFieldOffset(void* klass, const char* name)
   {
     if (!klass || !name)
       return 0;
@@ -191,9 +175,8 @@ namespace IL2CPP
     static fn_FindObjectsOfType pFindObjectsOfType = nullptr;
 
     if (!pFindObjectsOfType) {
-      pFindObjectsOfType = reinterpret_cast<fn_FindObjectsOfType>(
-        GetMethodAddress(Offsets::Object::FindObjectsOfType_RVA)
-      );
+      pFindObjectsOfType =
+        reinterpret_cast<fn_FindObjectsOfType>(GetMethodAddress(Offsets::Object::FindObjectsOfType_RVA));
     }
 
     if (!pFindObjectsOfType || !type)
@@ -217,9 +200,7 @@ namespace IL2CPP
         if (assemblies) {
           for (size_t i = 0; i < asmCount; i++) {
             auto img = assembly_get_image(assemblies[i]);
-            if (
-              img && image_get_name(img) && strstr(image_get_name(img), "UnityEngine.CoreModule")
-            ) {
+            if (img && image_get_name(img) && strstr(image_get_name(img), "UnityEngine.CoreModule")) {
               coreModuleImage = img;
               break;
             }
@@ -260,9 +241,7 @@ namespace IL2CPP
         if (assemblies) {
           for (size_t i = 0; i < asmCount; i++) {
             auto img = assembly_get_image(assemblies[i]);
-            if (
-              img && image_get_name(img) && strstr(image_get_name(img), "UnityEngine.CoreModule")
-            ) {
+            if (img && image_get_name(img) && strstr(image_get_name(img), "UnityEngine.CoreModule")) {
               coreModuleImage = img;
               break;
             }
@@ -302,9 +281,7 @@ namespace IL2CPP
         if (assemblies) {
           for (size_t i = 0; i < asmCount; i++) {
             auto img = assembly_get_image(assemblies[i]);
-            if (
-              img && image_get_name(img) && strstr(image_get_name(img), "UnityEngine.CoreModule")
-            ) {
+            if (img && image_get_name(img) && strstr(image_get_name(img), "UnityEngine.CoreModule")) {
               coreModuleImage = img;
               break;
             }
@@ -367,13 +344,11 @@ namespace IL2CPP
     Offsets::Classes::WeaponSounds     = reinterpret_cast<uintptr_t>(GetClass("WeaponSounds"));
     Offsets::Classes::PlayerDamageable = reinterpret_cast<uintptr_t>(GetClass("PlayerDamageable"));
 
-    Offsets::Classes::CheatDetectedBanner =
-      reinterpret_cast<uintptr_t>(GetClass("CheatDetectedBanner"));
-    Offsets::Classes::ClickerDetector = reinterpret_cast<uintptr_t>(GetClass("ClickerDetector"));
+    Offsets::Classes::CheatDetectedBanner = reinterpret_cast<uintptr_t>(GetClass("CheatDetectedBanner"));
+    Offsets::Classes::ClickerDetector     = reinterpret_cast<uintptr_t>(GetClass("ClickerDetector"));
 
-    Offsets::Classes::SkinName = reinterpret_cast<uintptr_t>(GetClass("SkinName"));
-    Offsets::Classes::FirstPersonControlSharp =
-      reinterpret_cast<uintptr_t>(GetClass("FirstPersonControlSharp"));
+    Offsets::Classes::SkinName                = reinterpret_cast<uintptr_t>(GetClass("SkinName"));
+    Offsets::Classes::FirstPersonControlSharp = reinterpret_cast<uintptr_t>(GetClass("FirstPersonControlSharp"));
 
     return Offsets::Classes::WeaponManager != 0 && Offsets::Classes::PlayerMoveC != 0
         && Offsets::Classes::WeaponSounds != 0;
@@ -492,8 +467,7 @@ namespace Offsets
       if (!fpcClass)
         return;
 
-      velocityDownFallMultiplierOffset =
-        IL2CPP::ResolveFieldOffset(fpcClass, {"velocityDownFallMultiplier"});
+      velocityDownFallMultiplierOffset = IL2CPP::ResolveFieldOffset(fpcClass, {"velocityDownFallMultiplier"});
 
       dynamicOffsetsResolved = true;
     }
@@ -516,9 +490,8 @@ namespace Offsets
       breakoutOffset      = IL2CPP::ResolveFieldOffset(wsClass, {"bulletBreakout"});
       superBreakoutOffset = IL2CPP::ResolveFieldOffset(wsClass, {"bulletSuperBreakout"});
 
-      isUnlimitedAmmoOffset = IL2CPP::ResolveFieldOffset(
-        wsClass, {"isUnlimitedAmmo"}, Offsets::WeaponSounds::isUnlimitedAmmo
-      );
+      isUnlimitedAmmoOffset =
+        IL2CPP::ResolveFieldOffset(wsClass, {"isUnlimitedAmmo"}, Offsets::WeaponSounds::isUnlimitedAmmo);
 
       canAffectAlliesOffset = IL2CPP::ResolveFieldOffset(wsClass, {"canAffectAllies"});
 

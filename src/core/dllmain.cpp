@@ -17,10 +17,11 @@
 #include "../features/visual/visual.h"
 
 // ---- D3D11 Present Hook via VTable ----
-namespace DX11Hook {
-  using fn_Present           = HRESULT(WINAPI*)(IDXGISwapChain*, UINT, UINT);
-  inline fn_Present oPresent = nullptr;
-  using fn_ResizeBuffers = HRESULT(WINAPI*)(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT);
+namespace DX11Hook
+{
+  using fn_Present                       = HRESULT(WINAPI*)(IDXGISwapChain*, UINT, UINT);
+  inline fn_Present oPresent             = nullptr;
+  using fn_ResizeBuffers                 = HRESULT(WINAPI*)(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT);
   inline fn_ResizeBuffers oResizeBuffers = nullptr;
   inline bool             hookInstalled  = false;
 
@@ -61,12 +62,7 @@ namespace DX11Hook {
   }
 
   HRESULT WINAPI hkResizeBuffers(
-    IDXGISwapChain* pSwapChain,
-    UINT            BufferCount,
-    UINT            Width,
-    UINT            Height,
-    DXGI_FORMAT     NewFormat,
-    UINT            SwapChainFlags
+    IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags
   )
   {
     if (Menu::pRenderTarget) {
@@ -78,11 +74,7 @@ namespace DX11Hook {
 
     if (SUCCEEDED(hr) && Menu::pDevice) {
       ID3D11Texture2D* pBackBuffer = nullptr;
-      if (
-        SUCCEEDED(pSwapChain->GetBuffer(
-          0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pBackBuffer)
-        ))
-      ) {
+      if (SUCCEEDED(pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pBackBuffer)))) {
         Menu::pDevice->CreateRenderTargetView(pBackBuffer, nullptr, &Menu::pRenderTarget);
         pBackBuffer->Release();
       }
@@ -103,8 +95,7 @@ namespace DX11Hook {
     RegisterClassExA(&wc);
 
     HWND hWnd = CreateWindowExA(
-      0, wc.lpszClassName, "", WS_OVERLAPPEDWINDOW, 0, 0, 100, 100, nullptr, nullptr, wc.hInstance,
-      nullptr
+      0, wc.lpszClassName, "", WS_OVERLAPPEDWINDOW, 0, 0, 100, 100, nullptr, nullptr, wc.hInstance, nullptr
     );
 
     DXGI_SWAP_CHAIN_DESC scd = {};
@@ -123,8 +114,8 @@ namespace DX11Hook {
 
     D3D_FEATURE_LEVEL featureLevel;
     HRESULT           hr = D3D11CreateDeviceAndSwapChain(
-      nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, nullptr, 0, D3D11_SDK_VERSION, &scd,
-      &tmpSwapChain, &tmpDevice, &featureLevel, &tmpContext
+      nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, nullptr, 0, D3D11_SDK_VERSION, &scd, &tmpSwapChain, &tmpDevice,
+      &featureLevel, &tmpContext
     );
 
     if (FAILED(hr)) {
@@ -146,19 +137,13 @@ namespace DX11Hook {
     UnregisterClassA(wc.lpszClassName, wc.hInstance);
 
     // Hook Present with MinHook
-    if (
-      MH_CreateHook(
-        pPresent, reinterpret_cast<LPVOID>(&hkPresent), reinterpret_cast<void**>(&oPresent)
-      )
-      != MH_OK
-    )
+    if (MH_CreateHook(pPresent, reinterpret_cast<LPVOID>(&hkPresent), reinterpret_cast<void**>(&oPresent)) != MH_OK)
       return false;
 
     // Hook ResizeBuffers
     if (
       MH_CreateHook(
-        pResizeBuffers, reinterpret_cast<LPVOID>(&hkResizeBuffers),
-        reinterpret_cast<void**>(&oResizeBuffers)
+        pResizeBuffers, reinterpret_cast<LPVOID>(&hkResizeBuffers), reinterpret_cast<void**>(&oResizeBuffers)
       )
       != MH_OK
     )
@@ -188,9 +173,8 @@ void TrainerThread(HMODULE hModule)
   // Initialize IL2CPP resolver
   if (!IL2CPP::Init()) {
     MessageBoxA(
-      nullptr,
-      "Failed to initialize IL2CPP resolver.\nGameAssembly.dll not found or exports missing.",
-      "PG3D Trainer", MB_ICONERROR
+      nullptr, "Failed to initialize IL2CPP resolver.\nGameAssembly.dll not found or exports missing.", "PG3D Trainer",
+      MB_ICONERROR
     );
     FreeLibraryAndExitThread(hModule, 1);
     return;
@@ -199,8 +183,7 @@ void TrainerThread(HMODULE hModule)
   // Resolve all game classes
   if (!IL2CPP::ResolveClasses()) {
     MessageBoxA(
-      nullptr, "Failed to resolve game classes.\nGame version may be incompatible.", "PG3D Trainer",
-      MB_ICONERROR
+      nullptr, "Failed to resolve game classes.\nGame version may be incompatible.", "PG3D Trainer", MB_ICONERROR
     );
     FreeLibraryAndExitThread(hModule, 1);
     return;
@@ -217,18 +200,14 @@ void TrainerThread(HMODULE hModule)
 
   // Initialize MinHook and install game hooks (god mode, anti-cheat)
   if (!Hooks::Init()) {
-    MessageBoxA(
-      nullptr, "Failed to initialize hooks.\nMinHook error.", "PG3D Trainer", MB_ICONERROR
-    );
+    MessageBoxA(nullptr, "Failed to initialize hooks.\nMinHook error.", "PG3D Trainer", MB_ICONERROR);
     FreeLibraryAndExitThread(hModule, 1);
     return;
   }
 
   // Find and hook D3D11 Present (for ImGui rendering)
   if (!DX11Hook::FindAndHookPresent()) {
-    MessageBoxA(
-      nullptr, "Failed to hook D3D11 Present.\nRenderer hook failed.", "PG3D Trainer", MB_ICONERROR
-    );
+    MessageBoxA(nullptr, "Failed to hook D3D11 Present.\nRenderer hook failed.", "PG3D Trainer", MB_ICONERROR);
     Hooks::Shutdown();
     FreeLibraryAndExitThread(hModule, 1);
     return;
@@ -258,9 +237,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID /*reserved*/)
 {
   if (reason == DLL_PROCESS_ATTACH) {
     DisableThreadLibraryCalls(hModule);
-    auto hThread = CreateThread(
-      nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(TrainerThread), hModule, 0, nullptr
-    );
+    auto hThread =
+      CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(TrainerThread), hModule, 0, nullptr);
     if (hThread)
       CloseHandle(hThread);
   }

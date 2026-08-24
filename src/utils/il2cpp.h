@@ -76,8 +76,7 @@ namespace IL2CPP
       WriteField<T>(obj, offset, value);
   }
 
-  inline size_t
-  ResolveFieldOffset(void* klass, const std::vector<const char*>& names, size_t fallback = 0)
+  inline size_t ResolveFieldOffset(void* klass, const std::vector<const char*>& names, size_t fallback = 0)
   {
     for (const char* name : names) {
       size_t offset = GetFieldOffset(klass, name);
@@ -93,9 +92,7 @@ namespace IL2CPP
   {
     if (!arrayObj)
       return nullptr;
-    return reinterpret_cast<T*>(
-      reinterpret_cast<uintptr_t>(arrayObj) + Offsets::IL2CPPStructs::arrayDataOffset
-    );
+    return reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(arrayObj) + Offsets::IL2CPPStructs::arrayDataOffset);
   }
 
   inline size_t GetArrayLength(void* arrayObj)

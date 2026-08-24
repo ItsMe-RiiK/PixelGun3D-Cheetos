@@ -3,14 +3,7 @@
 
 namespace Visual
 {
-  void DrawPlayerBox(
-    void*   drawList,
-    Vector2 footScreen,
-    Vector2 screenTop,
-    bool    isEnemy,
-    float   screenW,
-    float   screenH
-  )
+  void DrawPlayerBox(void* drawList, Vector2 footScreen, Vector2 screenTop, bool isEnemy, float screenW, float screenH)
   {
     float height = footScreen.y - screenTop.y;
     if (height < 5.0f)

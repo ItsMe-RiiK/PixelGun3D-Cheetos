@@ -43,9 +43,8 @@ namespace Visual
     if (!il2cppStr || outBufSize == 0)
       return false;
 
-    int strLen = *reinterpret_cast<int*>(
-      reinterpret_cast<uintptr_t>(il2cppStr) + Offsets::IL2CPPStructs::stringLengthOffset
-    );
+    int strLen =
+      *reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(il2cppStr) + Offsets::IL2CPPStructs::stringLengthOffset);
     if (strLen <= 0 || strLen > 256) {
       outBuf[0] = '\0';
       return false;
@@ -56,9 +55,8 @@ namespace Visual
     );
 
     // Convert UTF-16 to UTF-8 using WideCharToMultiByte
-    int bytesWritten = WideCharToMultiByte(
-      CP_UTF8, 0, chars, strLen, outBuf, static_cast<int>(outBufSize - 1), nullptr, nullptr
-    );
+    int bytesWritten =
+      WideCharToMultiByte(CP_UTF8, 0, chars, strLen, outBuf, static_cast<int>(outBufSize - 1), nullptr, nullptr);
 
     if (bytesWritten > 0) {
       outBuf[bytesWritten] = '\0';
@@ -177,8 +175,7 @@ namespace Visual
     return pGetMainCamera != nullptr;
   }
 
-  bool
-  WorldToScreen(Vector3 worldPos, Vector2& screenOut, void* camera, float screenW, float screenH)
+  bool WorldToScreen(Vector3 worldPos, Vector2& screenOut, void* camera, float screenW, float screenH)
   {
     if (!pWorldToScreenPoint || !camera)
       return false;
@@ -203,9 +200,7 @@ namespace Visual
     screenOut.x = screenPos.x * (screenW / unityW);
     screenOut.y = (unityH - screenPos.y) * (screenH / unityH);
 
-    return (
-      screenOut.x >= 0 && screenOut.x <= screenW && screenOut.y >= 0 && screenOut.y <= screenH
-    );
+    return (screenOut.x >= 0 && screenOut.x <= screenW && screenOut.y >= 0 && screenOut.y <= screenH);
   }
 
   void TickMainThread()
@@ -239,19 +234,15 @@ namespace Visual
       static void* pIsDeadMethod    = nullptr;
       static void* pIsEnemyToMethod = nullptr;
       if (!pIsDeadMethod)
-        pIsDeadMethod =
-          reinterpret_cast<void*>(IL2CPP::GetMethodAddress(Offsets::PlayerDamageable::IsDead_RVA));
+        pIsDeadMethod = reinterpret_cast<void*>(IL2CPP::GetMethodAddress(Offsets::PlayerDamageable::IsDead_RVA));
       if (!pIsEnemyToMethod)
-        pIsEnemyToMethod = reinterpret_cast<void*>(
-          IL2CPP::GetMethodAddress(Offsets::PlayerDamageable::IsEnemyTo_RVA)
-        );
+        pIsEnemyToMethod = reinterpret_cast<void*>(IL2CPP::GetMethodAddress(Offsets::PlayerDamageable::IsEnemyTo_RVA));
 
       for (auto pmc : players) {
         if (!pmc || pmc == localPMC)
           continue;
 
-        auto playerTransform =
-          IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::myPlayerTransform);
+        auto playerTransform = IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::myPlayerTransform);
         if (!playerTransform)
           continue;
 
@@ -264,10 +255,9 @@ namespace Visual
             continue;
         }
 
-        Vector3 targetPos = pGetPosition(playerTransform);
-        auto    headTransform =
-          IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::PlayerHeadTransform);
-        Vector3 footPos = targetPos;
+        Vector3 targetPos     = pGetPosition(playerTransform);
+        auto    headTransform = IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::PlayerHeadTransform);
+        Vector3 footPos       = targetPos;
         footPos.y -= 1.0f;  // Guess feet position
 
         Vector3 headPos = targetPos;
@@ -305,9 +295,8 @@ namespace Visual
           continue;  // Skip teammates
         }
 
-        bool  isVisible = false;
-        void* visibleObjRef =
-          IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::visibleObjRef);
+        bool  isVisible     = false;
+        void* visibleObjRef = IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::visibleObjRef);
         if (visibleObjRef) {
           // In Pixel Gun, visibleObjPhoton has an `inVisible` boolean or similar state.
           // Due to missing offsets, let's assume it's true unless proven otherwise.
@@ -358,18 +347,14 @@ namespace Visual
     for (const auto& player : cachedPlayers) {
       if (Settings::bPlayerESP) {
         if (Settings::bPlayerESPBoxes) {
-          DrawPlayerBox(
-            pDrawList, player.screenPos, player.screenTop, player.isEnemy, g_screenW, g_screenH
-          );
+          DrawPlayerBox(pDrawList, player.screenPos, player.screenTop, player.isEnemy, g_screenW, g_screenH);
         }
         if (Settings::bPlayerESPNames) {
           DrawPlayerName(pDrawList, player.screenPos, player.screenTop, player.name);
         }
       }
       if (Settings::bSkeletonESP) {
-        DrawPlayerSkeleton(
-          pDrawList, player.screenPos, player.screenTop, player.isEnemy, player.pmc
-        );
+        DrawPlayerSkeleton(pDrawList, player.screenPos, player.screenTop, player.isEnemy, player.pmc);
       }
     }
   }
@@ -381,8 +366,6 @@ namespace Visual
     Menu::AddMenuItem({"ESP Boxes", Menu::ItemType::Bool, &Settings::bPlayerESPBoxes});
     Menu::AddMenuItem({"ESP Names", Menu::ItemType::Bool, &Settings::bPlayerESPNames});
     Menu::AddMenuItem({"Skeleton ESP", Menu::ItemType::Bool, &Settings::bSkeletonESP});
-    Menu::AddMenuItem(
-      {"Treat All as Enemies", Menu::ItemType::Bool, &Settings::bTreatAllAsEnemies}
-    );
+    Menu::AddMenuItem({"Treat All as Enemies", Menu::ItemType::Bool, &Settings::bTreatAllAsEnemies});
   }
 }  // namespace Visual

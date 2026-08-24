@@ -12,6 +12,7 @@ namespace Menu
     Header,
     Bool,
     Float,
+    Int,
     Action
   };
 
@@ -19,13 +20,162 @@ namespace Menu
   {
     std::string name;
     ItemType    type;
-    bool*       bValue = nullptr;
-    float*      fValue = nullptr;
-    float       fMin   = 0.0f;
-    float       fMax   = 0.0f;
-    float       fStep  = 0.0f;
-    void (*action)()   = nullptr;
-    bool isExpanded    = true;
+    bool*       bValue;
+    float*      fValue;
+    int*        iValue;
+    float       fMin;
+    float       fMax;
+    float       fStep;
+    int         iMin;
+    int         iMax;
+    int         iStep;
+    void (*action)();
+    bool isExpanded;
+
+    // Default Constructor
+    MenuItem() = default;
+
+    // Header Constructor
+    MenuItem(std::string name_, ItemType type_) :
+        name(name_),
+        type(type_),
+        bValue(nullptr),
+        fValue(nullptr),
+        iValue(nullptr),
+        fMin(0),
+        fMax(0),
+        fStep(0),
+        iMin(0),
+        iMax(0),
+        iStep(0),
+        action(nullptr),
+        isExpanded(true)
+    {
+    }
+
+    // Bool Constructor
+    MenuItem(std::string name_, ItemType type_, bool* bValue_) :
+        name(name_),
+        type(type_),
+        bValue(bValue_),
+        fValue(nullptr),
+        iValue(nullptr),
+        fMin(0),
+        fMax(0),
+        fStep(0),
+        iMin(0),
+        iMax(0),
+        iStep(0),
+        action(nullptr),
+        isExpanded(true)
+    {
+    }
+
+    // Float Constructor
+    MenuItem(std::string name_, ItemType type_, bool* bValue_, float* fValue_, float fMin_, float fMax_, float fStep_) :
+        name(name_),
+        type(type_),
+        bValue(bValue_),
+        fValue(fValue_),
+        iValue(nullptr),
+        fMin(fMin_),
+        fMax(fMax_),
+        fStep(fStep_),
+        iMin(0),
+        iMax(0),
+        iStep(0),
+        action(nullptr),
+        isExpanded(true)
+    {
+    }
+
+    // Int Constructor
+    MenuItem(
+      std::string name_,
+      ItemType    type_,
+      bool*       bValue_,
+      float*      fValue_,
+      int*        iValue_,
+      float       fMin_,
+      float       fMax_,
+      float       fStep_,
+      int         iMin_,
+      int         iMax_,
+      int         iStep_
+    ) :
+        name(name_),
+        type(type_),
+        bValue(bValue_),
+        fValue(fValue_),
+        iValue(iValue_),
+        fMin(fMin_),
+        fMax(fMax_),
+        fStep(fStep_),
+        iMin(iMin_),
+        iMax(iMax_),
+        iStep(iStep_),
+        action(nullptr),
+        isExpanded(true)
+    {
+    }
+
+    // Action Constructor
+    MenuItem(
+      std::string name_,
+      ItemType    type_,
+      bool*       bValue_,
+      float*      fValue_,
+      int*        iValue_,
+      float       fMin_,
+      float       fMax_,
+      float       fStep_,
+      int         iMin_,
+      int         iMax_,
+      int         iStep_,
+      void (*action_)()
+    ) :
+        name(name_),
+        type(type_),
+        bValue(bValue_),
+        fValue(fValue_),
+        iValue(iValue_),
+        fMin(fMin_),
+        fMax(fMax_),
+        fStep(fStep_),
+        iMin(iMin_),
+        iMax(iMax_),
+        iStep(iStep_),
+        action(action_),
+        isExpanded(true)
+    {
+    }
+
+    // Old Action Constructor (from before adding Int)
+    MenuItem(
+      std::string name_,
+      ItemType    type_,
+      bool*       bValue_,
+      float*      fValue_,
+      float       fMin_,
+      float       fMax_,
+      float       fStep_,
+      void (*action_)()
+    ) :
+        name(name_),
+        type(type_),
+        bValue(bValue_),
+        fValue(fValue_),
+        iValue(nullptr),
+        fMin(fMin_),
+        fMax(fMax_),
+        fStep(fStep_),
+        iMin(0),
+        iMax(0),
+        iStep(0),
+        action(action_),
+        isExpanded(true)
+    {
+    }
   };
 
   // D3D11 state

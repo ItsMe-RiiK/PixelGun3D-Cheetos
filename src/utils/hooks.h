@@ -1,5 +1,6 @@
 #pragma once
 #include <windows.h>
+#include <cstdint>
 
 namespace Hooks
 {
@@ -39,19 +40,16 @@ namespace Hooks
   );
 
   // ---- MinusLive Hook (God Mode alternative) ----
-  using fn_MinusLive =
-    void (*)(void* thisPtr, float damage, bool isHeadshot, int weaponType, void* methodInfo);
+  using fn_MinusLive = void (*)(void* thisPtr, float damage, bool isHeadshot, int weaponType, void* methodInfo);
   extern fn_MinusLive oMinusLive;
 
   void hkMinusLive(void* thisPtr, float damage, bool isHeadshot, int weaponType, void* methodInfo);
 
   // ---- MinusLiveReal Hook ----
-  using fn_MinusLiveReal =
-    void (*)(void* thisPtr, float damage, bool isHeadshot, int weaponType, void* methodInfo);
+  using fn_MinusLiveReal = void (*)(void* thisPtr, float damage, bool isHeadshot, int weaponType, void* methodInfo);
   extern fn_MinusLiveReal oMinusLiveReal;
 
-  void
-  hkMinusLiveReal(void* thisPtr, float damage, bool isHeadshot, int weaponType, void* methodInfo);
+  void hkMinusLiveReal(void* thisPtr, float damage, bool isHeadshot, int weaponType, void* methodInfo);
 
   // ---- CheatDetectedBanner Bypass ----
   using fn_CBD_Trigger = void (*)();
@@ -61,6 +59,17 @@ namespace Hooks
   using fn_CBD_Show = void (*)();
   extern fn_CBD_Show oCBD_Show;
   void               hkCBD_Show();
+
+  // ---- Lottery Bypass (Chest Price / Output) ----
+  using fn_FreeLottery = int32_t (*)(void* arg);
+  extern fn_FreeLottery oFreeLottery;
+
+  int32_t hkFreeLottery(void* arg);
+
+  using fn_LotteryDropCount = int32_t (*)(void* arg);
+  extern fn_LotteryDropCount oLotteryDropCount;
+
+  int32_t hkLotteryDropCount(void* arg);
 
   // ---- D3D11 Present Hook (for ImGui rendering) ----
   using fn_Present = HRESULT(WINAPI*)(void* pSwapChain, UINT SyncInterval, UINT Flags);

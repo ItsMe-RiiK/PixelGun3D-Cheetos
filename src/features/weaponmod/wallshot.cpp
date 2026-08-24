@@ -19,14 +19,12 @@ namespace WeaponMod
     // Real Wallshot approach: inject WeaponSounds.Obf_61B98209.WallBreak (9) into InShopEffects list
     void* listObj = (void*) IL2CPP::ReadField<uintptr_t>(ws, Offsets::WeaponSounds::inShopEffects);
     if (listObj) {
-      void* itemsArray =
-        (void*) IL2CPP::ReadField<uintptr_t>(listObj, Offsets::IL2CPPStructs::listItemsOffset);
-      int size = IL2CPP::ReadField<int>(listObj, Offsets::IL2CPPStructs::listSizeOffset);
+      void* itemsArray = (void*) IL2CPP::ReadField<uintptr_t>(listObj, Offsets::IL2CPPStructs::listItemsOffset);
+      int   size       = IL2CPP::ReadField<int>(listObj, Offsets::IL2CPPStructs::listSizeOffset);
       if (itemsArray && size > 0 && !WeaponMod::backup.addedWallBreak) {
         bool hasWallBreak = false;
         for (int i = 0; i < size; i++) {
-          int effect =
-            IL2CPP::ReadField<int>(itemsArray, Offsets::IL2CPPStructs::arrayDataOffset + (i * 4));
+          int effect = IL2CPP::ReadField<int>(itemsArray, Offsets::IL2CPPStructs::arrayDataOffset + (i * 4));
           if (effect == 9) {
             hasWallBreak = true;
             break;
@@ -34,25 +32,19 @@ namespace WeaponMod
         }
 
         if (!hasWallBreak) {
-          int capacity =
-            IL2CPP::ReadField<int>(itemsArray, Offsets::IL2CPPStructs::arrayLengthOffset);
+          int capacity = IL2CPP::ReadField<int>(itemsArray, Offsets::IL2CPPStructs::arrayLengthOffset);
           WeaponMod::backup.addedWallBreak         = true;
           WeaponMod::backup.originalEffectListSize = size;
 
           if (size < capacity) {
-            IL2CPP::WriteField<int>(
-              itemsArray, Offsets::IL2CPPStructs::arrayDataOffset + (size * 4), 9
-            );
+            IL2CPP::WriteField<int>(itemsArray, Offsets::IL2CPPStructs::arrayDataOffset + (size * 4), 9);
             IL2CPP::WriteField<int>(listObj, Offsets::IL2CPPStructs::listSizeOffset, size + 1);
             WeaponMod::backup.overwrittenEffect = -1;
           }
           else {
-            WeaponMod::backup.overwrittenEffect = IL2CPP::ReadField<int>(
-              itemsArray, Offsets::IL2CPPStructs::arrayDataOffset + ((size - 1) * 4)
-            );
-            IL2CPP::WriteField<int>(
-              itemsArray, Offsets::IL2CPPStructs::arrayDataOffset + ((size - 1) * 4), 9
-            );
+            WeaponMod::backup.overwrittenEffect =
+              IL2CPP::ReadField<int>(itemsArray, Offsets::IL2CPPStructs::arrayDataOffset + ((size - 1) * 4));
+            IL2CPP::WriteField<int>(itemsArray, Offsets::IL2CPPStructs::arrayDataOffset + ((size - 1) * 4), 9);
           }
         }
       }

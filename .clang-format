@@ -22,8 +22,8 @@ BraceWrapping:
   AfterStruct: true
   AfterControlStatement: false
   BeforeElse: true
-  AfterEnum: false
-  AfterNamespace: false
+  AfterEnum: true
+  AfterNamespace: true
 
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: AfterColon

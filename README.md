@@ -97,5 +97,34 @@ Whether you compiled the code yourself or downloaded a pre-built Release archive
 2. Open a terminal and run `./runLinux.sh` (if downloaded from Releases) or `./scripts/runLinux.sh` (if built from source).
 *(Note: This requires `protontricks` installed on your system to correctly inject into the Steam Proton prefix).*
 
+## Support
+
+If you like this project and want to support its development, consider buying me a coffee or donating!
+
+<details>
+<summary><b>Donation Addresses</b></summary>
+
+| Payment Method | Address |
+| :--- | :--- |
+| [![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/MuhamadSyakir) | [Click Me!](https://www.paypal.com/paypalme/MuhamadSyakir) |
+| ![Bitcoin](https://img.shields.io/badge/Bitcoin-000000?style=for-the-badge&logo=bitcoin&logoColor=white) | `bc1qpp50c2wuz5n2rq9jy3fxdmte7smcwu5rnegu6q` |
+| ![Ethereum](https://img.shields.io/badge/Ethereum-3C3C3D?style=for-the-badge&logo=ethereum&logoColor=white) | `0xbF16e9cC4F75Dcd5c1DaD4443b9d8348eC196592` |
+| ![Tether](https://img.shields.io/badge/Tether-14B693?style=for-the-badge&logo=tether&logoColor=white) | `0xbF16e9cC4F75Dcd5c1DaD4443b9d8348eC196592` |
+| ![BNB](https://img.shields.io/badge/BNB-F3BA2F?style=for-the-badge&logo=binance&logoColor=white) | `0xbF16e9cC4F75Dcd5c1DaD4443b9d8348eC196592` |
+| ![XRP](https://img.shields.io/badge/XRP-23292F?style=for-the-badge&logo=xrp&logoColor=white) | `rnDnG9QBce7sbmY86HXqBUpcCq6LN3xfXg` |
+| ![USDC](https://img.shields.io/badge/USDC-2775CA?style=for-the-badge&logo=usd-coin&logoColor=white) | `0xbF16e9cC4F75Dcd5c1DaD4443b9d8348eC196592` |
+| ![Solana](https://img.shields.io/badge/Solana-000000?style=for-the-badge&logo=solana&logoColor=blue) | `FLFVbCaYQWoPrm9rH1WLuoYmiVnC5CFWoCPzkNk2vzy2` |
+| ![Tron](https://img.shields.io/badge/Tron-FF0013?style=for-the-badge&logo=tron&logoColor=white) | `TYNLxxQWERit64uNo8dSQX3CxdLmomtAq7` |
+| ![Dogecoin](https://img.shields.io/badge/Dogecoin-C2A633?style=for-the-badge&logo=dogecoin&logoColor=white) | `DFwJXDQsqPEdpnWhXCMmBWMru9iqYqWhDn` |
+| ![Cardano](https://img.shields.io/badge/Cardano-0033AD?style=for-the-badge&logo=cardano&logoColor=white) | `addr1qyhapduj2uvu8x4ct75hujtsx63uq375cxda8m25xgn7wep06zmey4cecwdtshaf0eyhqd4rcprafsvm60k4gv38uajq2z2l6a` |
+| ![Litecoin](https://img.shields.io/badge/Litecoin-A6A9AA?style=for-the-badge&logo=litecoin&logoColor=black) | `LMNbzEJ3M4qtAxsYyxMBkT4rzjSBJvUc2M` |
+| ![Avalanche](https://img.shields.io/badge/Avalanche-E84142?style=for-the-badge&logo=avalanche&logoColor=white) | `0xbF16e9cC4F75Dcd5c1DaD4443b9d8348eC196592` |
+| ![Polkadot](https://img.shields.io/badge/Polkadot-E6007A?style=for-the-badge&logo=polkadot&logoColor=white) | `15FtRzNuwpbNAjvMzRCegqDwN7cgw2a44ogfobdS7UmNACFr` |
+| ![Polygon](https://img.shields.io/badge/Polygon-8247E5?style=for-the-badge&logo=polygon&logoColor=white) | `0xbF16e9cC4F75Dcd5c1DaD4443b9d8348eC196592` |
+| ![Cosmos](https://img.shields.io/badge/Cosmos-2E3148?style=for-the-badge&logo=cosmos&logoColor=white) | `cosmos1ashcczkgj884t9gert2se4m4zw5ea7t2fa4qh9` |
+| ![X0 Cash](https://img.shields.io/badge/X0_Cash-228B22?style=for-the-badge&logoColor=white) | `FLFVbCaYQWoPrm9rH1WLuoYmiVnC5CFWoCPzkNk2vzy2` |
+
+</details>
+
 ## LICENSE
 This project under [MIT LICENSE](license)

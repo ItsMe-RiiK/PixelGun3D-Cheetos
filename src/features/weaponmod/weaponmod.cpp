@@ -2,7 +2,8 @@
 #include "../../utils/il2cpp.h"
 #include "../../ui/menu.h"
 
-namespace WeaponMod {
+namespace WeaponMod
+{
 
   WeaponModBackup backup           = {};
   void*           lastWeaponSounds = nullptr;

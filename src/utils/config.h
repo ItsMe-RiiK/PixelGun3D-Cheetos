@@ -1,7 +1,8 @@
 #pragma once
 #include <string>
 
-namespace Config {
+namespace Config
+{
   extern std::string configPath;
 
   void SetConfigPath(const std::string& dllPath);

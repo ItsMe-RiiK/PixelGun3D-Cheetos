@@ -1,8 +1,10 @@
 #pragma once
 #include <windows.h>
 
-namespace Hooks {
-  namespace Settings {
+namespace Hooks
+{
+  namespace Settings
+  {
     inline bool bAntiCheatBypass = true;
   }
 

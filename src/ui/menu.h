@@ -5,8 +5,10 @@
 
 #include <string>
 
-namespace Menu {
-  enum class ItemType {
+namespace Menu
+{
+  enum class ItemType
+  {
     Header,
     Bool,
     Float,

@@ -1,8 +1,10 @@
 #pragma once
 #include <cstdint>
 
-namespace PlayerMod {
-  namespace Settings {
+namespace PlayerMod
+{
+  namespace Settings
+  {
     inline bool  bHighJump       = false;
     inline float fJumpMultiplier = 2.0f;
     inline bool  bFly            = false;

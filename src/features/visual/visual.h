@@ -2,8 +2,10 @@
 #include <vector>
 #include <mutex>
 
-namespace Visual {
-  namespace Settings {
+namespace Visual
+{
+  namespace Settings
+  {
     inline bool bPlayerESP         = false;
     inline bool bPlayerESPBoxes    = true;
     inline bool bPlayerESPNames    = true;

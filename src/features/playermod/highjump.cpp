@@ -2,7 +2,8 @@
 #include "../../utils/il2cpp.h"
 #include <windows.h>
 
-namespace PlayerMod {
+namespace PlayerMod
+{
   void ApplyHighJump()
   {
     auto pmc = IL2CPP::GetLocalPlayerMoveC();

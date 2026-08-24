@@ -1,7 +1,9 @@
 #pragma once
 
-namespace WeaponMod {
-  namespace Settings {
+namespace WeaponMod
+{
+  namespace Settings
+  {
     // Infinite Ammo
     inline bool bInfiniteAmmo = false;
 

@@ -2,7 +2,8 @@
 #include "../../utils/il2cpp.h"
 #include "../../ui/menu.h"
 
-namespace PlayerMod {
+namespace PlayerMod
+{
   void Tick()
   {
     try {

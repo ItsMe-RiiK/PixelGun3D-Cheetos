@@ -1,7 +1,8 @@
 #include "visual.h"
 #include <imgui.h>
 
-namespace Visual {
+namespace Visual
+{
   void DrawPlayerBox(
     void*   drawList,
     Vector2 footScreen,

@@ -1,11 +1,13 @@
 #pragma once
 #include <cstdint>
 
-namespace Offsets {
+namespace Offsets
+{
   // ==========================================
   // WeaponManager (TypeDefIndex: 5805)
   // ==========================================
-  namespace WeaponManager {
+  namespace WeaponManager
+  {
     constexpr uintptr_t StaticInstance = 0x230;  // WeaponManager singleton
     constexpr uintptr_t myPlayerMoveC  = 0x48;   // Player_move_c*
   }  // namespace WeaponManager
@@ -13,7 +15,8 @@ namespace Offsets {
   // ==========================================
   // Player_move_c (TypeDefIndex: 1241)
   // ==========================================
-  namespace PlayerMoveC {
+  namespace PlayerMoveC
+  {
     constexpr uintptr_t charWeaponCurrent   = 0xBE8;      // current weapon struct
     constexpr uintptr_t myPlayerTransform   = 0x3F8;      // Transform*
     constexpr uintptr_t PlayerHeadTransform = 0x4B0;      // Transform*
@@ -34,7 +37,8 @@ namespace Offsets {
   // ==========================================
   // WeaponSounds (TypeDefIndex: 5877)
   // ==========================================
-  namespace WeaponSounds {
+  namespace WeaponSounds
+  {
     constexpr uintptr_t ammoInClip             = 0x6C;   // int
     constexpr uintptr_t InitialAmmo            = 0x70;   // int
     constexpr uintptr_t isUnlimitedAmmo        = 0x54A;  // bool
@@ -89,7 +93,8 @@ namespace Offsets {
   // ==========================================
   // PlayerDamageable (TypeDefIndex: 1711)
   // ==========================================
-  namespace PlayerDamageable {
+  namespace PlayerDamageable
+  {
     constexpr uintptr_t playerMoveC     = 0x18;  // Player_move_c*
     constexpr uintptr_t ApplyDamage_RVA = 0x1DB8410;
     constexpr uintptr_t IsDead_RVA      = 0x1DB9940;
@@ -99,7 +104,8 @@ namespace Offsets {
   // ==========================================
   // ItemRecord (TypeDefIndex: 6461)
   // ==========================================
-  namespace ItemRecord {
+  namespace ItemRecord
+  {
     constexpr uintptr_t ammoInClip      = 0x20;
     constexpr uintptr_t isUnlimitedAmmo = 0x6C;
   }  // namespace ItemRecord
@@ -107,14 +113,16 @@ namespace Offsets {
   // ==========================================
   // WeaponContainer (TypeDefIndex: 7682)
   // ==========================================
-  namespace WeaponContainer {
+  namespace WeaponContainer
+  {
     constexpr uintptr_t initialAmmo = 0x5C;
   }
 
   // ==========================================
   // Live Weapon (Dynamic resolution fallback)
   // ==========================================
-  namespace LiveWeapon {
+  namespace LiveWeapon
+  {
     constexpr uintptr_t ammoFallback = 0x48;
 
     // Dynamic offsets resolved at runtime
@@ -127,7 +135,8 @@ namespace Offsets {
   // ==========================================
   // SkinName (TypeDefIndex: 6028)
   // ==========================================
-  namespace SkinName {
+  namespace SkinName
+  {
     inline size_t isMineOffset             = 0;
     inline size_t firstPersonControlOffset = 0;
     inline bool   dynamicOffsetsResolved   = false;
@@ -138,7 +147,8 @@ namespace Offsets {
   // ==========================================
   // FirstPersonControlSharp (TypeDefIndex: 6617)
   // ==========================================
-  namespace FirstPersonControlSharp {
+  namespace FirstPersonControlSharp
+  {
     constexpr uintptr_t set_MoveSpeedMultiplier_RVA = 0x9A3EE0;
 
     inline size_t velocityDownFallMultiplierOffset = 0;
@@ -150,7 +160,8 @@ namespace Offsets {
   // ==========================================
   // IL2CPP Internal Structures
   // ==========================================
-  namespace IL2CPPStructs {
+  namespace IL2CPPStructs
+  {
     constexpr uintptr_t stringLengthOffset = 0x10;
     constexpr uintptr_t stringCharsOffset  = 0x14;
     constexpr uintptr_t arrayLengthOffset  = 0x18;
@@ -164,14 +175,16 @@ namespace Offsets {
   // ==========================================
   // Object (TypeDefIndex: 12345)
   // ==========================================
-  namespace Object {
+  namespace Object
+  {
     constexpr uintptr_t FindObjectsOfType_RVA = 0x476E060;
   }
 
   // ==========================================
   // CheatDetectedBanner (TypeDefIndex: 9999)
   // ==========================================
-  namespace AntiCheat {
+  namespace AntiCheat
+  {
     constexpr uintptr_t CBD_Trigger_RVA    = 0x218B940;  // static trigger method
     constexpr uintptr_t CBD_Awake_RVA      = 0x218B570;
     constexpr uintptr_t CBD_Update_RVA     = 0x218BB20;
@@ -181,7 +194,8 @@ namespace Offsets {
   // ==========================================
   // IL2CPP Class pointers (resolved at runtime, cached here)
   // ==========================================
-  namespace Classes {
+  namespace Classes
+  {
     inline uintptr_t WeaponManager           = 0;
     inline uintptr_t PlayerMoveC             = 0;
     inline uintptr_t WeaponSounds            = 0;

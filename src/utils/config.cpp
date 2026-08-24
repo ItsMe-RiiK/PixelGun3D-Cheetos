@@ -6,7 +6,8 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 
-namespace Config {
+namespace Config
+{
   std::string configPath = "";
 
   void SetConfigPath(const std::string& dllPath)

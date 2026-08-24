@@ -2,7 +2,8 @@
 #include "../../utils/il2cpp.h"
 #include <windows.h>
 
-namespace PlayerMod {
+namespace PlayerMod
+{
   void ApplyFly()
   {
     auto pmc = IL2CPP::GetLocalPlayerMoveC();

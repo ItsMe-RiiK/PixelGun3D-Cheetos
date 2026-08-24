@@ -1,6 +1,7 @@
 #include "il2cpp.h"
 
-namespace IL2CPP {
+namespace IL2CPP
+{
   // Function pointer typedefs
   using fn_il2cpp_domain_get                  = void* (*) ();
   using fn_il2cpp_domain_get_assemblies       = void** (*) (void* domain, size_t* size);
@@ -438,88 +439,108 @@ namespace IL2CPP {
   }
 }  // namespace IL2CPP
 
-namespace Offsets { namespace PlayerMoveC {
-  void InitDynamicOffsets()
+namespace Offsets
+{
+  namespace PlayerMoveC
   {
-    if (dynamicOffsetsResolved)
-      return;
+    void InitDynamicOffsets()
+    {
+      if (dynamicOffsetsResolved)
+        return;
 
-    void* pmcClass = (void*) Offsets::Classes::PlayerMoveC;
-    if (!pmcClass)
-      return;
+      void* pmcClass = (void*) Offsets::Classes::PlayerMoveC;
+      if (!pmcClass)
+        return;
 
-    mySkinNameOffset       = IL2CPP::ResolveFieldOffset(pmcClass, {"mySkinName"});
-    dynamicOffsetsResolved = true;
-  }
-}}  // namespace Offsets::PlayerMoveC
+      mySkinNameOffset       = IL2CPP::ResolveFieldOffset(pmcClass, {"mySkinName"});
+      dynamicOffsetsResolved = true;
+    }
+  }  // namespace PlayerMoveC
+}  // namespace Offsets
 
-namespace Offsets { namespace SkinName {
-  void InitDynamicOffsets()
+namespace Offsets
+{
+  namespace SkinName
   {
-    if (dynamicOffsetsResolved)
-      return;
+    void InitDynamicOffsets()
+    {
+      if (dynamicOffsetsResolved)
+        return;
 
-    void* skinNameClass = (void*) Offsets::Classes::SkinName;
-    if (!skinNameClass)
-      return;
+      void* skinNameClass = (void*) Offsets::Classes::SkinName;
+      if (!skinNameClass)
+        return;
 
-    isMineOffset             = IL2CPP::ResolveFieldOffset(skinNameClass, {"isMine"});
-    firstPersonControlOffset = IL2CPP::ResolveFieldOffset(skinNameClass, {"firstPersonControl"});
+      isMineOffset             = IL2CPP::ResolveFieldOffset(skinNameClass, {"isMine"});
+      firstPersonControlOffset = IL2CPP::ResolveFieldOffset(skinNameClass, {"firstPersonControl"});
 
-    dynamicOffsetsResolved = true;
-  }
-}}  // namespace Offsets::SkinName
+      dynamicOffsetsResolved = true;
+    }
+  }  // namespace SkinName
+}  // namespace Offsets
 
-namespace Offsets { namespace FirstPersonControlSharp {
-  void InitDynamicOffsets()
+namespace Offsets
+{
+  namespace FirstPersonControlSharp
   {
-    if (dynamicOffsetsResolved)
-      return;
+    void InitDynamicOffsets()
+    {
+      if (dynamicOffsetsResolved)
+        return;
 
-    void* fpcClass = (void*) Offsets::Classes::FirstPersonControlSharp;
-    if (!fpcClass)
-      return;
+      void* fpcClass = (void*) Offsets::Classes::FirstPersonControlSharp;
+      if (!fpcClass)
+        return;
 
-    velocityDownFallMultiplierOffset =
-      IL2CPP::ResolveFieldOffset(fpcClass, {"velocityDownFallMultiplier"});
+      velocityDownFallMultiplierOffset =
+        IL2CPP::ResolveFieldOffset(fpcClass, {"velocityDownFallMultiplier"});
 
-    dynamicOffsetsResolved = true;
-  }
-}}  // namespace Offsets::FirstPersonControlSharp
+      dynamicOffsetsResolved = true;
+    }
+  }  // namespace FirstPersonControlSharp
+}  // namespace Offsets
 
-namespace Offsets { namespace WeaponSounds {
-  void InitDynamicOffsets()
+namespace Offsets
+{
+  namespace WeaponSounds
   {
-    if (dynamicOffsetsResolved)
-      return;
+    void InitDynamicOffsets()
+    {
+      if (dynamicOffsetsResolved)
+        return;
 
-    void* wsClass = (void*) Offsets::Classes::WeaponSounds;
-    if (!wsClass)
-      return;
+      void* wsClass = (void*) Offsets::Classes::WeaponSounds;
+      if (!wsClass)
+        return;
 
-    breakoutOffset      = IL2CPP::ResolveFieldOffset(wsClass, {"bulletBreakout"});
-    superBreakoutOffset = IL2CPP::ResolveFieldOffset(wsClass, {"bulletSuperBreakout"});
+      breakoutOffset      = IL2CPP::ResolveFieldOffset(wsClass, {"bulletBreakout"});
+      superBreakoutOffset = IL2CPP::ResolveFieldOffset(wsClass, {"bulletSuperBreakout"});
 
-    isUnlimitedAmmoOffset = IL2CPP::ResolveFieldOffset(
-      wsClass, {"isUnlimitedAmmo"}, Offsets::WeaponSounds::isUnlimitedAmmo
-    );
+      isUnlimitedAmmoOffset = IL2CPP::ResolveFieldOffset(
+        wsClass, {"isUnlimitedAmmo"}, Offsets::WeaponSounds::isUnlimitedAmmo
+      );
 
-    canAffectAlliesOffset = IL2CPP::ResolveFieldOffset(wsClass, {"canAffectAllies"});
+      canAffectAlliesOffset = IL2CPP::ResolveFieldOffset(wsClass, {"canAffectAllies"});
 
-    dynamicOffsetsResolved = true;
-  }
-}}  // namespace Offsets::WeaponSounds
+      dynamicOffsetsResolved = true;
+    }
+  }  // namespace WeaponSounds
+}  // namespace Offsets
 
-namespace Offsets { namespace LiveWeapon {
-  void InitDynamicOffsets(void* charWeaponClass)
+namespace Offsets
+{
+  namespace LiveWeapon
   {
-    if (dynamicOffsetsResolved || !charWeaponClass)
-      return;
+    void InitDynamicOffsets(void* charWeaponClass)
+    {
+      if (dynamicOffsetsResolved || !charWeaponClass)
+        return;
 
-    liveAmmoOffset = IL2CPP::ResolveFieldOffset(
-      charWeaponClass, {"ammo", "currentAmmoInBackpack"}, Offsets::LiveWeapon::ammoFallback
-    );
+      liveAmmoOffset = IL2CPP::ResolveFieldOffset(
+        charWeaponClass, {"ammo", "currentAmmoInBackpack"}, Offsets::LiveWeapon::ammoFallback
+      );
 
-    dynamicOffsetsResolved = true;
-  }
-}}  // namespace Offsets::LiveWeapon
+      dynamicOffsetsResolved = true;
+    }
+  }  // namespace LiveWeapon
+}  // namespace Offsets

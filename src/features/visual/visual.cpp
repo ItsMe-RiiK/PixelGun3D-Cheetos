@@ -6,7 +6,8 @@
 #include <cmath>
 #include <vector>
 
-namespace Visual {
+namespace Visual
+{
   std::vector<PlayerESPData> cachedPlayers;
   std::mutex                 espMutex;
   float                      g_screenW      = 0.0f;

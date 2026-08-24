@@ -12,7 +12,8 @@
 #include <string>
 #include <algorithm>
 
-namespace Menu {
+namespace Menu
+{
   ID3D11Device*           pDevice       = nullptr;
   ID3D11DeviceContext*    pContext      = nullptr;
   ID3D11RenderTargetView* pRenderTarget = nullptr;
@@ -23,7 +24,8 @@ namespace Menu {
 
   bool initialized = false;
 
-  namespace Settings {
+  namespace Settings
+  {
     inline bool bMenuOpen = true;
   }
 

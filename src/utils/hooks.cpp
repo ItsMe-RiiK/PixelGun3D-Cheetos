@@ -5,7 +5,8 @@
 #include "../features/weaponmod/weaponmod.h"
 #include "../features/playermod/playermod.h"
 
-namespace Hooks {
+namespace Hooks
+{
   fn_ApplyDamage oApplyDamage = nullptr;
 
   void hkApplyDamage(

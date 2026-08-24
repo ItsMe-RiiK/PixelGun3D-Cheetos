@@ -3,7 +3,8 @@
 #include <windows.h>
 #include <vector>
 
-namespace IL2CPP {
+namespace IL2CPP
+{
   // Module handles
   extern HMODULE   hGameAssembly;
   extern uintptr_t gameAssemblyBase;

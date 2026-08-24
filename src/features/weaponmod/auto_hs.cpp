@@ -2,7 +2,8 @@
 #include "../../utils/il2cpp.h"
 #include "../../utils/offsets.h"
 
-namespace WeaponMod {
+namespace WeaponMod
+{
   void ApplyAutoHeadshot(void* thisPtr, int& damageType)
   {
     if (Settings::bAutoHeadshot && thisPtr) {

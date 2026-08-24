@@ -1,7 +1,8 @@
 #include "weaponmod.h"
 #include "../../utils/il2cpp.h"
 
-namespace WeaponMod {
+namespace WeaponMod
+{
   void ApplyAOEBullets(void* ws)
   {
     if (!ws)

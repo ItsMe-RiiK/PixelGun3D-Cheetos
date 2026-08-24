@@ -2,7 +2,8 @@
 #include "../../utils/il2cpp.h"
 #include <imgui.h>
 
-namespace Visual {
+namespace Visual
+{
   void
   DrawPlayerSkeleton(void* drawList, Vector2 footScreen, Vector2 screenTop, bool isEnemy, void* pmc)
   {

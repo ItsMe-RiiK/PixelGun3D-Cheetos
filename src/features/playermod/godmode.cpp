@@ -1,7 +1,8 @@
 #include "playermod.h"
 #include "../../utils/il2cpp.h"
 
-namespace PlayerMod {
+namespace PlayerMod
+{
   bool OnApplyDamage(void* thisPtr)
   {
     if (Settings::bGodMode) {

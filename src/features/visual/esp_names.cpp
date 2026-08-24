@@ -1,7 +1,8 @@
 #include "visual.h"
 #include <imgui.h>
 
-namespace Visual {
+namespace Visual
+{
   void DrawPlayerName(void* drawList, Vector2 footScreen, Vector2 screenTop, const char* name)
   {
     if (!name || !name[0])

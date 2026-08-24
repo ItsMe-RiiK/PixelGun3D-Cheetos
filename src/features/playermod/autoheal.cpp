@@ -1,7 +1,8 @@
 #include "playermod.h"
 #include "../../utils/il2cpp.h"
 
-namespace PlayerMod {
+namespace PlayerMod
+{
   void ApplyAutoHeal()
   {
     auto damageable = IL2CPP::GetLocalPlayerDamageable();

@@ -13,9 +13,6 @@ set "DUMPED_DIR=%PROJECT_ROOT%\resources\dumped\static"
 set "VALIDATOR=%TOOLS_DIR%\validate_offsets.py"
 set "LOG_DIR=%PROJECT_ROOT%\resources\logs"
 
-REM Generate timestamp
-for /f "tokens=2 delims==" %%I in ('wmic os get localdatetime /value') do set "DT=%%I"
-set "TIMESTAMP=%DT:~0,8%_%DT:~8,6%"
 set "LOG_FILE=%LOG_DIR%\validate.log"
 
 title PG3D Offset Updater
@@ -129,67 +126,8 @@ REM =====================================================
 call :Preflight
 if %errorlevel% neq 0 exit /b 1
 
-if "%~2"=="" (
-    echo   [*] No new dump path provided. Updating offsets using current dumps...
-    echo.
-    set "UPDATER_ARGS=--update"
-    goto Validate
-)
-
-set "NEW_DUMP_DIR=%~2"
-
-REM If user passed a file instead of a directory, get its folder
-if exist "%NEW_DUMP_DIR%" (
-    if not exist "%NEW_DUMP_DIR%\" (
-        for %%I in ("%NEW_DUMP_DIR%") do set "NEW_DUMP_DIR=%%~dpI"
-        if "!NEW_DUMP_DIR:~-1!"=="\" set "NEW_DUMP_DIR=!NEW_DUMP_DIR:~0,-1!"
-    )
-)
-
-if not exist "%NEW_DUMP_DIR%" (
-    echo   [!] Directory not found: %NEW_DUMP_DIR%
-    exit /b 1
-)
-
-if not exist "%NEW_DUMP_DIR%\dump.cs" (
-    echo   [!] dump.cs not found in: %NEW_DUMP_DIR%
-    exit /b 1
-)
-
-REM Backup current dumps
-set "BACKUP_DIR=%DUMPED_DIR%\backup_%TIMESTAMP%"
-echo   [*] Backing up current dumps to: %BACKUP_DIR%
-mkdir "%BACKUP_DIR%"
-
-for %%F in (dump.cs il2cpp.h script.json stringliteral.json) do (
-    if exist "%DUMPED_DIR%\%%F" (
-        copy /Y "%DUMPED_DIR%\%%F" "%BACKUP_DIR%\%%F" >nul
-    )
-)
-echo   [+] Backup complete
-
-REM Copy new dumps
-echo   [*] Copying new dump files...
-for %%F in (dump.cs il2cpp.h script.json stringliteral.json) do (
-    if exist "%NEW_DUMP_DIR%\%%F" (
-        REM Compare canonical paths to prevent copying over itself
-        for %%A in ("%NEW_DUMP_DIR%\%%F") do set "SRC_PATH=%%~fA"
-        for %%B in ("%DUMPED_DIR%\%%F") do set "DST_PATH=%%~fB"
-        if /I not "!SRC_PATH!"=="!DST_PATH!" (
-            copy /Y "%NEW_DUMP_DIR%\%%F" "%DUMPED_DIR%\%%F" >nul
-            echo   [+]   Copied: %%F
-        ) else (
-            echo   [+]   Kept existing: %%F
-        )
-    )
-)
-
+echo   [*] Updating offsets using current dumps...
 echo.
-echo   [+] Dump files updated!
-echo.
-echo   [*] Running auto-updater against new dumps...
-echo.
-
 set "UPDATER_ARGS=--update"
 goto Validate
 
@@ -201,11 +139,11 @@ echo   Usage: %~nx0 ^<command^> [args]
 echo.
 echo   Commands:
 echo     validate         — Run auto-updater against dump.cs
-echo     update ^<path^>    — Update dump files from a directory and run auto-updater
+echo     update           — Update offsets using current dumps (--update)
 echo     help             — Show this help message
 echo.
 echo   Examples:
 echo     %~nx0 validate
-echo     %~nx0 update C:\Users\You\Downloads\new_dumps
+echo     %~nx0 update
 echo.
 exit /b 0

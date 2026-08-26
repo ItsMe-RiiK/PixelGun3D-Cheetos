@@ -12,7 +12,6 @@ TOOLS_DIR="$PROJECT_ROOT/resources/tools"
 DUMPED_DIR="$PROJECT_ROOT/resources/dumped/static"
 VALIDATOR="$TOOLS_DIR/validate_offsets.py"
 LOG_DIR="$PROJECT_ROOT/resources/logs"
-TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 LOG_FILE="$LOG_DIR/validate.log"
 
 # --- Colors ---
@@ -74,6 +73,13 @@ preflight() {
     success "Pre-flight checks passed"
 }
 
+# --- Update offsets ---
+update_offsets() {
+    info "Updating offsets using current dumps..."
+    echo ""
+    validate --update
+}
+
 # --- Validate ---
 validate() {
     local args="${*-}"
@@ -108,65 +114,6 @@ validate() {
     success "Log saved to: $LOG_FILE"
 }
 
-# --- Update dump files ---
-update_dumps() {
-    local new_dump_dir="${1:-}"
-
-    if [ -z "$new_dump_dir" ]; then
-        info "No new dump path provided. Updating offsets using current dumps..."
-        echo ""
-        validate --update
-        exit 0
-    fi
-
-    if [ -f "$new_dump_dir" ]; then
-        new_dump_dir="$(dirname "$new_dump_dir")"
-    fi
-
-    if [ ! -d "$new_dump_dir" ]; then
-        error "Path not found: $new_dump_dir"
-        exit 1
-    fi
-
-    if [ ! -f "$new_dump_dir/dump.cs" ]; then
-        error "dump.cs not found in: $new_dump_dir"
-        exit 1
-    fi
-
-    # Backup current dumps
-    local backup_dir="$DUMPED_DIR/backup_${TIMESTAMP}"
-    info "Backing up current dumps to: $backup_dir"
-    mkdir -p "$backup_dir"
-
-    for f in dump.cs il2cpp.h script.json stringliteral.json; do
-        if [ -f "$DUMPED_DIR/$f" ]; then
-            cp "$DUMPED_DIR/$f" "$backup_dir/$f"
-        fi
-    done
-    success "Backup complete"
-
-    # Copy new dumps
-    info "Copying new dump files..."
-    for f in dump.cs il2cpp.h script.json stringliteral.json; do
-        if [ -f "$new_dump_dir/$f" ]; then
-            if [ "$new_dump_dir/$f" != "$DUMPED_DIR/$f" ] && [ "$(realpath "$new_dump_dir/$f")" != "$(realpath "$DUMPED_DIR/$f")" ]; then
-                cp "$new_dump_dir/$f" "$DUMPED_DIR/$f"
-                success "  Copied: $f"
-            else
-                success "  Kept existing: $f (same path)"
-            fi
-        fi
-    done
-
-    echo ""
-    success "Dump files updated!"
-    echo ""
-    info "Running auto-updater against new dumps..."
-    echo ""
-
-    validate --update
-}
-
 # --- Main ---
 main() {
     banner
@@ -178,19 +125,19 @@ main() {
             ;;
         update)
             preflight
-            update_dumps "${2:-}"
+            update_offsets
             ;;
         help)
             echo "  Usage: $0 <command> [args]"
             echo ""
             echo "  Commands:"
             echo "    validate         — Run auto-updater against dump.cs"
-            echo "    update <path>    — Update dump files from a directory and run auto-updater"
+            echo "    update           — Update offsets using current dumps (--update)"
             echo "    help             — Show this help message"
             echo ""
             echo "  Examples:"
             echo "    $0 validate"
-            echo "    $0 update ~/Downloads/new_dumps/"
+            echo "    $0 update"
             echo ""
             ;;
         *)

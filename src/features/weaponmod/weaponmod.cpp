@@ -25,10 +25,6 @@ namespace WeaponMod
     backup.criticalHitChance = IL2CPP::ReadField<int>(ws, criticalHitChance);
     backup.criticalHitCoef   = IL2CPP::ReadField<float>(ws, criticalHitCoef);
 
-    // Reach
-    backup.radiusRoundMelee      = IL2CPP::ReadField<float>(ws, radiusRoundMelee);
-    backup.lengthShootFromPrefab = IL2CPP::ReadField<float>(ws, lengthShootFromPrefab);
-    backup.shootDistanceIfZoom   = IL2CPP::ReadField<float>(ws, shootDistanceIfZoom);
 
     // AOE Bullets
     backup.isSectorsAOE           = IL2CPP::ReadField<bool>(ws, isSectorsAOE);
@@ -60,11 +56,6 @@ namespace WeaponMod
     IL2CPP::WriteField(ws, criticalHitChance, backup.criticalHitChance);
     IL2CPP::WriteField(ws, criticalHitCoef, backup.criticalHitCoef);
 
-    // Reach
-    IL2CPP::WriteField(ws, radiusRoundMelee, backup.radiusRoundMelee);
-    IL2CPP::WriteField(ws, lengthShootFromPrefab, backup.lengthShootFromPrefab);
-    IL2CPP::WriteField(ws, shootDistanceIfZoom, backup.shootDistanceIfZoom);
-
     // AOE Bullets
     IL2CPP::WriteField(ws, isSectorsAOE, backup.isSectorsAOE);
     IL2CPP::WriteField(ws, sectorsAOEAngleFront, backup.sectorsAOEAngleFront);
@@ -93,12 +84,11 @@ namespace WeaponMod
         ApplyInfiniteAmmo(ws);
       if (Settings::bCritChance100)
         ApplyCritChance(ws);
-      if (Settings::bReach)
-        ApplyReach(ws);
+
       if (Settings::bAOEBullets)
         ApplyAOEBullets(ws);
 
-      bool anyActive = Settings::bInfiniteAmmo || Settings::bCritChance100 || Settings::bReach || Settings::bAOEBullets;
+      bool anyActive = Settings::bInfiniteAmmo || Settings::bCritChance100 || Settings::bAOEBullets;
 
       if (!anyActive) {
         backup.hasBackup = false;
@@ -116,10 +106,6 @@ namespace WeaponMod
     Menu::AddMenuItem({"100% Crit Chance", Menu::ItemType::Bool, &Settings::bCritChance100});
     Menu::AddMenuItem(
       {"Crit Multiplier", Menu::ItemType::Float, nullptr, &Settings::fCritMultiplier, 1.0f, 20.0f, 1.0f}
-    );
-    Menu::AddMenuItem({"Extended Reach", Menu::ItemType::Bool, &Settings::bReach});
-    Menu::AddMenuItem(
-      {"Reach Multiplier", Menu::ItemType::Float, nullptr, &Settings::fReachMultiplier, 1.0f, 20.0f, 1.0f}
     );
     Menu::AddMenuItem({"Auto Headshot", Menu::ItemType::Bool, &Settings::bAutoHeadshot});
     Menu::AddMenuItem({"AOE Bullets", Menu::ItemType::Bool, &Settings::bAOEBullets});

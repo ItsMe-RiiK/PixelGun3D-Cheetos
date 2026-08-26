@@ -11,9 +11,7 @@ namespace WeaponMod
     inline bool  bCritChance100  = false;
     inline float fCritMultiplier = 1.0f;
 
-    // Reach
-    inline bool  bReach           = false;
-    inline float fReachMultiplier = 1.0f;
+
 
     // AOE Bullets
     inline bool  bAOEBullets = false;
@@ -30,9 +28,6 @@ namespace WeaponMod
 
     int   criticalHitChance;
     float criticalHitCoef;
-    float radiusRoundMelee;
-    float lengthShootFromPrefab;
-    float shootDistanceIfZoom;
 
     // AOE Bullets
     bool  isSectorsAOE;
@@ -56,7 +51,7 @@ namespace WeaponMod
   // Logic functions
   void ApplyInfiniteAmmo(void* ws);
   void ApplyCritChance(void* ws);
-  void ApplyReach(void* ws);
+
   void ApplyAOEBullets(void* ws);
   void ApplyAutoHeadshot(void* thisPtr, int& damageType);
 }  // namespace WeaponMod

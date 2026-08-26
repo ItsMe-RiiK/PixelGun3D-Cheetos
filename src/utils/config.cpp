@@ -40,8 +40,6 @@ namespace Config
     j["weaponmod"]["infinite_ammo"]   = WeaponMod::Settings::bInfiniteAmmo;
     j["weaponmod"]["crit_chance"]     = WeaponMod::Settings::bCritChance100;
     j["weaponmod"]["crit_multiplier"] = WeaponMod::Settings::fCritMultiplier;
-    j["weaponmod"]["reach"]           = WeaponMod::Settings::bReach;
-    j["weaponmod"]["reach_mult"]      = WeaponMod::Settings::fReachMultiplier;
     j["weaponmod"]["autohs"]          = WeaponMod::Settings::bAutoHeadshot;
 
     j["playermod"]["high_jump"]       = PlayerMod::Settings::bHighJump;
@@ -111,8 +109,6 @@ namespace Config
     LOAD_BOOL("weaponmod", "infinite_ammo", WeaponMod::Settings::bInfiniteAmmo);
     LOAD_BOOL("weaponmod", "crit_chance", WeaponMod::Settings::bCritChance100);
     LOAD_FLOAT("weaponmod", "crit_multiplier", WeaponMod::Settings::fCritMultiplier);
-    LOAD_BOOL("weaponmod", "reach", WeaponMod::Settings::bReach);
-    LOAD_FLOAT("weaponmod", "reach_mult", WeaponMod::Settings::fReachMultiplier);
     LOAD_BOOL("weaponmod", "autohs", WeaponMod::Settings::bAutoHeadshot);
 
     LOAD_BOOL("playermod", "high_jump", PlayerMod::Settings::bHighJump);

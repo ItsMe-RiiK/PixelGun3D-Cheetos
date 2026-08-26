@@ -103,8 +103,11 @@ namespace Menu
       if (dir < 0) {
         *item.bValue = false;
       }
-      else if (dir > 0) {
+      else if (dir > 0 && dir != 2) {  // 1 is right, 2 is enter
         *item.bValue = true;
+      }
+      else if (dir == 2) {
+        *item.bValue = !(*item.bValue);  // Toggle on enter
       }
     }
     else if (item.type == ItemType::Float && item.fValue) {
@@ -160,6 +163,10 @@ namespace Menu
         }
         if (wParam == VK_RIGHT) {
           Interact(1);
+          return 0;
+        }
+        if (wParam == VK_RETURN) {
+          Interact(2);
           return 0;
         }
       }

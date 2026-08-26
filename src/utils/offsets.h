@@ -75,14 +75,9 @@ namespace Offsets
     constexpr uintptr_t sectorsAOERadius       = 0x49C;  // float
     constexpr uintptr_t lengthShootFromPrefab  = 0x594;  // float
     constexpr uintptr_t shootDistanceIfZoom    = 0x4CC;  // float
-    constexpr uintptr_t ignoreBarrier          = 0x134;  // bool
-    constexpr uintptr_t railgun                = 0x1E4;  // bool
-    constexpr uintptr_t railgunStopAtWall      = 0x1F0;  // bool
     constexpr uintptr_t inShopEffects          = 0x5B0;  // List<int>
 
     // Dynamic offsets resolved at runtime
-    inline size_t breakoutOffset         = 0;
-    inline size_t superBreakoutOffset    = 0;
     inline size_t isUnlimitedAmmoOffset  = 0;
     inline size_t canAffectAlliesOffset  = 0;
     inline bool   dynamicOffsetsResolved = false;
@@ -192,26 +187,64 @@ namespace Offsets
   }  // namespace AntiCheat
 
   // ==========================================
-  // Lottery
+  // GameEventItemData (TypeDefIndex: 8300)
+  // Lottery / Chest Pricing
   // ==========================================
   namespace Lottery
   {
-    constexpr uintptr_t PriceModifier_RVA    = 0x81CF90;
+    // GameEventItemData.get_Count() — returns int drop count
     constexpr uintptr_t LotteryDropCount_RVA = 0xCF0160;
   }  // namespace Lottery
+
+  // ==========================================
+  // NetworkStartTableNGUIController (TypeDefIndex: 1110)
+  // Match Rewards
+  // ==========================================
+  namespace MatchReward
+  {
+    // NetworkStartTableNGUIController.Obf_B4BEBDFB() — ShowResult coroutine
+    // This is the IEnumerator that displays end-of-match rewards
+    // Parameters include _addExpierence and _addCoin among ~31 args
+    constexpr uintptr_t ShowResultCoroutine_RVA = 0x1452CF0;
+  }  // namespace MatchReward
+
+
+  // ==========================================
+  // Obf_706337B8 (TypeDefIndex: 14493)
+  // PixelPass Premium Spoof
+  // ==========================================
+  namespace PixelPass
+  {
+    // Obf_706337B8.Obf_F6C9A39B() — "HasPremium" check on PixelPass controller
+    // Signature: bool (void* thisPtr)
+    constexpr uintptr_t HasPremium_RVA = 0x1B5F860;
+
+    // Obf_706337B8.Obf_4B1410FD() — another premium bool getter candidate
+    constexpr uintptr_t HasPremium2_RVA = 0x1B5EE20;
+
+    // Obf_706337B8.Obf_130735C4() — yet another premium bool getter candidate
+    constexpr uintptr_t HasPremium3_RVA = 0x1B65010;
+
+    // Obf_706337B8.Obf_48C71807() — premium bool getter candidate
+    constexpr uintptr_t HasPremium4_RVA = 0x1B65370;
+
+    // Obf_706337B8.Obf_0FE2844A() — premium bool getter candidate
+    constexpr uintptr_t HasPremium5_RVA = 0x1B63FC0;
+  }  // namespace PixelPass
 
   // ==========================================
   // IL2CPP Class pointers (resolved at runtime, cached here)
   // ==========================================
   namespace Classes
   {
-    inline uintptr_t WeaponManager           = 0;
-    inline uintptr_t PlayerMoveC             = 0;
-    inline uintptr_t WeaponSounds            = 0;
-    inline uintptr_t PlayerDamageable        = 0;
-    inline uintptr_t CheatDetectedBanner     = 0;
-    inline uintptr_t ClickerDetector         = 0;
-    inline uintptr_t SkinName                = 0;
-    inline uintptr_t FirstPersonControlSharp = 0;
+    inline uintptr_t WeaponManager                   = 0;
+    inline uintptr_t PlayerMoveC                     = 0;
+    inline uintptr_t WeaponSounds                    = 0;
+    inline uintptr_t PlayerDamageable                = 0;
+    inline uintptr_t CheatDetectedBanner             = 0;
+    inline uintptr_t ClickerDetector                 = 0;
+    inline uintptr_t SkinName                        = 0;
+    inline uintptr_t FirstPersonControlSharp         = 0;
+    inline uintptr_t NetworkStartTableNGUIController = 0;
   }  // namespace Classes
 }  // namespace Offsets

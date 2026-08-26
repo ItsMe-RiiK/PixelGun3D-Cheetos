@@ -103,7 +103,8 @@ namespace Hooks
     int   Obf_08A89C0D,        // _gemsByGemsHarvester
     int   Obf_577B6512,        // _balanceBrawlLeaderboardPoints
     int   Obf_A7814652,        // _addGems
-    void* Obf_3831FE85         // Obf_98ACDCCA: templateEventItems
+    void* Obf_3831FE85,        // Obf_98ACDCCA: templateEventItems
+    void* methodInfo           // hidden IL2CPP MethodInfo*
   );
   extern fn_ShowResultCoroutine oShowResultCoroutine;
 
@@ -112,13 +113,13 @@ namespace Hooks
     void* Obf_9306E8D0,
     void* Obf_C4D0C293,
     bool  Obf_CCA82BCF,
-    int   addExp,
+    int   realAddCoin,
     int   blueTotal,
     bool  firstPlace,
     bool  deadheatDuel,
     bool  param8,
     bool  iAmWinnerInTeam,
-    int   addCoin,
+    int   realAddExp,
     int   addEventCurrency,
     int   winnerCommand,
     int   bpCurrency,
@@ -139,7 +140,8 @@ namespace Hooks
     int   gemsByHarvester,
     int   balanceBrawlPoints,
     int   addGems,
-    void* templateEventItems
+    void* templateEventItems,
+    void* methodInfo
   );
 
   // ---- IAP: ProcessPurchase ----

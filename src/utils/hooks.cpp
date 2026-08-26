@@ -36,13 +36,13 @@ namespace Hooks
     void* winner,
     void* ratingChange,
     bool  showAward,
-    int   addExp,
+    int   realAddCoin,       // Param 4: Discovered to be the real coin amount!
     int   blueTotal,
     bool  firstPlace,
     bool  deadheatDuel,
     bool  param8,
     bool  iAmWinnerInTeam,
-    int   addCoin,
+    int   realAddExp,        // Param 10: Discovered to be the real EXP amount!
     int   addEventCurrency,
     int   winnerCommand,
     int   bpCurrency,
@@ -63,19 +63,20 @@ namespace Hooks
     int   gemsByHarvester,
     int   balanceBrawlPoints,
     int   addGems,
-    void* templateEventItems
+    void* templateEventItems,
+    void* methodInfo
   )
   {
     if (CurrencyMod::Settings::bEnableRewardMultiplier) {
-      // Multiply only coins as others are server-sided
-      addCoin = static_cast<int>(addCoin * CurrencyMod::Settings::fCoinsMultiplier);
+      // Multiply only the real coins parameter (param 4)
+      realAddCoin = static_cast<int>(realAddCoin * CurrencyMod::Settings::fCoinsMultiplier);
     }
 
     return oShowResultCoroutine(
-      thisPtr, winner, ratingChange, showAward, addExp, blueTotal, firstPlace, deadheatDuel, param8, iAmWinnerInTeam,
-      addCoin, addEventCurrency, winnerCommand, bpCurrency, pixelPassCurrency, param15, pixelPassExp, param17, param18,
+      thisPtr, winner, ratingChange, showAward, realAddCoin, blueTotal, firstPlace, deadheatDuel, param8, iAmWinnerInTeam,
+      realAddExp, addEventCurrency, winnerCommand, bpCurrency, pixelPassCurrency, param15, pixelPassExp, param17, param18,
       param19, clanCurrencyLimitReached, addDetails, addModuleChest, winterPoints, vipRewards, springPt1Points,
-      springPt2Points, springPt2Currency, gemsByHarvester, balanceBrawlPoints, addGems, templateEventItems
+      springPt2Points, springPt2Currency, gemsByHarvester, balanceBrawlPoints, addGems, templateEventItems, methodInfo
     );
   }
 

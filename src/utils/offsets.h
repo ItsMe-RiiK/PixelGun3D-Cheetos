@@ -54,7 +54,6 @@ namespace Offsets
     constexpr uintptr_t recoilCoeffZoom        = 0x130;  // float
     constexpr uintptr_t firstShotScatterZoom   = 0x124;  // bool
     constexpr uintptr_t moveScatterCoeffZoom   = 0x128;  // float
-    constexpr uintptr_t radiusRoundMelee       = 0x1A0;  // float
     constexpr uintptr_t isPiercingMelee        = 0x1AE;  // bool
     constexpr uintptr_t distancePiercingMelee  = 0x1B0;  // float
     constexpr uintptr_t bulletDelay            = 0x1D4;  // float
@@ -73,8 +72,6 @@ namespace Offsets
     constexpr uintptr_t sectorsAOEDmgMultSide  = 0x494;  // float
     constexpr uintptr_t sectorsAOEDmgMultBack  = 0x498;  // float
     constexpr uintptr_t sectorsAOERadius       = 0x49C;  // float
-    constexpr uintptr_t lengthShootFromPrefab  = 0x594;  // float
-    constexpr uintptr_t shootDistanceIfZoom    = 0x4CC;  // float
     constexpr uintptr_t inShopEffects          = 0x5B0;  // List<int>
 
     // Dynamic offsets resolved at runtime
@@ -203,9 +200,10 @@ namespace Offsets
   namespace MatchReward
   {
     // NetworkStartTableNGUIController.Obf_B4BEBDFB() — ShowResult coroutine
-    // This is the IEnumerator that displays end-of-match rewards
-    // Parameters include _addExpierence and _addCoin among ~31 args
     constexpr uintptr_t ShowResultCoroutine_RVA = 0x1452CF0;
+
+    // NetworkStartTableNGUIController.Obf_763E52DA() — ApplyMatchReward (Actual value applier)
+    constexpr uintptr_t ApplyMatchReward_RVA = 0x144FD00;
   }  // namespace MatchReward
 
 

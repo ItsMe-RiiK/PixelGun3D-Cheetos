@@ -49,7 +49,7 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 
 | Feature | Description | Status |
 | :--- | :--- | :--- |
-| **Lottery** | modified output chest lottery event | <span title="Work">✅</span> |
+| **Lottery** | Modify output chest lottery event | <span title="Work">✅</span> |
 | **Multiple Coin** | Multiple coins from match rewards | <span title="Work">✅</span> |
 | **Spoof PixelPass** | <span title="Only Active when activated">Activate PixelPass for free</span> | <span title="Work">✅</span> |
 

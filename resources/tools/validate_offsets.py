@@ -4,7 +4,7 @@ import sys
 import os
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-DUMP_FILE = os.path.join(PROJECT_ROOT, "resources", "dumped", "dump.cs")
+DUMP_FILE = os.path.join(PROJECT_ROOT, "resources", "dumped", "static", "dump.cs")
 OFFSETS_FILE = os.path.join(PROJECT_ROOT, "src", "utils", "offsets.h")
 
 def run_update():
@@ -70,7 +70,7 @@ def run_update():
                 last_class_name = last_class_name.replace("UnityEngine.", "")
             continue
 
-        ns_match = re.match(r'\s*namespace\s+(\w+)\s*\{', line)
+        ns_match = re.match(r'\s*namespace\s+(\w+)', line)
         if ns_match and last_class_name:
             ns_name = ns_match.group(1)
             if ns_name != "Offsets":
@@ -84,7 +84,7 @@ def run_update():
 
     for line in lines:
         # Match start of namespace
-        ns_match = re.match(r'\s*namespace\s+(\w+)\s*\{', line)
+        ns_match = re.match(r'\s*namespace\s+(\w+)', line)
         if ns_match:
             current_ns = ns_match.group(1)
             updated_lines.append(line)

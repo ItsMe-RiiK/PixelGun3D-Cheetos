@@ -12,7 +12,7 @@ set "PROJECT_ROOT=%SCRIPT_DIR%.."
 set "BUILD_DIR=%PROJECT_ROOT%\build"
 set "BIN_DIR=%BUILD_DIR%\bin"
 set "VCPKG_DIR=%PROJECT_ROOT%\vcpkg"
-set "TRIPLET=x64-windows"
+set "TRIPLET=x64-mingw-static"
 
 title PG3D Trainer — Build
 
@@ -44,15 +44,11 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-where cl >nul 2>&1
+where g++ >nul 2>&1
 if %errorlevel% neq 0 (
-    where g++ >nul 2>&1
-    if %errorlevel% neq 0 (
-        echo   [!] No C++ compiler found.
-        echo       Install Visual Studio Build Tools or MinGW-w64.
-        echo       Or run from a "Developer Command Prompt for VS".
-        exit /b 1
-    )
+    echo   [!] No MinGW-w64 C++ compiler found (g++).
+    echo       Please install MinGW-w64 and add it to your PATH.
+    exit /b 1
 )
 
 echo   [+] Dependencies OK
@@ -87,7 +83,8 @@ echo   [*] Configuring CMake (triplet: %TRIPLET%, type: %BUILD_TYPE%)...
 cmake -S "%PROJECT_ROOT%" -B "%BUILD_DIR%" ^
     -DCMAKE_TOOLCHAIN_FILE="%VCPKG_DIR%\scripts\buildsystems\vcpkg.cmake" ^
     -DVCPKG_TARGET_TRIPLET=%TRIPLET% ^
-    -DCMAKE_BUILD_TYPE=%BUILD_TYPE%
+    -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ^
+    -G "MinGW Makefiles"
 
 if %errorlevel% neq 0 (
     echo   [!] CMake configure failed.

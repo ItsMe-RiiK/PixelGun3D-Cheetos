@@ -46,6 +46,17 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 </details>
 
 <details>
+<summary><b>Currency</b></summary>
+
+| Feature | Description | Status |
+| :--- | :--- | :--- |
+| **Lottery** | modified output chest lottery event | <span title="Work">✅</span> |
+| **Multiple Coin** | Multiple coins from match rewards | <span title="Work">✅</span> |
+| **Spoof PixelPass** | Unlimited event items | <span title="Work">✅</span> |
+
+</details>
+
+<details>
 <summary><b>System</b></summary>
 
 | Feature | Description | Status |

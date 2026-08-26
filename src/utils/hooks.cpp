@@ -36,13 +36,13 @@ namespace Hooks
     void* winner,
     void* ratingChange,
     bool  showAward,
-    int   realAddCoin,       // Param 4: Discovered to be the real coin amount!
+    int   realAddCoin,  // Param 4: Discovered to be the real coin amount!
     int   blueTotal,
     bool  firstPlace,
     bool  deadheatDuel,
     bool  param8,
     bool  iAmWinnerInTeam,
-    int   realAddExp,        // Param 10: Discovered to be the real EXP amount!
+    int   realAddExp,  // Param 10: Discovered to be the real EXP amount!
     int   addEventCurrency,
     int   winnerCommand,
     int   bpCurrency,
@@ -73,10 +73,11 @@ namespace Hooks
     }
 
     return oShowResultCoroutine(
-      thisPtr, winner, ratingChange, showAward, realAddCoin, blueTotal, firstPlace, deadheatDuel, param8, iAmWinnerInTeam,
-      realAddExp, addEventCurrency, winnerCommand, bpCurrency, pixelPassCurrency, param15, pixelPassExp, param17, param18,
-      param19, clanCurrencyLimitReached, addDetails, addModuleChest, winterPoints, vipRewards, springPt1Points,
-      springPt2Points, springPt2Currency, gemsByHarvester, balanceBrawlPoints, addGems, templateEventItems, methodInfo
+      thisPtr, winner, ratingChange, showAward, realAddCoin, blueTotal, firstPlace, deadheatDuel, param8,
+      iAmWinnerInTeam, realAddExp, addEventCurrency, winnerCommand, bpCurrency, pixelPassCurrency, param15,
+      pixelPassExp, param17, param18, param19, clanCurrencyLimitReached, addDetails, addModuleChest, winterPoints,
+      vipRewards, springPt1Points, springPt2Points, springPt2Currency, gemsByHarvester, balanceBrawlPoints, addGems,
+      templateEventItems, methodInfo
     );
   }
 

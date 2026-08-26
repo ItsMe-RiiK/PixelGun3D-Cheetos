@@ -11,8 +11,6 @@ namespace WeaponMod
     inline bool  bCritChance100  = false;
     inline float fCritMultiplier = 1.0f;
 
-
-
     // AOE Bullets
     inline bool  bAOEBullets = false;
     inline float fAOERadius  = 50.0f;

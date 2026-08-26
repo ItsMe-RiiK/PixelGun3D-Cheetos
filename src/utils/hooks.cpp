@@ -123,9 +123,6 @@ namespace Hooks
 
   void hkPlayerMoveC_Update(void* thisPtr)
   {
-    // When Player_move_c::Update is running, we're in-match — lottery hooks should be disabled
-    CurrencyMod::Settings::bSafeToModify = false;
-
     // Apply our mods BEFORE the game's Update so our values are ready when the game processes shooting
     bool isLocalPlayer = false;
     if (thisPtr) {
@@ -153,10 +150,6 @@ namespace Hooks
     if (oPlayerMoveC_Update) {
       oPlayerMoveC_Update(thisPtr);
     }
-
-    // Re-enable lottery modifications after the update completes
-    // (we're still in-match but the critical section has passed)
-    CurrencyMod::Settings::bSafeToModify = true;
   }
 
   fn_CBD_Trigger oCBD_Trigger = nullptr;

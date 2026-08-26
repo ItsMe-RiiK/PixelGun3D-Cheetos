@@ -5,10 +5,8 @@ namespace CurrencyMod
   namespace Settings
   {
     // Lottery
-    inline bool bEnableLotteryModifier = false;
-    inline bool bModifyChestOutput     = false;
-    inline int  iChestOutputAmount     = 99999;
-    inline bool bSafeToModify          = false;  // Safety flag prevent crash while match
+    inline bool bModifyChestOutput = false;
+    inline int  iChestOutputAmount = 99999;
 
     // Match Reward
     inline bool  bEnableRewardMultiplier = false;

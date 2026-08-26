@@ -52,9 +52,8 @@ namespace Config
     j["currency"]["enable_reward_multiplier"] = CurrencyMod::Settings::bEnableRewardMultiplier;
     j["currency"]["coins_multiplier"]         = CurrencyMod::Settings::fCoinsMultiplier;
 
-    j["lottery"]["enable_modifier"] = CurrencyMod::Settings::bEnableLotteryModifier;
-    j["lottery"]["modify_output"]   = CurrencyMod::Settings::bModifyChestOutput;
-    j["lottery"]["output_amount"]   = CurrencyMod::Settings::iChestOutputAmount;
+    j["lottery"]["modify_output"] = CurrencyMod::Settings::bModifyChestOutput;
+    j["lottery"]["output_amount"] = CurrencyMod::Settings::iChestOutputAmount;
 
     // Passes
     j["pixelpass"]["spoof_premium"] = CurrencyMod::Settings::bSpoofPixelPassPremium;
@@ -122,7 +121,6 @@ namespace Config
     LOAD_FLOAT("currency", "coins_multiplier", CurrencyMod::Settings::fCoinsMultiplier);
 
     // Lottery
-    LOAD_BOOL("lottery", "enable_modifier", CurrencyMod::Settings::bEnableLotteryModifier);
     LOAD_BOOL("lottery", "modify_output", CurrencyMod::Settings::bModifyChestOutput);
     LOAD_INT("lottery", "output_amount", CurrencyMod::Settings::iChestOutputAmount);
 

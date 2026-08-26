@@ -6,7 +6,7 @@ namespace CurrencyMod
 {
   int OnLotteryDropCount(int originalCount)
   {
-    if (!Settings::bEnableLotteryModifier || !Settings::bModifyChestOutput || !Settings::bSafeToModify)
+    if (!Settings::bModifyChestOutput)
       return originalCount;
 
     return Settings::iChestOutputAmount;

@@ -8,7 +8,6 @@ namespace CurrencyMod
     Menu::AddMenuItem({"-- CURRENCY --", Menu::ItemType::Header});
 
     // Lottery
-    Menu::AddMenuItem({"Enable Lottery Modifier", Menu::ItemType::Bool, &Settings::bEnableLotteryModifier});
     Menu::AddMenuItem({"Modify Chest Output", Menu::ItemType::Bool, &Settings::bModifyChestOutput});
     Menu::AddMenuItem(
       {"Chest Output Amount", Menu::ItemType::Int, nullptr, nullptr, &Settings::iChestOutputAmount, 0.0f, 0.0f, 0.0f,

@@ -2,6 +2,7 @@
 #include "../features/visual/visual.h"
 #include "../features/playermod/playermod.h"
 #include "../features/weaponmod/weaponmod.h"
+#include "../features/currency/currency.h"
 #include "hooks.h"
 #include <nlohmann/json.hpp>
 #include <fstream>
@@ -36,8 +37,7 @@ namespace Config
     j["visual"]["skeleton_esp"] = Visual::Settings::bSkeletonESP;
 
     // Weapon Mod
-    j["weaponmod"]["infinite_ammo"] = WeaponMod::Settings::bInfiniteAmmo;
-    // j["weaponmod"]["wallshot"]        = WeaponMod::Settings::bWallshot;
+    j["weaponmod"]["infinite_ammo"]   = WeaponMod::Settings::bInfiniteAmmo;
     j["weaponmod"]["crit_chance"]     = WeaponMod::Settings::bCritChance100;
     j["weaponmod"]["crit_multiplier"] = WeaponMod::Settings::fCritMultiplier;
     j["weaponmod"]["reach"]           = WeaponMod::Settings::bReach;
@@ -49,6 +49,17 @@ namespace Config
     j["playermod"]["fly"]             = PlayerMod::Settings::bFly;
     j["playermod"]["god_mode"]        = PlayerMod::Settings::bGodMode;
     j["playermod"]["auto_heal"]       = PlayerMod::Settings::bAutoHeal;
+
+    // Currency
+    j["currency"]["enable_reward_multiplier"] = CurrencyMod::Settings::bEnableRewardMultiplier;
+    j["currency"]["coins_multiplier"]         = CurrencyMod::Settings::fCoinsMultiplier;
+
+    j["lottery"]["enable_modifier"] = CurrencyMod::Settings::bEnableLotteryModifier;
+    j["lottery"]["modify_output"]   = CurrencyMod::Settings::bModifyChestOutput;
+    j["lottery"]["output_amount"]   = CurrencyMod::Settings::iChestOutputAmount;
+
+    // Passes
+    j["pixelpass"]["spoof_premium"] = CurrencyMod::Settings::bSpoofPixelPassPremium;
 
     // System
     j["system"]["anticheat_bypass"] = Hooks::Settings::bAntiCheatBypass;
@@ -83,6 +94,9 @@ namespace Config
 #define LOAD_FLOAT(section, key, var) \
   if (j.contains(section) && j[section].contains(key)) \
   var = j[section][key].get<float>()
+#define LOAD_INT(section, key, var) \
+  if (j.contains(section) && j[section].contains(key)) \
+  var = j[section][key].get<int>()
 
     LOAD_BOOL("weapon", "aoe_bullets", WeaponMod::Settings::bAOEBullets);
     LOAD_FLOAT("weapon", "aoe_radius", WeaponMod::Settings::fAOERadius);
@@ -95,7 +109,6 @@ namespace Config
 
     // Weapon Mod
     LOAD_BOOL("weaponmod", "infinite_ammo", WeaponMod::Settings::bInfiniteAmmo);
-    // LOAD_BOOL("weaponmod", "wallshot", WeaponMod::Settings::bWallshot);
     LOAD_BOOL("weaponmod", "crit_chance", WeaponMod::Settings::bCritChance100);
     LOAD_FLOAT("weaponmod", "crit_multiplier", WeaponMod::Settings::fCritMultiplier);
     LOAD_BOOL("weaponmod", "reach", WeaponMod::Settings::bReach);
@@ -108,10 +121,23 @@ namespace Config
     LOAD_BOOL("playermod", "god_mode", PlayerMod::Settings::bGodMode);
     LOAD_BOOL("playermod", "auto_heal", PlayerMod::Settings::bAutoHeal);
 
+    // Currency
+    LOAD_BOOL("currency", "enable_reward_multiplier", CurrencyMod::Settings::bEnableRewardMultiplier);
+    LOAD_FLOAT("currency", "coins_multiplier", CurrencyMod::Settings::fCoinsMultiplier);
+
+    // Lottery
+    LOAD_BOOL("lottery", "enable_modifier", CurrencyMod::Settings::bEnableLotteryModifier);
+    LOAD_BOOL("lottery", "modify_output", CurrencyMod::Settings::bModifyChestOutput);
+    LOAD_INT("lottery", "output_amount", CurrencyMod::Settings::iChestOutputAmount);
+
+    // Passes
+    LOAD_BOOL("pixelpass", "spoof_premium", CurrencyMod::Settings::bSpoofPixelPassPremium);
+
     // System
     LOAD_BOOL("system", "anticheat_bypass", Hooks::Settings::bAntiCheatBypass);
 
 #undef LOAD_BOOL
 #undef LOAD_FLOAT
+#undef LOAD_INT
   }
 }  // namespace Config

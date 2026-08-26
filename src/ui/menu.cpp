@@ -3,7 +3,7 @@
 #include "../features/visual/visual.h"
 #include "../features/playermod/playermod.h"
 #include "../features/weaponmod/weaponmod.h"
-#include "../features/currency/lottery.h"
+#include "../features/currency/currency.h"
 #include "../utils/hooks.h"
 
 #include <imgui.h>
@@ -44,27 +44,8 @@ namespace Menu
     WeaponMod::InitMenu();
     PlayerMod::InitMenu();
 
-    //CURRENCY / LOTTERY
-    AddMenuItem({"-- LOTTERY --", ItemType::Header});
-    AddMenuItem({"Enable Lottery Modifier", ItemType::Bool, &LotteryMod::bEnableLotteryModifier});
-    AddMenuItem(
-      {"Chest Price", ItemType::Int, nullptr, nullptr, &LotteryMod::iChestPrice, 0.0f, 0.0f, 0.0f, -15000, 15000, 10}
-    );
-    AddMenuItem({"Modify Chest Output", ItemType::Bool, &LotteryMod::bModifyChestOutput});
-    AddMenuItem(
-      {"Chest Output Amount", ItemType::Int, nullptr, nullptr, &LotteryMod::iChestOutputAmount, 0.0f, 0.0f, 0.0f,
-       -99999, 99999, 10}
-    );
-
-    // SETTINGS
-    AddMenuItem({"-- SETTINGS --", ItemType::Header});
-    AddMenuItem({"Bypass Anti-Cheat", ItemType::Bool, &Hooks::Settings::bAntiCheatBypass});
-    AddMenuItem({"Save Config", ItemType::Action, nullptr, nullptr, nullptr, 0.0f, 0.0f, 0.0f, 0, 0, 0, []() {
-                   Config::Save();
-                 }});
-    AddMenuItem({"Load Config", ItemType::Action, nullptr, nullptr, nullptr, 0.0f, 0.0f, 0.0f, 0, 0, 0, []() {
-                   Config::Load();
-                 }});
+    CurrencyMod::InitMenu();
+    Hooks::SetupMenu();
   }
 
   std::vector<int> GetVisibleIndices()
@@ -275,13 +256,33 @@ namespace Menu
 
     float startX    = 50.0f;
     float startY    = 50.0f;
-    float width     = 350.0f;
     float rowHeight = 20.0f;
     float padding   = 10.0f;
 
     std::vector<int> visibleIndices = GetVisibleIndices();
     if (visibleIndices.empty())
       return;
+
+#ifndef PROJECT_VERSION
+  #define PROJECT_VERSION "Unknown"
+#endif
+
+    std::string titleStr = std::string("Pixel Gun 3D Cheat v") + PROJECT_VERSION;
+
+    // Calculate dynamic width
+    float width  = 250.0f;  // base thinner width
+    float titleW = ImGui::CalcTextSize(titleStr.c_str()).x + padding * 2;
+    if (titleW > width)
+      width = titleW;
+
+    for (int idx : visibleIndices) {
+      auto& item       = items[idx];
+      float textW      = ImGui::CalcTextSize(item.name.c_str()).x;
+      float itemTotalW = textW + 100.0f;  // space for values on the right
+      if (itemTotalW > width) {
+        width = itemTotalW;
+      }
+    }
 
     // Calculate how many items can fit on screen safely
     float availableHeight = screenH - startY - (padding * 2) - 30.0f - 20.0f;  // 20.0f bottom margin
@@ -324,12 +325,7 @@ namespace Menu
       ImVec2(startX, startY), ImVec2(startX + width, startY + totalHeight), IM_COL32(100, 50, 200, 255), 0, 0, 2.0f
     );
 
-#ifndef PROJECT_VERSION
-  #define PROJECT_VERSION "Unknown"
-#endif
-
     // Title
-    std::string titleStr = std::string("Pixel Gun 3D Cheat v") + PROJECT_VERSION;
     drawList->AddText(ImVec2(startX + padding, startY + padding), IM_COL32(100, 200, 255, 255), titleStr.c_str());
 
     float currentY = startY + padding + 30.0f;

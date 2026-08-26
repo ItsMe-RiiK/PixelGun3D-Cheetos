@@ -29,6 +29,7 @@ namespace IL2CPP
   size_t      field_get_offset(void* field);
   size_t      GetFieldOffset(void* klass, const char* name);
   void*       object_get_class(void* obj);
+  void*       string_new(const char* str);
 
   template<typename T>
   inline T ReadField(void* obj, uintptr_t offset)

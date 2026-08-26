@@ -7,9 +7,6 @@ namespace WeaponMod
     // Infinite Ammo
     inline bool bInfiniteAmmo = false;
 
-    // Wallshot
-    // inline bool bWallshot = false;
-
     // Crit
     inline bool  bCritChance100  = false;
     inline float fCritMultiplier = 1.0f;
@@ -28,17 +25,9 @@ namespace WeaponMod
 
   struct WeaponModBackup
   {
-    bool  isUnlimitedAmmo;
-    int   ammoInClip;
-    bool  ignoreBarrier;
-    bool  railgunStopAtWall;
-    bool  bulletBreakout;
-    bool  bulletSuperBreakout;
-    bool  addedWallBreak;
-    int   originalEffectListSize;
-    int   overwrittenEffect;
-    bool  isPiercingMelee;
-    float distancePiercingMelee;
+    bool isUnlimitedAmmo;
+    int  ammoInClip;
+
     int   criticalHitChance;
     float criticalHitCoef;
     float radiusRoundMelee;
@@ -66,7 +55,6 @@ namespace WeaponMod
 
   // Logic functions
   void ApplyInfiniteAmmo(void* ws);
-  // void ApplyWallshot(void* ws);
   void ApplyCritChance(void* ws);
   void ApplyReach(void* ws);
   void ApplyAOEBullets(void* ws);

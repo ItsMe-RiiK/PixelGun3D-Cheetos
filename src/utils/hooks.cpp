@@ -4,27 +4,82 @@
 #include "../features/visual/visual.h"
 #include "../features/weaponmod/weaponmod.h"
 #include "../features/playermod/playermod.h"
-#include "../features/currency/lottery.h"
+#include "../features/currency/currency.h"
+#include "../utils/config.h"
+#include "../ui/menu.h"
+#include <string>
 
 namespace Hooks
 {
   fn_ApplyDamage oApplyDamage = nullptr;
-  fn_FreeLottery oFreeLottery = nullptr;
 
-  int32_t hkFreeLottery(void* arg)
-  {
-    int32_t overrideValue = LotteryMod::OnFreeLottery(oFreeLottery(arg));
-    return overrideValue;
-  }
-
+  // ---- Lottery: Drop Count Hook ----
   fn_LotteryDropCount oLotteryDropCount = nullptr;
 
   int32_t hkLotteryDropCount(void* arg)
   {
-    int32_t overrideValue = LotteryMod::OnLotteryDropCount(oLotteryDropCount(arg));
-    return overrideValue;
+    // Safety: validate arg before calling original
+    if (!arg || IsBadReadPtr(arg, 0x10)) {
+      if (oLotteryDropCount)
+        return oLotteryDropCount(arg);
+      return 0;
+    }
+
+    return CurrencyMod::OnLotteryDropCount(oLotteryDropCount(arg));
   }
 
+  // ---- Match Reward: ShowResult Coroutine Hook ----
+  fn_ShowResultCoroutine oShowResultCoroutine = nullptr;
+
+  void* hkShowResultCoroutine(
+    void* thisPtr,
+    void* winner,
+    void* ratingChange,
+    bool  showAward,
+    int   addExp,
+    int   blueTotal,
+    bool  firstPlace,
+    bool  deadheatDuel,
+    bool  param8,
+    bool  iAmWinnerInTeam,
+    int   addCoin,
+    int   addEventCurrency,
+    int   winnerCommand,
+    int   bpCurrency,
+    int   pixelPassCurrency,
+    bool  param15,
+    int   pixelPassExp,
+    int   param17,
+    int   param18,
+    int   param19,
+    bool  clanCurrencyLimitReached,
+    void* addDetails,
+    void* addModuleChest,
+    int   winterPoints,
+    void* vipRewards,
+    int   springPt1Points,
+    int   springPt2Points,
+    int   springPt2Currency,
+    int   gemsByHarvester,
+    int   balanceBrawlPoints,
+    int   addGems,
+    void* templateEventItems
+  )
+  {
+    if (CurrencyMod::Settings::bEnableRewardMultiplier) {
+      // Multiply only coins as others are server-sided
+      addCoin = static_cast<int>(addCoin * CurrencyMod::Settings::fCoinsMultiplier);
+    }
+
+    return oShowResultCoroutine(
+      thisPtr, winner, ratingChange, showAward, addExp, blueTotal, firstPlace, deadheatDuel, param8, iAmWinnerInTeam,
+      addCoin, addEventCurrency, winnerCommand, bpCurrency, pixelPassCurrency, param15, pixelPassExp, param17, param18,
+      param19, clanCurrencyLimitReached, addDetails, addModuleChest, winterPoints, vipRewards, springPt1Points,
+      springPt2Points, springPt2Currency, gemsByHarvester, balanceBrawlPoints, addGems, templateEventItems
+    );
+  }
+
+  // ---- ApplyDamage Hook ----
   void hkApplyDamage(
     void*       thisPtr,
     float       damage,
@@ -66,6 +121,9 @@ namespace Hooks
 
   void hkPlayerMoveC_Update(void* thisPtr)
   {
+    // When Player_move_c::Update is running, we're in-match — lottery hooks should be disabled
+    CurrencyMod::Settings::bSafeToModify = false;
+
     // Apply our mods BEFORE the game's Update so our values are ready when the game processes shooting
     bool isLocalPlayer = false;
     if (thisPtr) {
@@ -93,6 +151,10 @@ namespace Hooks
     if (oPlayerMoveC_Update) {
       oPlayerMoveC_Update(thisPtr);
     }
+
+    // Re-enable lottery modifications after the update completes
+    // (we're still in-match but the critical section has passed)
+    CurrencyMod::Settings::bSafeToModify = true;
   }
 
   fn_CBD_Trigger oCBD_Trigger = nullptr;
@@ -100,6 +162,49 @@ namespace Hooks
 
   fn_CBD_Show oCBD_Show = nullptr;
   void        hkCBD_Show() { /* NOP */ }
+
+
+  // ---- PixelPass Premium: HasPremium ----
+  fn_PPBoolGetter oPPHasPremium1 = nullptr;
+  fn_PPBoolGetter oPPHasPremium2 = nullptr;
+  fn_PPBoolGetter oPPHasPremium3 = nullptr;
+  fn_PPBoolGetter oPPHasPremium4 = nullptr;
+  fn_PPBoolGetter oPPHasPremium5 = nullptr;
+
+  bool hkPPHasPremium1(void* thisPtr)
+  {
+    if (CurrencyMod::Settings::bSpoofPixelPassPremium)
+      return true;
+    return oPPHasPremium1(thisPtr);
+  }
+
+  bool hkPPHasPremium2(void* thisPtr)
+  {
+    if (CurrencyMod::Settings::bSpoofPixelPassPremium)
+      return true;
+    return oPPHasPremium2(thisPtr);
+  }
+
+  bool hkPPHasPremium3(void* thisPtr)
+  {
+    if (CurrencyMod::Settings::bSpoofPixelPassPremium)
+      return true;
+    return oPPHasPremium3(thisPtr);
+  }
+
+  bool hkPPHasPremium4(void* thisPtr)
+  {
+    if (CurrencyMod::Settings::bSpoofPixelPassPremium)
+      return true;
+    return oPPHasPremium4(thisPtr);
+  }
+
+  bool hkPPHasPremium5(void* thisPtr)
+  {
+    if (CurrencyMod::Settings::bSpoofPixelPassPremium)
+      return true;
+    return oPPHasPremium5(thisPtr);
+  }
 
   fn_Present oPresent = nullptr;
 
@@ -131,12 +236,16 @@ namespace Hooks
     auto cbdShowAddr = reinterpret_cast<void*>(gaBase + Offsets::AntiCheat::CBD_ShowBanner_RVA);
     MH_CreateHook(cbdShowAddr, reinterpret_cast<void*>(&hkCBD_Show), reinterpret_cast<void**>(&oCBD_Show));
 
-    auto freeLotteryAddr = reinterpret_cast<void*>(gaBase + Offsets::Lottery::PriceModifier_RVA);
-    MH_CreateHook(freeLotteryAddr, reinterpret_cast<void*>(&hkFreeLottery), reinterpret_cast<void**>(&oFreeLottery));
-
+    // 3. Hook the drop count getter
     auto lotteryDropCountAddr = reinterpret_cast<void*>(gaBase + Offsets::Lottery::LotteryDropCount_RVA);
     MH_CreateHook(
       lotteryDropCountAddr, reinterpret_cast<void*>(&hkLotteryDropCount), reinterpret_cast<void**>(&oLotteryDropCount)
+    );
+
+    // 5. Match Reward: Hook ShowResult coroutine
+    auto showResultAddr = reinterpret_cast<void*>(gaBase + Offsets::MatchReward::ShowResultCoroutine_RVA);
+    MH_CreateHook(
+      showResultAddr, reinterpret_cast<void*>(&hkShowResultCoroutine), reinterpret_cast<void**>(&oShowResultCoroutine)
     );
 
     // Dynamic resolution for Player_move_c::Update
@@ -148,9 +257,39 @@ namespace Hooks
       );
     }
 
+    // 6. PixelPass Premium: Hook multiple bool getters on the controller
+    auto pp1Addr = reinterpret_cast<void*>(gaBase + Offsets::PixelPass::HasPremium_RVA);
+    MH_CreateHook(pp1Addr, reinterpret_cast<void*>(&hkPPHasPremium1), reinterpret_cast<void**>(&oPPHasPremium1));
+
+    auto pp2Addr = reinterpret_cast<void*>(gaBase + Offsets::PixelPass::HasPremium2_RVA);
+    MH_CreateHook(pp2Addr, reinterpret_cast<void*>(&hkPPHasPremium2), reinterpret_cast<void**>(&oPPHasPremium2));
+
+    auto pp3Addr = reinterpret_cast<void*>(gaBase + Offsets::PixelPass::HasPremium3_RVA);
+    MH_CreateHook(pp3Addr, reinterpret_cast<void*>(&hkPPHasPremium3), reinterpret_cast<void**>(&oPPHasPremium3));
+
+    auto pp4Addr = reinterpret_cast<void*>(gaBase + Offsets::PixelPass::HasPremium4_RVA);
+    MH_CreateHook(pp4Addr, reinterpret_cast<void*>(&hkPPHasPremium4), reinterpret_cast<void**>(&oPPHasPremium4));
+
+    auto pp5Addr = reinterpret_cast<void*>(gaBase + Offsets::PixelPass::HasPremium5_RVA);
+    MH_CreateHook(pp5Addr, reinterpret_cast<void*>(&hkPPHasPremium5), reinterpret_cast<void**>(&oPPHasPremium5));
+
     MH_EnableHook(MH_ALL_HOOKS);
 
     return true;
+  }
+
+  void SetupMenu()
+  {
+    Menu::AddMenuItem({"-- SETTINGS --", Menu::ItemType::Header});
+    Menu::AddMenuItem({"Bypass Anti-Cheat", Menu::ItemType::Bool, &Settings::bAntiCheatBypass});
+    Menu::AddMenuItem(
+      {"Save Config", Menu::ItemType::Action, nullptr, nullptr, nullptr, 0.0f, 0.0f, 0.0f, 0, 0, 0,
+       []() { Config::Save(); }}
+    );
+    Menu::AddMenuItem(
+      {"Load Config", Menu::ItemType::Action, nullptr, nullptr, nullptr, 0.0f, 0.0f, 0.0f, 0, 0, 0,
+       []() { Config::Load(); }}
+    );
   }
 
   void Shutdown()

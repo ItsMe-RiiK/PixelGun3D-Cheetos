@@ -1,34 +1,14 @@
-#include "lottery.h"
+#include "currency.h"
 #include "../../utils/il2cpp.h"
+#include "../../utils/offsets.h"
 
-namespace LotteryMod
+namespace CurrencyMod
 {
-  bool bEnableLotteryModifier = false;
-  int  iChestPrice            = 0;
-  bool bModifyChestOutput     = false;
-  int  iChestOutputAmount     = 250;
-
-  int OnFreeLottery(int originalPrice)
-  {
-    if (bEnableLotteryModifier) {
-      // Prevent matchmaking crash by ignoring lottery modifications during a match
-      if (IL2CPP::GetLocalPlayerMoveC() != nullptr) {
-        return originalPrice;
-      }
-      return iChestPrice;
-    }
-    return originalPrice;
-  }
-
   int OnLotteryDropCount(int originalCount)
   {
-    if (bEnableLotteryModifier && bModifyChestOutput) {
-      // Prevent matchmaking crash by ignoring lottery modifications during a match
-      if (IL2CPP::GetLocalPlayerMoveC() != nullptr) {
-        return originalCount;
-      }
-      return iChestOutputAmount;
-    }
-    return originalCount;
+    if (!Settings::bEnableLotteryModifier || !Settings::bModifyChestOutput || !Settings::bSafeToModify)
+      return originalCount;
+
+    return Settings::iChestOutputAmount;
   }
-}  // namespace LotteryMod
+}  // namespace CurrencyMod

@@ -154,9 +154,16 @@ namespace IL2CPP
 
   void* object_get_class(void* obj)
   {
-    if (!obj || !ptr_object_get_class)
+    if (!ptr_object_get_class)
       return nullptr;
     return ptr_object_get_class(obj);
+  }
+
+  void* string_new(const char* str)
+  {
+    if (!ptr_string_new)
+      return nullptr;
+    return ptr_string_new(str);
   }
 
   void* GetSystemTypeForClass(void* klass)
@@ -322,6 +329,7 @@ namespace IL2CPP
           size_t length   = GetArrayLength(arrayObj);
           void** elements = GetArrayElements<void*>(arrayObj);
           if (elements) {
+            cachedPlayers.reserve(length);
             for (size_t i = 0; i < length; i++) {
               if (elements[i]) {
                 cachedPlayers.push_back(elements[i]);
@@ -349,6 +357,9 @@ namespace IL2CPP
 
     Offsets::Classes::SkinName                = reinterpret_cast<uintptr_t>(GetClass("SkinName"));
     Offsets::Classes::FirstPersonControlSharp = reinterpret_cast<uintptr_t>(GetClass("FirstPersonControlSharp"));
+
+    Offsets::Classes::NetworkStartTableNGUIController =
+      reinterpret_cast<uintptr_t>(GetClass("NetworkStartTableNGUIController"));
 
     return Offsets::Classes::WeaponManager != 0 && Offsets::Classes::PlayerMoveC != 0
         && Offsets::Classes::WeaponSounds != 0;
@@ -486,9 +497,6 @@ namespace Offsets
       void* wsClass = (void*) Offsets::Classes::WeaponSounds;
       if (!wsClass)
         return;
-
-      breakoutOffset      = IL2CPP::ResolveFieldOffset(wsClass, {"bulletBreakout"});
-      superBreakoutOffset = IL2CPP::ResolveFieldOffset(wsClass, {"bulletSuperBreakout"});
 
       isUnlimitedAmmoOffset =
         IL2CPP::ResolveFieldOffset(wsClass, {"isUnlimitedAmmo"}, Offsets::WeaponSounds::isUnlimitedAmmo);

@@ -24,8 +24,6 @@ namespace Visual
   using fn_GetPixelHeight           = int (*)(void* camera);
   fn_GetPixelHeight pGetPixelHeight = nullptr;
 
-  using fn_GetPosition        = Vector3 (*)(void* transform);
-  fn_GetPosition pGetPosition = nullptr;
 
   using fn_GetMainCamera          = void* (*) ();
   fn_GetMainCamera pGetMainCamera = nullptr;
@@ -119,14 +117,6 @@ namespace Visual
       pGetPixelHeight = *reinterpret_cast<fn_GetPixelHeight*>(getHeightMethod);
     }
 
-    auto transformClass = IL2CPP::class_from_name(coreModuleImage, "UnityEngine", "Transform");
-    if (transformClass) {
-      auto getPosMethod = IL2CPP::class_get_method_from_name(transformClass, "get_position", 0);
-      if (getPosMethod) {
-        pGetPosition = *reinterpret_cast<fn_GetPosition*>(getPosMethod);
-      }
-    }
-
     // Resolve Physics::Linecast from PhysicsModule
     void* physicsModuleImage = nullptr;
     for (size_t i = 0; i < asmCount; i++) {
@@ -212,7 +202,7 @@ namespace Visual
         return;
       }
 
-      if (!pGetMainCamera || !pWorldToScreenPoint || !pGetPosition) {
+      if (!pGetMainCamera || !pWorldToScreenPoint) {
         std::lock_guard<std::mutex> lock(espMutex);
         cachedPlayers.clear();
         return;
@@ -230,6 +220,7 @@ namespace Visual
       lastVisualTick = GetTickCount64();
       std::vector<PlayerESPData> newCache;
       auto                       players = IL2CPP::GetPlayers();
+      newCache.reserve(players.size());
 
       static void* pIsDeadMethod    = nullptr;
       static void* pIsEnemyToMethod = nullptr;
@@ -255,14 +246,16 @@ namespace Visual
             continue;
         }
 
-        Vector3 targetPos     = pGetPosition(playerTransform);
-        auto    headTransform = IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::PlayerHeadTransform);
-        Vector3 footPos       = targetPos;
+        auto    targetPosIL2CPP = IL2CPP::GetTransformPosition(playerTransform);
+        Vector3 targetPos       = {targetPosIL2CPP.x, targetPosIL2CPP.y, targetPosIL2CPP.z};
+        auto    headTransform   = IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::PlayerHeadTransform);
+        Vector3 footPos         = targetPos;
         footPos.y -= 1.0f;  // Guess feet position
 
         Vector3 headPos = targetPos;
         if (headTransform) {
-          headPos = pGetPosition(headTransform);
+          auto headPosIL2CPP = IL2CPP::GetTransformPosition(headTransform);
+          headPos            = {headPosIL2CPP.x, headPosIL2CPP.y, headPosIL2CPP.z};
           headPos.y += 0.3f;  // Offset to top of head
         }
         else {

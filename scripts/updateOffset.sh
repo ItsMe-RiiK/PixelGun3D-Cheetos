@@ -76,6 +76,7 @@ preflight() {
 
 # --- Validate ---
 validate() {
+    local args="${*-}"
     info "Running offset auto-updater..."
     echo ""
 
@@ -83,7 +84,7 @@ validate() {
     mkdir -p "$LOG_DIR"
 
     # Run updater and tee to log
-    python3 "$VALIDATOR" 2>&1 | tee "$LOG_FILE"
+    python3 "$VALIDATOR" $args 2>&1 | tee "$LOG_FILE"
 
     echo ""
 
@@ -112,16 +113,18 @@ update_dumps() {
     local new_dump_dir="${1:-}"
 
     if [ -z "$new_dump_dir" ]; then
-        echo "  Usage: $0 update <path-to-new-dumps>"
+        info "No new dump path provided. Updating offsets using current dumps..."
         echo ""
-        echo "  The directory should contain at least dump.cs"
-        echo "  Optionally: il2cpp.h, script.json, stringliteral.json"
-        echo ""
-        exit 1
+        validate --update
+        exit 0
+    fi
+
+    if [ -f "$new_dump_dir" ]; then
+        new_dump_dir="$(dirname "$new_dump_dir")"
     fi
 
     if [ ! -d "$new_dump_dir" ]; then
-        error "Directory not found: $new_dump_dir"
+        error "Path not found: $new_dump_dir"
         exit 1
     fi
 
@@ -146,8 +149,12 @@ update_dumps() {
     info "Copying new dump files..."
     for f in dump.cs il2cpp.h script.json stringliteral.json; do
         if [ -f "$new_dump_dir/$f" ]; then
-            cp "$new_dump_dir/$f" "$DUMPED_DIR/$f"
-            success "  Copied: $f"
+            if [ "$new_dump_dir/$f" != "$DUMPED_DIR/$f" ] && [ "$(realpath "$new_dump_dir/$f")" != "$(realpath "$DUMPED_DIR/$f")" ]; then
+                cp "$new_dump_dir/$f" "$DUMPED_DIR/$f"
+                success "  Copied: $f"
+            else
+                success "  Kept existing: $f (same path)"
+            fi
         fi
     done
 
@@ -157,7 +164,7 @@ update_dumps() {
     info "Running auto-updater against new dumps..."
     echo ""
 
-    validate
+    validate --update
 }
 
 # --- Main ---

@@ -206,7 +206,6 @@ namespace Offsets
     constexpr uintptr_t ApplyMatchReward_RVA = 0x144FD00;
   }  // namespace MatchReward
 
-
   // ==========================================
   // Obf_706337B8 (TypeDefIndex: 14493)
   // PixelPass Premium Spoof

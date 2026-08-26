@@ -26,8 +26,14 @@ echo   ║       PIXEL GUN 3D — Offset Updater         ║
 echo   ╚═════════════════════════════════════════════╝
 echo.
 
-if "%~1"=="" goto Validate
-if /i "%~1"=="validate" goto Validate
+if "%~1"=="" (
+    set "UPDATER_ARGS="
+    goto Validate
+)
+if /i "%~1"=="validate" (
+    set "UPDATER_ARGS="
+    goto Validate
+)
 if /i "%~1"=="update" goto Update
 if /i "%~1"=="help" goto Help
 
@@ -87,7 +93,7 @@ REM Create log directory
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%"
 
 REM Run updater and log
-%PYTHON% "%VALIDATOR%" > "%LOG_FILE%" 2>&1
+%PYTHON% "%VALIDATOR%" %UPDATER_ARGS% > "%LOG_FILE%" 2>&1
 type "%LOG_FILE%"
 
 echo.
@@ -124,14 +130,21 @@ call :Preflight
 if %errorlevel% neq 0 exit /b 1
 
 if "%~2"=="" (
-    echo   Usage: %~nx0 update ^<path-to-new-dumps^>
+    echo   [*] No new dump path provided. Updating offsets using current dumps...
     echo.
-    echo   The directory should contain at least dump.cs
-    echo   Optionally: il2cpp.h, script.json, stringliteral.json
-    exit /b 1
+    set "UPDATER_ARGS=--update"
+    goto Validate
 )
 
 set "NEW_DUMP_DIR=%~2"
+
+REM If user passed a file instead of a directory, get its folder
+if exist "%NEW_DUMP_DIR%" (
+    if not exist "%NEW_DUMP_DIR%\" (
+        for %%I in ("%NEW_DUMP_DIR%") do set "NEW_DUMP_DIR=%%~dpI"
+        if "!NEW_DUMP_DIR:~-1!"=="\" set "NEW_DUMP_DIR=!NEW_DUMP_DIR:~0,-1!"
+    )
+)
 
 if not exist "%NEW_DUMP_DIR%" (
     echo   [!] Directory not found: %NEW_DUMP_DIR%
@@ -159,8 +172,15 @@ REM Copy new dumps
 echo   [*] Copying new dump files...
 for %%F in (dump.cs il2cpp.h script.json stringliteral.json) do (
     if exist "%NEW_DUMP_DIR%\%%F" (
-        copy /Y "%NEW_DUMP_DIR%\%%F" "%DUMPED_DIR%\%%F" >nul
-        echo   [+]   Copied: %%F
+        REM Compare canonical paths to prevent copying over itself
+        for %%A in ("%NEW_DUMP_DIR%\%%F") do set "SRC_PATH=%%~fA"
+        for %%B in ("%DUMPED_DIR%\%%F") do set "DST_PATH=%%~fB"
+        if /I not "!SRC_PATH!"=="!DST_PATH!" (
+            copy /Y "%NEW_DUMP_DIR%\%%F" "%DUMPED_DIR%\%%F" >nul
+            echo   [+]   Copied: %%F
+        ) else (
+            echo   [+]   Kept existing: %%F
+        )
     )
 )
 
@@ -170,6 +190,7 @@ echo.
 echo   [*] Running auto-updater against new dumps...
 echo.
 
+set "UPDATER_ARGS=--update"
 goto Validate
 
 REM =====================================================

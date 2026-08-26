@@ -149,8 +149,12 @@ def run_update():
 
         updated_lines.append(line)
 
-    with open(OFFSETS_FILE, "w", encoding="utf-8") as f:
-        f.writelines(updated_lines)
+    if "--update" in sys.argv:
+        with open(OFFSETS_FILE, "w", encoding="utf-8") as f:
+            f.writelines(updated_lines)
+        print("\n[INFO] Applied updates to offsets.h")
+    else:
+        print("\n[INFO] Run with 'update' to apply these changes to offsets.h")
 
     print("\n=== Validating dynamic offsets in il2cpp.cpp ===")
     il2cpp_file = os.path.join(PROJECT_ROOT, "src", "utils", "il2cpp.cpp")
@@ -197,9 +201,9 @@ def run_update():
                         break
                 if not found:
                     if target_class is None:
-                        print(f"[WARNING] Dynamic offset {var_name} NOT FOUND in dump.cs (tried: {names})!")
+                        print(f"[WARNING] Dynamic offset {var_name} NOT FOUND in dump.cs (tried: {names})! You may need to add its obfuscated name to the fallback list in il2cpp.cpp.")
                     else:
-                        print(f"[WARNING] Dynamic offset {target_class}::{var_name} NOT FOUND in dump.cs (tried: {names})!")
+                        print(f"[WARNING] Dynamic offset {target_class}::{var_name} NOT FOUND in dump.cs (tried: {names})! You may need to add its obfuscated name to the fallback list in il2cpp.cpp.")
                     missing_count += 1
 
     print("\n==================================")

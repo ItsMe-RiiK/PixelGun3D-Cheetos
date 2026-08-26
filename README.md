@@ -27,7 +27,6 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 | :--- | :--- | :--- |
 | **Infinite Ammo** | Unlimited ammunition | <span title="Work">✅</span> |
 | **Guaranteed Criticals** | 100% Crit Chance with adjustable multiplier | <span title="Work">✅</span> |
-| **Reach** | Extended melee range |  <span title="Work">✅</span>|
 | **Auto Headshot** | Automatically headshot | <span title="Work">✅</span> |
 | **AOE Bullets** | Area of Effect with adjustable radius | <span title="Work">✅</span> |
 

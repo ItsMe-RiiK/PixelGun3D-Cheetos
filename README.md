@@ -1,7 +1,7 @@
 # Pixel Gun 3D: PC Edition - Internal Cheat
 
 ![Cheat Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FItsMe-RiiK%2FPixelGun3D-Cheetos%2Fmain%2Fvcpkg.json&query=%24.version&label=Version&color=green)
-![Game Version](https://img.shields.io/badge/Game%20Version-26.10.2.0-brightgreen.svg)
+![Game Version](https://img.shields.io/badge/Game%20Version-26.11.0.0-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 [![Build Status](https://github.com/ItsMe-RiiK/PixelGun3D-Cheetos/actions/workflows/build.yml/badge.svg)](https://github.com/ItsMe-RiiK/PixelGun3D-Cheetos/actions)
 

@@ -25,7 +25,7 @@ namespace Offsets
     constexpr uintptr_t visibleObjRef       = 0x7C8;      // visibleObjPhoton*
     constexpr uintptr_t nickLabel           = 0x418;      // TextMesh*
     constexpr uintptr_t playerBodyRenderer  = 0x488;      // SkinnedMeshRenderer*
-    constexpr uintptr_t OnEventFired_RVA    = 0x157D550;  // In Player_move_c
+    constexpr uintptr_t OnEventFired_RVA    = 0x162C940;  // In Player_move_c
 
     // Dynamic offsets resolved at runtime
     inline size_t mySkinNameOffset       = 0;
@@ -41,7 +41,7 @@ namespace Offsets
   {
     constexpr uintptr_t ammoInClip             = 0x6C;   // int
     constexpr uintptr_t InitialAmmo            = 0x70;   // int
-    constexpr uintptr_t isUnlimitedAmmo        = 0x54A;  // bool
+    constexpr uintptr_t isUnlimitedAmmo        = 0x55A;  // bool
     constexpr uintptr_t tekKoof                = 0x9C;   // float (base scatter)
     constexpr uintptr_t upKoofFire             = 0xA0;   // float (scatter increase on fire)
     constexpr uintptr_t downKoofFirst          = 0xA4;   // float (first shot recovery)
@@ -57,22 +57,22 @@ namespace Offsets
     constexpr uintptr_t isPiercingMelee        = 0x1AE;  // bool
     constexpr uintptr_t distancePiercingMelee  = 0x1B0;  // float
     constexpr uintptr_t bulletDelay            = 0x1D4;  // float
-    constexpr uintptr_t shootDelay             = 0x1D8;  // float
-    constexpr uintptr_t chargeTime             = 0x214;  // float
+    constexpr uintptr_t shootDelay             = 0x1DC;  // float
+    constexpr uintptr_t chargeTime             = 0x21C;  // float
     constexpr uintptr_t bazookaExplosionRadius = 0x158;  // float
     constexpr uintptr_t bazooka                = 0x140;  // bool
-    constexpr uintptr_t criticalHitChance      = 0x564;  // int (0-100)
-    constexpr uintptr_t criticalHitCoef        = 0x568;  // float (multiplier)
-    constexpr uintptr_t DelayTimer             = 0x550;  // float
-    constexpr uintptr_t isSectorsAOE           = 0x484;  // bool
+    constexpr uintptr_t criticalHitChance      = 0x574;  // int (0-100)
+    constexpr uintptr_t criticalHitCoef        = 0x578;  // float (multiplier)
+    constexpr uintptr_t DelayTimer             = 0x560;  // float
+    constexpr uintptr_t isSectorsAOE           = 0x494;  // bool
     constexpr uintptr_t isMelee                = 0x191;  // bool
-    constexpr uintptr_t sectorsAOEAngleFront   = 0x488;  // float
-    constexpr uintptr_t sectorsAOEAngleBack    = 0x48C;  // float
-    constexpr uintptr_t sectorsAOEDmgMultFront = 0x490;  // float
-    constexpr uintptr_t sectorsAOEDmgMultSide  = 0x494;  // float
-    constexpr uintptr_t sectorsAOEDmgMultBack  = 0x498;  // float
-    constexpr uintptr_t sectorsAOERadius       = 0x49C;  // float
-    constexpr uintptr_t inShopEffects          = 0x5B0;  // List<int>
+    constexpr uintptr_t sectorsAOEAngleFront   = 0x498;  // float
+    constexpr uintptr_t sectorsAOEAngleBack    = 0x49C;  // float
+    constexpr uintptr_t sectorsAOEDmgMultFront = 0x4A0;  // float
+    constexpr uintptr_t sectorsAOEDmgMultSide  = 0x4A4;  // float
+    constexpr uintptr_t sectorsAOEDmgMultBack  = 0x4A8;  // float
+    constexpr uintptr_t sectorsAOERadius       = 0x4AC;  // float
+    constexpr uintptr_t inShopEffects          = 0x5C0;  // List<int>
 
     // Dynamic offsets resolved at runtime
     inline size_t isUnlimitedAmmoOffset  = 0;
@@ -88,9 +88,9 @@ namespace Offsets
   namespace PlayerDamageable
   {
     constexpr uintptr_t playerMoveC     = 0x18;  // Player_move_c*
-    constexpr uintptr_t ApplyDamage_RVA = 0x1DB8410;
-    constexpr uintptr_t IsDead_RVA      = 0x1DB9940;
-    constexpr uintptr_t IsEnemyTo_RVA   = 0x1DB9960;
+    constexpr uintptr_t ApplyDamage_RVA = 0x1DDAEC0;
+    constexpr uintptr_t IsDead_RVA      = 0x1DDC3F0;
+    constexpr uintptr_t IsEnemyTo_RVA   = 0x1DDC410;
   }  // namespace PlayerDamageable
 
   // ==========================================
@@ -141,7 +141,7 @@ namespace Offsets
   // ==========================================
   namespace FirstPersonControlSharp
   {
-    constexpr uintptr_t set_MoveSpeedMultiplier_RVA = 0x9A3EE0;
+    constexpr uintptr_t set_MoveSpeedMultiplier_RVA = 0x9A8B50;
 
     inline size_t velocityDownFallMultiplierOffset = 0;
     inline bool   dynamicOffsetsResolved           = false;
@@ -169,7 +169,7 @@ namespace Offsets
   // ==========================================
   namespace Object
   {
-    constexpr uintptr_t FindObjectsOfType_RVA = 0x476E060;
+    constexpr uintptr_t FindObjectsOfType_RVA = 0x47B5A90;
   }
 
   // ==========================================
@@ -177,10 +177,10 @@ namespace Offsets
   // ==========================================
   namespace AntiCheat
   {
-    constexpr uintptr_t CBD_Trigger_RVA    = 0x218B940;  // static trigger method
-    constexpr uintptr_t CBD_Awake_RVA      = 0x218B570;
-    constexpr uintptr_t CBD_Update_RVA     = 0x218BB20;
-    constexpr uintptr_t CBD_ShowBanner_RVA = 0x218B9C0;  // static show method
+    constexpr uintptr_t CBD_Trigger_RVA    = 0x21B1160;  // static trigger method
+    constexpr uintptr_t CBD_Awake_RVA      = 0x21B0C30;
+    constexpr uintptr_t CBD_Update_RVA     = 0x21B11E0;
+    constexpr uintptr_t CBD_ShowBanner_RVA = 0x21B0EA0;  // static show method
   }  // namespace AntiCheat
 
   // ==========================================
@@ -190,7 +190,7 @@ namespace Offsets
   namespace Lottery
   {
     // GameEventItemData.get_Count() — returns int drop count
-    constexpr uintptr_t LotteryDropCount_RVA = 0xCF0160;
+    constexpr uintptr_t LotteryDropCount_RVA = 0xCFB580;
   }  // namespace Lottery
 
   // ==========================================
@@ -200,33 +200,21 @@ namespace Offsets
   namespace MatchReward
   {
     // NetworkStartTableNGUIController.Obf_B4BEBDFB() — ShowResult coroutine
-    constexpr uintptr_t ShowResultCoroutine_RVA = 0x1452CF0;
+    constexpr uintptr_t ShowResultCoroutine_RVA = 0x1461350;
 
     // NetworkStartTableNGUIController.Obf_763E52DA() — ApplyMatchReward (Actual value applier)
-    constexpr uintptr_t ApplyMatchReward_RVA = 0x144FD00;
+    constexpr uintptr_t ApplyMatchReward_RVA = 0x145A150;
   }  // namespace MatchReward
 
   // ==========================================
-  // Obf_706337B8 (TypeDefIndex: 14493)
+  // PixelPassPremiumController (TypeDefIndex: 0)
   // PixelPass Premium Spoof
   // ==========================================
   namespace PixelPass
   {
-    // Obf_706337B8.Obf_F6C9A39B() — "HasPremium" check on PixelPass controller
-    // Signature: bool (void* thisPtr)
-    constexpr uintptr_t HasPremium_RVA = 0x1B5F860;
-
-    // Obf_706337B8.Obf_4B1410FD() — another premium bool getter candidate
-    constexpr uintptr_t HasPremium2_RVA = 0x1B5EE20;
-
-    // Obf_706337B8.Obf_130735C4() — yet another premium bool getter candidate
-    constexpr uintptr_t HasPremium3_RVA = 0x1B65010;
-
-    // Obf_706337B8.Obf_48C71807() — premium bool getter candidate
-    constexpr uintptr_t HasPremium4_RVA = 0x1B65370;
-
-    // Obf_706337B8.Obf_0FE2844A() — premium bool getter candidate
-    constexpr uintptr_t HasPremium5_RVA = 0x1B63FC0;
+    // Real PixelPass Premium checks on 丒丄丕一丐万七业丌 controller
+    constexpr uintptr_t HasPremium_RVA   = 0x1B83B40;
+    constexpr uintptr_t HasTimeEvent_RVA = 0x1B83AC0;
   }  // namespace PixelPass
 
   // ==========================================

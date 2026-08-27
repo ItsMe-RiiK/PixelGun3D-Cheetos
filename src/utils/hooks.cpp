@@ -159,46 +159,13 @@ namespace Hooks
   void        hkCBD_Show() { /* NOP */ }
 
 
-  // ---- PixelPass Premium: HasPremium ----
-  fn_PPBoolGetter oPPHasPremium1 = nullptr;
-  fn_PPBoolGetter oPPHasPremium2 = nullptr;
-  fn_PPBoolGetter oPPHasPremium3 = nullptr;
-  fn_PPBoolGetter oPPHasPremium4 = nullptr;
-  fn_PPBoolGetter oPPHasPremium5 = nullptr;
-
-  bool hkPPHasPremium1(void* thisPtr)
+  // ---- PixelPass Premium ----
+  fn_PPBoolGetter oPPHasPremium = nullptr;
+  bool            hkPPHasPremium(void* thisPtr)
   {
     if (CurrencyMod::Settings::bSpoofPixelPassPremium)
       return true;
-    return oPPHasPremium1(thisPtr);
-  }
-
-  bool hkPPHasPremium2(void* thisPtr)
-  {
-    if (CurrencyMod::Settings::bSpoofPixelPassPremium)
-      return true;
-    return oPPHasPremium2(thisPtr);
-  }
-
-  bool hkPPHasPremium3(void* thisPtr)
-  {
-    if (CurrencyMod::Settings::bSpoofPixelPassPremium)
-      return true;
-    return oPPHasPremium3(thisPtr);
-  }
-
-  bool hkPPHasPremium4(void* thisPtr)
-  {
-    if (CurrencyMod::Settings::bSpoofPixelPassPremium)
-      return true;
-    return oPPHasPremium4(thisPtr);
-  }
-
-  bool hkPPHasPremium5(void* thisPtr)
-  {
-    if (CurrencyMod::Settings::bSpoofPixelPassPremium)
-      return true;
-    return oPPHasPremium5(thisPtr);
+    return oPPHasPremium(thisPtr);
   }
 
   fn_Present oPresent = nullptr;
@@ -252,22 +219,9 @@ namespace Hooks
       );
     }
 
-    // 6. PixelPass Premium: Hook multiple bool getters on the controller
-    auto pp1Addr = reinterpret_cast<void*>(gaBase + Offsets::PixelPass::HasPremium_RVA);
-    MH_CreateHook(pp1Addr, reinterpret_cast<void*>(&hkPPHasPremium1), reinterpret_cast<void**>(&oPPHasPremium1));
-
-    auto pp2Addr = reinterpret_cast<void*>(gaBase + Offsets::PixelPass::HasPremium2_RVA);
-    MH_CreateHook(pp2Addr, reinterpret_cast<void*>(&hkPPHasPremium2), reinterpret_cast<void**>(&oPPHasPremium2));
-
-    auto pp3Addr = reinterpret_cast<void*>(gaBase + Offsets::PixelPass::HasPremium3_RVA);
-    MH_CreateHook(pp3Addr, reinterpret_cast<void*>(&hkPPHasPremium3), reinterpret_cast<void**>(&oPPHasPremium3));
-
-    auto pp4Addr = reinterpret_cast<void*>(gaBase + Offsets::PixelPass::HasPremium4_RVA);
-    MH_CreateHook(pp4Addr, reinterpret_cast<void*>(&hkPPHasPremium4), reinterpret_cast<void**>(&oPPHasPremium4));
-
-    auto pp5Addr = reinterpret_cast<void*>(gaBase + Offsets::PixelPass::HasPremium5_RVA);
-    MH_CreateHook(pp5Addr, reinterpret_cast<void*>(&hkPPHasPremium5), reinterpret_cast<void**>(&oPPHasPremium5));
-
+    // 6. PixelPass Premium
+    auto ppPremiumAddr = reinterpret_cast<void*>(gaBase + Offsets::PixelPass::HasPremium_RVA);
+    MH_CreateHook(ppPremiumAddr, reinterpret_cast<void*>(&hkPPHasPremium), reinterpret_cast<void**>(&oPPHasPremium));
     MH_EnableHook(MH_ALL_HOOKS);
 
     return true;

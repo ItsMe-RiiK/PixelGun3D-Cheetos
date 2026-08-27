@@ -7,6 +7,39 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 DUMP_FILE = os.path.join(PROJECT_ROOT, "resources", "dumped", "static", "dump.cs")
 OFFSETS_FILE = os.path.join(PROJECT_ROOT, "src", "utils", "offsets.h")
 
+# Map old class names to new ones if they changed
+CLASS_MAPPINGS = {
+    "Obf_368D154B": "不丂丅丌且丁丏世上",
+    "Obf_50821B2F": "一丆丏七不东丝丐专",
+    "Obf_706337B8": "一丆丏七不东丝丐专",
+    "PixelPassPremiumController": "丒丄丕一丐万七业丌"
+}
+
+# Map variable names to their exact dump.cs names
+MAPPINGS = {
+    # AntiCheat
+    "Trigger": "不东一丌万丑一万世",
+    "ShowBanner": "丈专丄七不丞与东丗",
+    "AddScore": "丌七上七丏不七专东丂",
+    "AddCoins": "丌丝丙丞三万丐丅丑一",
+    "AddGems": "丂一丐七丗丏与丝丒丙",
+    "LotteryDropCount": "get_Count",
+
+    # MatchReward
+    "ShowResultCoroutine": "丗三下与丘与丗丅丌",
+    "ApplyMatchReward": "下丑丘丛下丞不七丛",
+
+    # WeaponSounds
+    "sectorsAOEDmgMultFront": "sectorsAOEDamageMultiplierFront",
+    "sectorsAOEDmgMultSide": "sectorsAOEDamageMultiplierSide",
+    "sectorsAOEDmgMultBack": "sectorsAOEDamageMultiplierBack",
+    "sectorsAOERadius": "sectorsAOERadiusSectorsAoE",
+
+    # PixelPass Premium
+    "HasPremium": "一三三丗丝三丏丁万",
+    "HasTimeEvent": "一一世丄丏与业专丅",
+}
+
 def run_update():
     if not os.path.exists(DUMP_FILE):
         print(f"Error: dump.cs not found at {DUMP_FILE}")
@@ -74,7 +107,8 @@ def run_update():
         if ns_match and last_class_name:
             ns_name = ns_match.group(1)
             if ns_name != "Offsets":
-                ns_to_class[ns_name] = last_class_name
+                mapped_class_name = CLASS_MAPPINGS.get(last_class_name, last_class_name)
+                ns_to_class[ns_name] = mapped_class_name
             last_class_name = None
 
     current_ns = ""
@@ -106,14 +140,24 @@ def run_update():
                 target_class = ns_to_class[current_ns]
                 new_hex = None
 
-                if var_name.endswith("_RVA"):
-                    method_name = var_name.replace("_RVA", "")
-                    if current_ns == "AntiCheat" and method_name.startswith("CBD_"):
-                        method_name = method_name.replace("CBD_", "")
+                search_name = var_name
+                if search_name.endswith("_RVA"):
+                    search_name = search_name[:-4]
+                    if current_ns == "AntiCheat" and search_name.startswith("CBD_"):
+                        search_name = search_name[4:]
 
-                    new_hex = class_data.get(target_class, {}).get("methods", {}).get(method_name)
-                else:
-                    new_hex = class_data.get(target_class, {}).get("fields", {}).get(var_name)
+                if search_name in MAPPINGS:
+                    search_name = MAPPINGS[search_name]
+
+                target_dict = class_data.get(target_class, {}).get("methods", {}) if var_name.endswith("_RVA") else class_data.get(target_class, {}).get("fields", {})
+                new_hex = target_dict.get(search_name)
+
+                if not new_hex:
+                    # Case-insensitive fallback
+                    for k, v in target_dict.items():
+                        if k.lower() == search_name.lower():
+                            new_hex = v
+                            break
 
                 if new_hex:
                     if new_hex.lower() != old_hex.lower():

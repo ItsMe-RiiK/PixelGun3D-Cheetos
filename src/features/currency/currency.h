@@ -13,7 +13,7 @@ namespace CurrencyMod
 
     // Match Reward
     inline bool  bEnableRewardMultiplier = false;
-    inline float fCoinsMultiplier        = 1.0f;
+    inline float fCoinsMultiplier        = 100000.0f;
 
     // PixelPass
     inline bool bSpoofPixelPassPremium = false;

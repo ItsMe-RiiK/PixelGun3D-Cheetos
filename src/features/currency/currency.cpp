@@ -8,10 +8,10 @@ namespace CurrencyMod
     Menu::AddMenuItem({"-- CURRENCY --", Menu::ItemType::Header});
 
     // Lottery
-    Menu::AddMenuItem({"Modify Chest Output", Menu::ItemType::Bool, &Settings::bModifyChestOutput});
+    Menu::AddMenuItem({"Modify Lottery Output", Menu::ItemType::Bool, &Settings::bModifyChestOutput});
     Menu::AddMenuItem(
-      {"Chest Output Amount", Menu::ItemType::Int, nullptr, nullptr, &Settings::iChestOutputAmount, 0.0f, 0.0f, 0.0f,
-       -99999, 99999, 10}
+      {"Lottery Output Amount", Menu::ItemType::Int, nullptr, nullptr, &Settings::iChestOutputAmount, 0.0f, 0.0f, 0.0f,
+       0, 100000, 50}
     );
 
     // Free Store
@@ -20,7 +20,7 @@ namespace CurrencyMod
     // Match Reward
     Menu::AddMenuItem({"Enable Reward Multiplier", Menu::ItemType::Bool, &Settings::bEnableRewardMultiplier});
     Menu::AddMenuItem(
-      {"Coins Multiplier", Menu::ItemType::Float, nullptr, &Settings::fCoinsMultiplier, 1.0f, 10000.0f, 1.0f}
+      {"Coins Multiplier", Menu::ItemType::Float, nullptr, &Settings::fCoinsMultiplier, 1.0f, 100000.0f, 100.0f}
     );
 
     // PixelPass

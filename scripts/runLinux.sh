@@ -103,7 +103,7 @@ launch_wine() {
         exit 1
     fi
 
-    # Cek ketersediaan command protontricks (Native atau Flatpak)
+    # Check protontricks (Native or Flatpak)
     local PROTON_CMD=""
     if command -v protontricks &>/dev/null; then
         PROTON_CMD="protontricks"
@@ -124,7 +124,7 @@ launch_wine() {
 
     info "Launching PG3D_Injector.exe via Protontricks..."
     
-    # Eksekusi dengan Protontricks
+    # Execute with Protontricks
     $PROTON_CMD -c "wine ./PG3D_Injector.exe" "$APP_ID"
 }
 

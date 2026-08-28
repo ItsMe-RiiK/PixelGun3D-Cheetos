@@ -12,7 +12,9 @@ CLASS_MAPPINGS = {
     "Obf_368D154B": "不丂丅丌且丁丏世上",
     "Obf_50821B2F": "一丆丏七不东丝丐专",
     "Obf_706337B8": "一丆丏七不东丝丐专",
-    "PixelPassPremiumController": "丒丄丕一丐万七业丌"
+    "PixelPassPremiumController": "丒丄丕一丐万七业丌",
+    "ItemPrice": "下下与丆丅丂三丄丑",
+    "ClanStoreItemData": "专丙丛三丒丈丅丙世"
 }
 
 # Map variable names to their exact dump.cs names

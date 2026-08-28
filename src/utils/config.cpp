@@ -2,6 +2,9 @@
 #include "../features/visual/visual.h"
 #include "../features/playermod/playermod.h"
 #include "../features/weaponmod/weaponmod.h"
+#include "../features/visual/visual.h"
+#include "../features/playermod/playermod.h"
+#include "../features/weaponmod/weaponmod.h"
 #include "../features/currency/currency.h"
 #include "hooks.h"
 #include <nlohmann/json.hpp>
@@ -30,32 +33,35 @@ namespace Config
     j["weapon"]["aoe_bullets"] = WeaponMod::Settings::bAOEBullets;
     j["weapon"]["aoe_radius"]  = WeaponMod::Settings::fAOERadius;
 
-    // Visual
-    j["visual"]["player_esp"]   = Visual::Settings::bPlayerESP;
-    j["visual"]["esp_boxes"]    = Visual::Settings::bPlayerESPBoxes;
-    j["visual"]["esp_names"]    = Visual::Settings::bPlayerESPNames;
-    j["visual"]["skeleton_esp"] = Visual::Settings::bSkeletonESP;
+    j["visual"]["esp_boxes"]            = Visual::Settings::bPlayerESPBoxes;
+    j["visual"]["esp_names"]            = Visual::Settings::bPlayerESPNames;
+    j["visual"]["skeleton_esp"]         = Visual::Settings::bSkeletonESP;
+    j["visual"]["treat_all_as_enemies"] = Visual::Settings::bTreatAllAsEnemies;
 
-    // Weapon Mod
-    j["weaponmod"]["infinite_ammo"]   = WeaponMod::Settings::bInfiniteAmmo;
-    j["weaponmod"]["crit_chance"]     = WeaponMod::Settings::bCritChance100;
-    j["weaponmod"]["crit_multiplier"] = WeaponMod::Settings::fCritMultiplier;
-    j["weaponmod"]["autohs"]          = WeaponMod::Settings::bAutoHeadshot;
-
+    // PlayerMod
     j["playermod"]["high_jump"]       = PlayerMod::Settings::bHighJump;
     j["playermod"]["jump_multiplier"] = PlayerMod::Settings::fJumpMultiplier;
     j["playermod"]["fly"]             = PlayerMod::Settings::bFly;
     j["playermod"]["god_mode"]        = PlayerMod::Settings::bGodMode;
     j["playermod"]["auto_heal"]       = PlayerMod::Settings::bAutoHeal;
 
-    // Currency
+    // WeaponMod
+    j["weaponmod"]["infinite_ammo"]   = WeaponMod::Settings::bInfiniteAmmo;
+    j["weaponmod"]["crit_chance"]     = WeaponMod::Settings::bCritChance100;
+    j["weaponmod"]["crit_multiplier"] = WeaponMod::Settings::fCritMultiplier;
+    j["weaponmod"]["autohs"]          = WeaponMod::Settings::bAutoHeadshot;
+    j["weaponmod"]["aoe_bullets"]     = WeaponMod::Settings::bAOEBullets;
+    j["weaponmod"]["aoe_radius"]      = WeaponMod::Settings::fAOERadius;
+
+    // CurrencyMod
+    j["currency"]["free_store"]               = CurrencyMod::Settings::bFreeStore;
     j["currency"]["enable_reward_multiplier"] = CurrencyMod::Settings::bEnableRewardMultiplier;
     j["currency"]["coins_multiplier"]         = CurrencyMod::Settings::fCoinsMultiplier;
 
     j["lottery"]["modify_output"] = CurrencyMod::Settings::bModifyChestOutput;
     j["lottery"]["output_amount"] = CurrencyMod::Settings::iChestOutputAmount;
 
-    // Passes
+    // PixelPass
     j["pixelpass"]["spoof_premium"] = CurrencyMod::Settings::bSpoofPixelPassPremium;
 
     // System
@@ -99,32 +105,35 @@ namespace Config
     LOAD_FLOAT("weapon", "aoe_radius", WeaponMod::Settings::fAOERadius);
 
     // Visual
-    LOAD_BOOL("visual", "player_esp", Visual::Settings::bPlayerESP);
     LOAD_BOOL("visual", "esp_boxes", Visual::Settings::bPlayerESPBoxes);
     LOAD_BOOL("visual", "esp_names", Visual::Settings::bPlayerESPNames);
     LOAD_BOOL("visual", "skeleton_esp", Visual::Settings::bSkeletonESP);
+    LOAD_BOOL("visual", "treat_all_as_enemies", Visual::Settings::bTreatAllAsEnemies);
 
-    // Weapon Mod
-    LOAD_BOOL("weaponmod", "infinite_ammo", WeaponMod::Settings::bInfiniteAmmo);
-    LOAD_BOOL("weaponmod", "crit_chance", WeaponMod::Settings::bCritChance100);
-    LOAD_FLOAT("weaponmod", "crit_multiplier", WeaponMod::Settings::fCritMultiplier);
-    LOAD_BOOL("weaponmod", "autohs", WeaponMod::Settings::bAutoHeadshot);
-
+    // PlayerMod
     LOAD_BOOL("playermod", "high_jump", PlayerMod::Settings::bHighJump);
     LOAD_FLOAT("playermod", "jump_multiplier", PlayerMod::Settings::fJumpMultiplier);
     LOAD_BOOL("playermod", "fly", PlayerMod::Settings::bFly);
     LOAD_BOOL("playermod", "god_mode", PlayerMod::Settings::bGodMode);
     LOAD_BOOL("playermod", "auto_heal", PlayerMod::Settings::bAutoHeal);
 
-    // Currency
+    // WeaponMod
+    LOAD_BOOL("weaponmod", "infinite_ammo", WeaponMod::Settings::bInfiniteAmmo);
+    LOAD_BOOL("weaponmod", "crit_chance", WeaponMod::Settings::bCritChance100);
+    LOAD_FLOAT("weaponmod", "crit_multiplier", WeaponMod::Settings::fCritMultiplier);
+    LOAD_BOOL("weaponmod", "autohs", WeaponMod::Settings::bAutoHeadshot);
+    LOAD_BOOL("weaponmod", "aoe_bullets", WeaponMod::Settings::bAOEBullets);
+    LOAD_FLOAT("weaponmod", "aoe_radius", WeaponMod::Settings::fAOERadius);
+
+    // CurrencyMod
+    LOAD_BOOL("currency", "free_store", CurrencyMod::Settings::bFreeStore);
     LOAD_BOOL("currency", "enable_reward_multiplier", CurrencyMod::Settings::bEnableRewardMultiplier);
     LOAD_FLOAT("currency", "coins_multiplier", CurrencyMod::Settings::fCoinsMultiplier);
 
-    // Lottery
     LOAD_BOOL("lottery", "modify_output", CurrencyMod::Settings::bModifyChestOutput);
     LOAD_INT("lottery", "output_amount", CurrencyMod::Settings::iChestOutputAmount);
 
-    // Passes
+    // PixelPass
     LOAD_BOOL("pixelpass", "spoof_premium", CurrencyMod::Settings::bSpoofPixelPassPremium);
 
     // System

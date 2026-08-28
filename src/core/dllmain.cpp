@@ -42,7 +42,7 @@ namespace DX11Hook
       Menu::Render();
 
       // Draw ESP (on the background overlay)
-      if (Visual::Settings::bPlayerESP || Visual::Settings::bSkeletonESP) {
+      if (Visual::Settings::bPlayerESPBoxes || Visual::Settings::bPlayerESPNames || Visual::Settings::bSkeletonESP) {
         // Get screen dimensions
         DXGI_SWAP_CHAIN_DESC desc;
         pSwapChain->GetDesc(&desc);

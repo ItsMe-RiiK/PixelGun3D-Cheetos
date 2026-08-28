@@ -336,11 +336,7 @@ int main(int argc, char* argv[])
   while (!IsModuleLoaded(gameProc.pid, L"GameAssembly.dll")) {
     if (!IsGameAlive()) {
       SetColor(COLOR_RED);
-      std::cout << "  [!] Game process exited." << std::endl;
-      SetColor(COLOR_DEFAULT);
-      std::cout << "\n  Press any key to exit..." << std::endl;
-      std::cin.get();
-      return 1;
+      return 0;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
@@ -360,8 +356,6 @@ int main(int argc, char* argv[])
     SetColor(COLOR_YELLOW);
     std::cout << "  [!] Trainer is already injected!" << std::endl;
     SetColor(COLOR_DEFAULT);
-    std::cout << "\n  Press any key to exit..." << std::endl;
-    std::cin.get();
     return 0;
   }
 
@@ -386,7 +380,7 @@ int main(int argc, char* argv[])
     SetColor(COLOR_DEFAULT);
   }
 
-  std::cout << "\n  Press any key to exit..." << std::endl;
-  std::cin.get();
+  // Wait a moment so the user can read the success message
+  std::this_thread::sleep_for(std::chrono::seconds(2));
   return 0;
 }

@@ -38,6 +38,14 @@ REM =====================================================
 REM Check Build
 REM =====================================================
 :CheckBuild
+REM Auto-copy libtrainer.dll to trainer.dll if needed (matches Linux script behavior)
+if not exist "%BIN_DIR%trainer.dll" (
+    if exist "%BIN_DIR%libtrainer.dll" (
+        echo   [*] Found libtrainer.dll, copying to trainer.dll for injector compatibility...
+        copy /y "%BIN_DIR%libtrainer.dll" "%BIN_DIR%trainer.dll" >nul
+    )
+)
+
 if not exist "%BIN_DIR%trainer.dll" (
     echo   [!] trainer.dll not found.
     echo       Make sure you have compiled the code or downloaded a release.
@@ -67,6 +75,7 @@ echo.
 echo   [*] Launching PG3D_Injector.exe...
 echo.
 
+REM Command 'start' akan membuka injector tanpa membuat script ini menunggu (langsung exit)
 start "" "%BIN_DIR%PG3D_Injector.exe"
 exit /b 0
 

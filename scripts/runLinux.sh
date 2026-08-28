@@ -43,9 +43,13 @@ error()   { echo -e "  ${RED}[!]${NC} $*"; }
 # --- Locate Steam game directory ---
 find_game_dir() {
     local steam_paths=(
+        # Linux Standard
         "$HOME/.local/share/Steam/steamapps/common/Pixel Gun 3D"
         "$HOME/.steam/steam/steamapps/common/Pixel Gun 3D"
+        # Linux Flatpak
         "$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/common/Pixel Gun 3D"
+        # macOS Standard
+        "$HOME/Library/Application Support/Steam/steamapps/common/Pixel Gun 3D"
     )
 
     for p in "${steam_paths[@]}"; do
@@ -59,7 +63,12 @@ find_game_dir() {
 }
 
 check_build() {
-    if [ ! -f "$BIN_DIR/trainer.dll" ] && [ ! -f "$BIN_DIR/libtrainer.dll" ]; then
+    if [ ! -f "$BIN_DIR/trainer.dll" ] && [ -f "$BIN_DIR/libtrainer.dll" ]; then
+        info "Found libtrainer.dll, copying to trainer.dll for injector compatibility..."
+        cp "$BIN_DIR/libtrainer.dll" "$BIN_DIR/trainer.dll"
+    fi
+
+    if [ ! -f "$BIN_DIR/trainer.dll" ]; then
         error "trainer.dll not found."
         if [[ "$BIN_DIR" == *"build/bin"* ]]; then
             echo "    Run build first: ./scripts/build.sh"
@@ -80,23 +89,31 @@ check_build() {
 
 # --- Launch via Wine / Protontricks ---
 launch_wine() {
-    # To inject into a Steam Proton game, we MUST run in the same Wine prefix.
-    # We use protontricks to achieve this automatically.
-    if ! command -v protontricks &>/dev/null; then
+    cd "$BIN_DIR"
+    local APP_ID="2524890"
+    local OS_TYPE="$(uname -s)"
+
+    if [[ "$OS_TYPE" == "Darwin" ]]; then
+        # macOS handling
+        warn "macOS detected. Protontricks is not used here."
+        info "If you are using CrossOver or Whisky, you must run PG3D_Injector.exe manually"
+        info "inside the exact same bottle/prefix where Pixel Gun 3D is running."
+        echo ""
+        info "Injector path: $BIN_DIR/PG3D_Injector.exe"
+        exit 1
+    fi
+
+    # Cek ketersediaan command protontricks (Native atau Flatpak)
+    local PROTON_CMD=""
+    if command -v protontricks &>/dev/null; then
+        PROTON_CMD="protontricks"
+    elif command -v flatpak &>/dev/null && flatpak list | grep -q com.github.Matoking.protontricks; then
+        PROTON_CMD="flatpak run com.github.Matoking.protontricks"
+    else
         error "protontricks is not installed."
         warn "It is required to inject into a Steam (Proton) game process."
-        echo ""
-        if [[ "$(uname -s)" == "Darwin" ]]; then
-            warn "Install on macOS:"
-            echo "    brew install protontricks"
-        else
-            warn "Install on Arch Linux:"
-            echo "    sudo pacman -S protontricks"
-        fi
-        echo ""
-        info "Alternatively, copy the files to a Windows machine:"
-        info "  $BIN_DIR/trainer.dll"
-        info "  $BIN_DIR/PG3D_Injector.exe"
+        echo "    Arch Linux: sudo pacman -S protontricks"
+        echo "    Flatpak:    flatpak install flathub com.github.Matoking.protontricks"
         exit 1
     fi
 
@@ -104,14 +121,11 @@ launch_wine() {
     warn "Make sure Pixel Gun 3D is running via Steam (Proton)"
     warn "before the injector starts scanning for the process."
     echo ""
-    read -rp "  Press Enter to launch injector, or Ctrl+C to cancel..."
-    echo ""
 
     info "Launching PG3D_Injector.exe via Protontricks..."
-    cd "$BIN_DIR"
     
-    # 2524890 is the Steam AppID for Pixel Gun 3D PC
-    protontricks -c "wine ./PG3D_Injector.exe" 2524890
+    # Eksekusi dengan Protontricks
+    $PROTON_CMD -c "wine ./PG3D_Injector.exe" "$APP_ID"
 }
 
 # --- Show game location ---

@@ -248,6 +248,30 @@ namespace Visual
 
         auto headTransform = IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::PlayerHeadTransform);
 
+        auto    targetPosIL2CPP = IL2CPP::GetTransformPosition(playerTransform);
+        Vector3 targetPos       = {targetPosIL2CPP.x, targetPosIL2CPP.y, targetPosIL2CPP.z};
+
+        Vector3 footPos = targetPos;
+        footPos.y -= 1.0f;  // Guess feet position
+
+        Vector3 headPos = targetPos;
+        if (headTransform && !IsBadReadPtr(headTransform, sizeof(void*))) {
+          auto headPosIL2CPP = IL2CPP::GetTransformPosition(headTransform);
+          headPos            = {headPosIL2CPP.x, headPosIL2CPP.y, headPosIL2CPP.z};
+          headPos.y += 0.3f;  // Offset to top of head
+        }
+        else {
+          headPos.y += 1.0f;  // Guess height
+        }
+
+        Vector2 footScreen, headScreen;
+        if (
+          !WorldToScreen(footPos, footScreen, camera, g_screenW, g_screenH)
+          || !WorldToScreen(headPos, headScreen, camera, g_screenW, g_screenH)
+        ) {
+          continue;
+        }
+
         // Is enemy? IsEnemyTo takes Player_move_c* as parameter (not PlayerDamageable*)
         bool isEnemy = true;
 
@@ -269,8 +293,6 @@ namespace Visual
         bool  isVisible     = false;
         void* visibleObjRef = IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::visibleObjRef);
         if (visibleObjRef) {
-          // In Pixel Gun, visibleObjPhoton has an `inVisible` boolean or similar state.
-          // Due to missing offsets, let's assume it's true unless proven otherwise.
           isVisible = true;
         }
 
@@ -290,8 +312,8 @@ namespace Visual
         data.headTransform = headTransform;
         data.isEnemy       = isEnemy;
         data.isVisible     = isVisible;
-        data.screenPos     = {0, 0};
-        data.screenTop     = {0, 0};
+        data.screenPos     = {footScreen.x, footScreen.y};
+        data.screenTop     = {headScreen.x, headScreen.y};
         memcpy(data.name, playerName, sizeof(data.name));
         newCache.push_back(data);
       }
@@ -322,36 +344,8 @@ namespace Visual
 
     std::lock_guard<std::mutex> lock(espMutex);
     for (auto& player : cachedPlayers) {
-      if (!player.pmc)
-        continue;
-
-      auto    targetPosIL2CPP = IL2CPP::GetTransformPosition(player.transform);
-      Vector3 targetPos       = {targetPosIL2CPP.x, targetPosIL2CPP.y, targetPosIL2CPP.z};
-
-      Vector3 footPos = targetPos;
-      footPos.y -= 1.0f;  // Guess feet position
-
-      Vector3 headPos = targetPos;
-      if (player.headTransform) {
-        auto headPosIL2CPP = IL2CPP::GetTransformPosition(player.headTransform);
-        headPos            = {headPosIL2CPP.x, headPosIL2CPP.y, headPosIL2CPP.z};
-        headPos.y += 0.3f;  // Offset to top of head
-      }
-      else {
-        headPos.y += 1.0f;  // Guess height
-      }
-
-      Vector2 footScreen, headScreen;
-      if (
-        !WorldToScreen(footPos, footScreen, camera, g_screenW, g_screenH)
-        || !WorldToScreen(headPos, headScreen, camera, g_screenW, g_screenH)
-      ) {
-        continue;
-      }
-
-      // We update screenPos here so it's always perfectly synced to the frame
-      player.screenPos = {footScreen.x, footScreen.y};
-      player.screenTop = {headScreen.x, headScreen.y};
+      if (player.screenPos.x == 0 && player.screenPos.y == 0)
+        continue;  // Skip if invalid
 
       if (Settings::bPlayerESPBoxes) {
         DrawPlayerBox(pDrawList, player.screenPos, player.screenTop, player.isEnemy, g_screenW, g_screenH);
@@ -359,7 +353,7 @@ namespace Visual
       if (Settings::bPlayerESPNames) {
         DrawPlayerName(pDrawList, player.screenPos, player.screenTop, player.name);
       }
-      if (Settings::bSkeletonESP) {
+      if (Settings::bSkeletonESP && player.pmc) {
         DrawPlayerSkeleton(pDrawList, player.screenPos, player.screenTop, player.isEnemy, player.pmc);
       }
     }

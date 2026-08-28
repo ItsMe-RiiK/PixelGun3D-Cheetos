@@ -6,18 +6,19 @@ namespace CurrencyMod
   {
     // Lottery
     inline bool bModifyChestOutput = false;
-    inline int  iChestOutputAmount = 99999;
+    inline int  iChestOutputAmount = 250;
+
+    // Free Store
+    inline bool bFreeStore = false;
 
     // Match Reward
     inline bool  bEnableRewardMultiplier = false;
-    inline float fCoinsMultiplier        = 99999.0f;
+    inline float fCoinsMultiplier        = 1.0f;
 
     // PixelPass
     inline bool bSpoofPixelPassPremium = false;
   }  // namespace Settings
 
   void InitMenu();
-
-  // Logic functions
-  int OnLotteryDropCount(int originalCount);
+  int  OnLotteryDropCount(int originalCount);
 }  // namespace CurrencyMod

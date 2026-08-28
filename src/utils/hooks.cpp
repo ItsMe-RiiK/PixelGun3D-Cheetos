@@ -2,8 +2,8 @@
 #include <MinHook.h>
 #include "il2cpp.h"
 #include "../features/visual/visual.h"
-#include "../features/weaponmod/weaponmod.h"
 #include "../features/playermod/playermod.h"
+#include "../features/weaponmod/weaponmod.h"
 #include "../features/currency/currency.h"
 #include "../utils/config.h"
 #include "../ui/menu.h"
@@ -19,13 +19,40 @@ namespace Hooks
   int32_t hkLotteryDropCount(void* arg)
   {
     // Safety: validate arg before calling original
-    if (!arg || IsBadReadPtr(arg, 0x10)) {
+    if (!arg) {
       if (oLotteryDropCount)
         return oLotteryDropCount(arg);
       return 0;
     }
 
     return CurrencyMod::OnLotteryDropCount(oLotteryDropCount(arg));
+  }
+
+  // ---- Store: Item Price Hook ----
+  fn_ItemPriceGetCurrency oItemPriceGetCurrency = nullptr;
+  fn_ItemPriceGetPrice    oItemPriceGetPrice    = nullptr;
+
+  int32_t hkItemPriceGetPrice(void* thisPtr)
+  {
+    if (CurrencyMod::Settings::bFreeStore) {
+      return 0;
+    }
+
+    return oItemPriceGetPrice(thisPtr);
+  }
+
+  using fn_StoreItemDataGetPrice                  = void* (*) (void* thisPtr);
+  fn_StoreItemDataGetPrice oStoreItemDataGetPrice = nullptr;
+
+  void* hkStoreItemDataGetPrice(void* thisPtr)
+  {
+    void* listObj = oStoreItemDataGetPrice(thisPtr);
+
+    if (CurrencyMod::Settings::bFreeStore && listObj) {
+      IL2CPP::WriteFieldIfValid<int>(listObj, Offsets::IL2CPPStructs::listSizeOffset, 0);
+    }
+
+    return listObj;
   }
 
   // ---- Match Reward: ShowResult Coroutine Hook ----
@@ -204,6 +231,32 @@ namespace Hooks
       lotteryDropCountAddr, reinterpret_cast<void*>(&hkLotteryDropCount), reinterpret_cast<void**>(&oLotteryDropCount)
     );
 
+    // Store
+    auto itemPriceGetCurrencyAddr = reinterpret_cast<void*>(gaBase + Offsets::ItemPrice::get_Currency_RVA);
+    MH_CreateHook(
+      itemPriceGetCurrencyAddr, nullptr, reinterpret_cast<void**>(&oItemPriceGetCurrency)
+    );  // We only need the original function ptr to call it
+
+    auto itemPriceGetPriceAddr = reinterpret_cast<void*>(gaBase + Offsets::ItemPrice::get_Price_RVA);
+    if (
+      MH_CreateHook(
+        itemPriceGetPriceAddr, reinterpret_cast<void*>(&hkItemPriceGetPrice),
+        reinterpret_cast<void**>(&oItemPriceGetPrice)
+      )
+      != MH_OK
+    )
+      return false;
+
+    auto storeItemPriceAddr = reinterpret_cast<void*>(gaBase + Offsets::StoreItemData::get_Price_RVA);
+    if (
+      MH_CreateHook(
+        storeItemPriceAddr, reinterpret_cast<void*>(&hkStoreItemDataGetPrice),
+        reinterpret_cast<void**>(&oStoreItemDataGetPrice)
+      )
+      != MH_OK
+    )
+      return false;
+
     // 5. Match Reward: Hook ShowResult coroutine
     auto showResultAddr = reinterpret_cast<void*>(gaBase + Offsets::MatchReward::ShowResultCoroutine_RVA);
     MH_CreateHook(
@@ -229,7 +282,7 @@ namespace Hooks
 
   void SetupMenu()
   {
-    Menu::AddMenuItem({"-- SETTINGS --", Menu::ItemType::Header});
+    Menu::AddMenuItem({"-- SETTINGS --", Menu::ItemType::Header, false});
     Menu::AddMenuItem({"Bypass Anti-Cheat", Menu::ItemType::Bool, &Settings::bAntiCheatBypass});
     Menu::AddMenuItem(
       {"Save Config", Menu::ItemType::Action, nullptr, nullptr, nullptr, 0.0f, 0.0f, 0.0f, 0, 0, 0,

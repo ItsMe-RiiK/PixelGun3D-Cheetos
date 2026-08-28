@@ -172,23 +172,6 @@ namespace Menu
       }
     }
 
-    if (Settings::bMenuOpen) {
-      switch (msg) {
-      case WM_LBUTTONDOWN :
-      case WM_LBUTTONUP :
-      case WM_RBUTTONDOWN :
-      case WM_RBUTTONUP :
-      case WM_MBUTTONDOWN :
-      case WM_MBUTTONUP :
-      case WM_MOUSEWHEEL :
-      case WM_MOUSEMOVE :
-      case WM_KEYDOWN :
-      case WM_KEYUP :
-      case WM_CHAR :
-        return 0;
-      }
-    }
-
     return CallWindowProc(oWndProc, hWnd, msg, wParam, lParam);
   }
 
@@ -291,6 +274,12 @@ namespace Menu
       }
     }
 
+    std::string footerText  = "[ARROWS] Navigate|[INSERT] Hide";
+    float       footerTextW = ImGui::CalcTextSize(footerText.c_str()).x + padding * 2;
+    if (footerTextW > width) {
+      width = footerTextW;
+    }
+
     // Calculate how many items can fit on screen safely
     float availableHeight = screenH - startY - (padding * 2) - 30.0f - 20.0f;  // 20.0f bottom margin
     int   maxVisibleItems = static_cast<int>(availableHeight / rowHeight);
@@ -380,6 +369,24 @@ namespace Menu
 
       currentY += rowHeight;
     }
+
+    // Draw Footer
+    float footerHeight = 25.0f;
+    float footerStartY = startY + totalHeight;
+    drawList->AddRectFilled(
+      ImVec2(startX, footerStartY), ImVec2(startX + width, footerStartY + footerHeight), IM_COL32(30, 30, 40, 230)
+    );
+    drawList->AddRect(
+      ImVec2(startX, footerStartY), ImVec2(startX + width, footerStartY + footerHeight), IM_COL32(100, 50, 200, 255), 0,
+      0, 2.0f
+    );
+
+    footerText  = "[ARROWS] Navigate|[INSERT] Hide";
+    footerTextW = ImGui::CalcTextSize(footerText.c_str()).x;
+    drawList->AddText(
+      ImVec2(startX + (width - footerTextW) / 2.0f, footerStartY + 5.0f), IM_COL32(150, 150, 150, 255),
+      footerText.c_str()
+    );
   }
 
   void Shutdown()

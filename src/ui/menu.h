@@ -36,7 +36,7 @@ namespace Menu
     MenuItem() = default;
 
     // Header Constructor
-    MenuItem(std::string name_, ItemType type_) :
+    MenuItem(std::string name_, ItemType type_, bool isExpanded_ = true) :
         name(name_),
         type(type_),
         bValue(nullptr),
@@ -49,7 +49,7 @@ namespace Menu
         iMax(0),
         iStep(0),
         action(nullptr),
-        isExpanded(true)
+        isExpanded(isExpanded_)
     {
     }
 

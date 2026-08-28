@@ -196,7 +196,7 @@ namespace Visual
   void TickMainThread()
   {
     try {
-      if (!Settings::bPlayerESP && !Settings::bSkeletonESP) {
+      if (!Settings::bPlayerESPBoxes && !Settings::bPlayerESPNames && !Settings::bSkeletonESP) {
         std::lock_guard<std::mutex> lock(espMutex);
         cachedPlayers.clear();
         return;
@@ -246,29 +246,7 @@ namespace Visual
             continue;
         }
 
-        auto    targetPosIL2CPP = IL2CPP::GetTransformPosition(playerTransform);
-        Vector3 targetPos       = {targetPosIL2CPP.x, targetPosIL2CPP.y, targetPosIL2CPP.z};
-        auto    headTransform   = IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::PlayerHeadTransform);
-        Vector3 footPos         = targetPos;
-        footPos.y -= 1.0f;  // Guess feet position
-
-        Vector3 headPos = targetPos;
-        if (headTransform) {
-          auto headPosIL2CPP = IL2CPP::GetTransformPosition(headTransform);
-          headPos            = {headPosIL2CPP.x, headPosIL2CPP.y, headPosIL2CPP.z};
-          headPos.y += 0.3f;  // Offset to top of head
-        }
-        else {
-          headPos.y += 1.0f;  // Guess height
-        }
-
-        Vector2 footScreen, headScreen;
-        if (
-          !WorldToScreen(footPos, footScreen, camera, g_screenW, g_screenH)
-          || !WorldToScreen(headPos, headScreen, camera, g_screenW, g_screenH)
-        ) {
-          continue;
-        }
+        auto headTransform = IL2CPP::SafeReadField<void*>(pmc, Offsets::PlayerMoveC::PlayerHeadTransform);
 
         // Is enemy? IsEnemyTo takes Player_move_c* as parameter (not PlayerDamageable*)
         bool isEnemy = true;
@@ -307,11 +285,13 @@ namespace Visual
         }
 
         PlayerESPData data;
-        data.pmc       = pmc;
-        data.screenPos = {footScreen.x, footScreen.y};
-        data.screenTop = {headScreen.x, headScreen.y};
-        data.isEnemy   = isEnemy;
-        data.isVisible = isVisible;
+        data.pmc           = pmc;
+        data.transform     = playerTransform;
+        data.headTransform = headTransform;
+        data.isEnemy       = isEnemy;
+        data.isVisible     = isVisible;
+        data.screenPos     = {0, 0};
+        data.screenTop     = {0, 0};
         memcpy(data.name, playerName, sizeof(data.name));
         newCache.push_back(data);
       }
@@ -327,7 +307,7 @@ namespace Visual
 
   void RenderOverlay(void* pDrawList)
   {
-    if (!Settings::bPlayerESP && !Settings::bSkeletonESP)
+    if (!Settings::bPlayerESPBoxes && !Settings::bPlayerESPNames && !Settings::bSkeletonESP)
       return;
 
     if (GetTickCount64() - lastVisualTick > 1000) {
@@ -336,15 +316,48 @@ namespace Visual
       return;
     }
 
+    void* camera = pGetMainCamera();
+    if (!camera)
+      return;
+
     std::lock_guard<std::mutex> lock(espMutex);
-    for (const auto& player : cachedPlayers) {
-      if (Settings::bPlayerESP) {
-        if (Settings::bPlayerESPBoxes) {
-          DrawPlayerBox(pDrawList, player.screenPos, player.screenTop, player.isEnemy, g_screenW, g_screenH);
-        }
-        if (Settings::bPlayerESPNames) {
-          DrawPlayerName(pDrawList, player.screenPos, player.screenTop, player.name);
-        }
+    for (auto& player : cachedPlayers) {
+      if (!player.pmc)
+        continue;
+
+      auto    targetPosIL2CPP = IL2CPP::GetTransformPosition(player.transform);
+      Vector3 targetPos       = {targetPosIL2CPP.x, targetPosIL2CPP.y, targetPosIL2CPP.z};
+
+      Vector3 footPos = targetPos;
+      footPos.y -= 1.0f;  // Guess feet position
+
+      Vector3 headPos = targetPos;
+      if (player.headTransform) {
+        auto headPosIL2CPP = IL2CPP::GetTransformPosition(player.headTransform);
+        headPos            = {headPosIL2CPP.x, headPosIL2CPP.y, headPosIL2CPP.z};
+        headPos.y += 0.3f;  // Offset to top of head
+      }
+      else {
+        headPos.y += 1.0f;  // Guess height
+      }
+
+      Vector2 footScreen, headScreen;
+      if (
+        !WorldToScreen(footPos, footScreen, camera, g_screenW, g_screenH)
+        || !WorldToScreen(headPos, headScreen, camera, g_screenW, g_screenH)
+      ) {
+        continue;
+      }
+
+      // We update screenPos here so it's always perfectly synced to the frame
+      player.screenPos = {footScreen.x, footScreen.y};
+      player.screenTop = {headScreen.x, headScreen.y};
+
+      if (Settings::bPlayerESPBoxes) {
+        DrawPlayerBox(pDrawList, player.screenPos, player.screenTop, player.isEnemy, g_screenW, g_screenH);
+      }
+      if (Settings::bPlayerESPNames) {
+        DrawPlayerName(pDrawList, player.screenPos, player.screenTop, player.name);
       }
       if (Settings::bSkeletonESP) {
         DrawPlayerSkeleton(pDrawList, player.screenPos, player.screenTop, player.isEnemy, player.pmc);
@@ -355,10 +368,9 @@ namespace Visual
   void InitMenu()
   {
     Menu::AddMenuItem({"-- VISUAL --", Menu::ItemType::Header});
-    Menu::AddMenuItem({"Player ESP", Menu::ItemType::Bool, &Settings::bPlayerESP});
     Menu::AddMenuItem({"ESP Boxes", Menu::ItemType::Bool, &Settings::bPlayerESPBoxes});
     Menu::AddMenuItem({"ESP Names", Menu::ItemType::Bool, &Settings::bPlayerESPNames});
-    Menu::AddMenuItem({"Skeleton ESP", Menu::ItemType::Bool, &Settings::bSkeletonESP});
-    Menu::AddMenuItem({"Treat All as Enemies", Menu::ItemType::Bool, &Settings::bTreatAllAsEnemies});
+    Menu::AddMenuItem({"ESP Bones", Menu::ItemType::Bool, &Settings::bSkeletonESP});
+    Menu::AddMenuItem({"ESP Team", Menu::ItemType::Bool, &Settings::bTreatAllAsEnemies});
   }
 }  // namespace Visual

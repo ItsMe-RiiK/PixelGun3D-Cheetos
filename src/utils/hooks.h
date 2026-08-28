@@ -68,6 +68,15 @@ namespace Hooks
 
   int32_t hkLotteryDropCount(void* arg);
 
+  // ---- Store: Item Price Hook ----
+  using fn_ItemPriceGetCurrency = void* (*) (void* thisPtr);
+  extern fn_ItemPriceGetCurrency oItemPriceGetCurrency;
+
+  using fn_ItemPriceGetPrice = int32_t (*)(void* thisPtr);
+  extern fn_ItemPriceGetPrice oItemPriceGetPrice;
+
+  int32_t hkItemPriceGetPrice(void* thisPtr);
+
   // ---- Match Reward: ShowResult Coroutine ----
   // NetworkStartTableNGUIController.Obf_B4BEBDFB — 31 parameters
   // We hook this to multiply exp and coins before the coroutine processes them

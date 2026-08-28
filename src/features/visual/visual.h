@@ -6,9 +6,8 @@ namespace Visual
 {
   namespace Settings
   {
-    inline bool bPlayerESP         = false;
-    inline bool bPlayerESPBoxes    = true;
-    inline bool bPlayerESPNames    = true;
+    inline bool bPlayerESPBoxes    = false;
+    inline bool bPlayerESPNames    = false;
     inline bool bSkeletonESP       = false;
     inline bool bTreatAllAsEnemies = false;
   }  // namespace Settings
@@ -31,7 +30,9 @@ namespace Visual
     bool    isDead;
     bool    isVisible;
     char    name[64];
-    void*   pmc;  // Added pmc
+    void*   pmc;
+    void*   transform;
+    void*   headTransform;
   };
 
   extern std::vector<PlayerESPData> cachedPlayers;

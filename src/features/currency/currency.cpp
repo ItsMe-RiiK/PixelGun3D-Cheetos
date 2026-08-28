@@ -14,6 +14,9 @@ namespace CurrencyMod
        -99999, 99999, 10}
     );
 
+    // Free Store
+    Menu::AddMenuItem({"Free Store (0 everything)", Menu::ItemType::Bool, &Settings::bFreeStore});
+
     // Match Reward
     Menu::AddMenuItem({"Enable Reward Multiplier", Menu::ItemType::Bool, &Settings::bEnableRewardMultiplier});
     Menu::AddMenuItem(

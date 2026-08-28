@@ -207,6 +207,29 @@ namespace Offsets
   }  // namespace MatchReward
 
   // ==========================================
+  // ItemPrice (TypeDefIndex: 6465)
+  // Store - Item Price
+  // ==========================================
+  namespace ItemPrice
+  {
+    // ItemPrice.get_Currency()
+    constexpr uintptr_t get_Currency_RVA = 0x496100;
+
+    // ItemPrice.get_Price()
+    constexpr uintptr_t get_Price_RVA = 0x900B70;  // get_Price for "Coins", "Gems", and "Lottery keys"
+  }  // namespace ItemPrice
+
+  // ==========================================
+  // ClanStoreItemData (TypeDefIndex: 12871)
+  // Store - Item Data
+  // ==========================================
+  namespace StoreItemData
+  {
+    // ClanStoreItemData (专丙丛三丒丈丅丙世).get_Price()
+    constexpr uintptr_t get_Price_RVA = 0x1885FD0;  // returns List<七丙三丒丞万一丏丕>
+  }  // namespace StoreItemData
+
+  // ==========================================
   // PixelPassPremiumController (TypeDefIndex: 0)
   // PixelPass Premium Spoof
   // ==========================================

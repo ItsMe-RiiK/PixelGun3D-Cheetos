@@ -164,17 +164,6 @@ namespace Hooks
   // ---- PixelPass Premium: HasPremium ----
   using fn_PPBoolGetter = bool (*)(void* thisPtr);
 
-  extern fn_PPBoolGetter oPPHasPremium1;
-  extern fn_PPBoolGetter oPPHasPremium2;
-  extern fn_PPBoolGetter oPPHasPremium3;
-  extern fn_PPBoolGetter oPPHasPremium4;
-  extern fn_PPBoolGetter oPPHasPremium5;
-
-  bool hkPPHasPremium1(void* thisPtr);
-  bool hkPPHasPremium2(void* thisPtr);
-  bool hkPPHasPremium3(void* thisPtr);
-  bool hkPPHasPremium4(void* thisPtr);
-  bool hkPPHasPremium5(void* thisPtr);
 
   // ---- D3D11 Present Hook (for ImGui rendering) ----
   using fn_Present = HRESULT(WINAPI*)(void* pSwapChain, UINT SyncInterval, UINT Flags);

@@ -230,17 +230,6 @@ namespace Offsets
   }  // namespace StoreItemData
 
   // ==========================================
-  // PixelPassPremiumController (TypeDefIndex: 0)
-  // PixelPass Premium Spoof
-  // ==========================================
-  namespace PixelPass
-  {
-    // Real PixelPass Premium checks on 丒丄丕一丐万七业丌 controller
-    constexpr uintptr_t HasPremium_RVA   = 0x1B83B40;
-    constexpr uintptr_t HasTimeEvent_RVA = 0x1B83AC0;
-  }  // namespace PixelPass
-
-  // ==========================================
   // IL2CPP Class pointers (resolved at runtime, cached here)
   // ==========================================
   namespace Classes

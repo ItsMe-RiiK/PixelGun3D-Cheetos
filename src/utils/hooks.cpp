@@ -31,12 +31,10 @@ namespace Hooks
   // ---- Store: Item Price Hook ----
   fn_ItemPriceGetCurrency oItemPriceGetCurrency = nullptr;
   fn_ItemPriceGetPrice    oItemPriceGetPrice    = nullptr;
-
-  int32_t hkItemPriceGetPrice(void* thisPtr)
+  int32_t                 hkItemPriceGetPrice(void* thisPtr)
   {
-    if (CurrencyMod::Settings::bFreeStore) {
+    if (CurrencyMod::Settings::bFreeStore)
       return 0;
-    }
 
     return oItemPriceGetPrice(thisPtr);
   }
@@ -186,15 +184,6 @@ namespace Hooks
   void        hkCBD_Show() { /* NOP */ }
 
 
-  // ---- PixelPass Premium ----
-  fn_PPBoolGetter oPPHasPremium = nullptr;
-  bool            hkPPHasPremium(void* thisPtr)
-  {
-    if (CurrencyMod::Settings::bSpoofPixelPassPremium)
-      return true;
-    return oPPHasPremium(thisPtr);
-  }
-
   fn_Present oPresent = nullptr;
 
   bool Init()
@@ -244,8 +233,9 @@ namespace Hooks
         reinterpret_cast<void**>(&oItemPriceGetPrice)
       )
       != MH_OK
-    )
+    ) {
       return false;
+    }
 
     auto storeItemPriceAddr = reinterpret_cast<void*>(gaBase + Offsets::StoreItemData::get_Price_RVA);
     if (
@@ -272,9 +262,6 @@ namespace Hooks
       );
     }
 
-    // 6. PixelPass Premium
-    auto ppPremiumAddr = reinterpret_cast<void*>(gaBase + Offsets::PixelPass::HasPremium_RVA);
-    MH_CreateHook(ppPremiumAddr, reinterpret_cast<void*>(&hkPPHasPremium), reinterpret_cast<void**>(&oPPHasPremium));
     MH_EnableHook(MH_ALL_HOOKS);
 
     return true;

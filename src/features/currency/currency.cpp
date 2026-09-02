@@ -22,8 +22,5 @@ namespace CurrencyMod
     Menu::AddMenuItem(
       {"Coins Multiplier", Menu::ItemType::Float, nullptr, &Settings::fCoinsMultiplier, 1.0f, 100000.0f, 100.0f}
     );
-
-    // PixelPass
-    Menu::AddMenuItem({"Spoof PixelPass Premium", Menu::ItemType::Bool, &Settings::bSpoofPixelPassPremium});
   }
 }  // namespace CurrencyMod

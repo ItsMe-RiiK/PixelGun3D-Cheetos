@@ -61,8 +61,6 @@ namespace Config
     j["lottery"]["modify_output"] = CurrencyMod::Settings::bModifyChestOutput;
     j["lottery"]["output_amount"] = CurrencyMod::Settings::iChestOutputAmount;
 
-    // PixelPass
-    j["pixelpass"]["spoof_premium"] = CurrencyMod::Settings::bSpoofPixelPassPremium;
 
     // System
     j["system"]["anticheat_bypass"] = Hooks::Settings::bAntiCheatBypass;
@@ -132,9 +130,6 @@ namespace Config
 
     LOAD_BOOL("lottery", "modify_output", CurrencyMod::Settings::bModifyChestOutput);
     LOAD_INT("lottery", "output_amount", CurrencyMod::Settings::iChestOutputAmount);
-
-    // PixelPass
-    LOAD_BOOL("pixelpass", "spoof_premium", CurrencyMod::Settings::bSpoofPixelPassPremium);
 
     // System
     LOAD_BOOL("system", "anticheat_bypass", Hooks::Settings::bAntiCheatBypass);

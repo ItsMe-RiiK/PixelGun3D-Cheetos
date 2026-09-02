@@ -9,10 +9,6 @@ OFFSETS_FILE = os.path.join(PROJECT_ROOT, "src", "utils", "offsets.h")
 
 # Map old class names to new ones if they changed
 CLASS_MAPPINGS = {
-    "Obf_368D154B": "不丂丅丌且丁丏世上",
-    "Obf_50821B2F": "一丆丏七不东丝丐专",
-    "Obf_706337B8": "一丆丏七不东丝丐专",
-    "PixelPassPremiumController": "丒丄丕一丐万七业丌",
     "ItemPrice": "下下与丆丅丂三丄丑",
     "ClanStoreItemData": "专丙丛三丒丈丅丙世"
 }
@@ -22,9 +18,6 @@ MAPPINGS = {
     # AntiCheat
     "Trigger": "不东一丌万丑一万世",
     "ShowBanner": "丈专丄七不丞与东丗",
-    "AddScore": "丌七上七丏不七专东丂",
-    "AddCoins": "丌丝丙丞三万丐丅丑一",
-    "AddGems": "丂一丐七丗丏与丝丒丙",
     "LotteryDropCount": "get_Count",
 
     # MatchReward
@@ -36,10 +29,6 @@ MAPPINGS = {
     "sectorsAOEDmgMultSide": "sectorsAOEDamageMultiplierSide",
     "sectorsAOEDmgMultBack": "sectorsAOEDamageMultiplierBack",
     "sectorsAOERadius": "sectorsAOERadiusSectorsAoE",
-
-    # PixelPass Premium
-    "HasPremium": "一三三丗丝三丏丁万",
-    "HasTimeEvent": "一一世丄丏与业专丅",
 }
 
 def run_update():

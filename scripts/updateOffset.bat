@@ -28,7 +28,7 @@ if "%~1"=="" (
     goto Validate
 )
 if /i "%~1"=="validate" (
-    set "UPDATER_ARGS="
+	set "UPDATER_ARGS="
     goto Validate
 )
 if /i "%~1"=="update" goto Update

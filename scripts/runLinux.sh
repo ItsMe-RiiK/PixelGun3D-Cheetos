@@ -123,7 +123,7 @@ launch_wine() {
     echo ""
 
     info "Launching PG3D_Injector.exe via Protontricks..."
-    
+
     # Execute with Protontricks
     $PROTON_CMD -c "wine ./PG3D_Injector.exe" "$APP_ID"
 }

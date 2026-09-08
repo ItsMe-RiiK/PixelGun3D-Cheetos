@@ -105,10 +105,13 @@ namespace WeaponMod
     Menu::AddMenuItem({"Infinite Ammo", Menu::ItemType::Bool, &Settings::bInfiniteAmmo});
     Menu::AddMenuItem({"100% Crit Chance", Menu::ItemType::Bool, &Settings::bCritChance100});
     Menu::AddMenuItem(
-      {"Crit Multiplier", Menu::ItemType::Float, nullptr, &Settings::fCritMultiplier, 1.0f, 20.0f, 1.0f}
+      {"Crit Multiplier", Menu::ItemType::Float, nullptr, &Settings::fCritMultiplier, 1.0f, 20.0f,
+       1.0f}
     );
     Menu::AddMenuItem({"Auto Headshot", Menu::ItemType::Bool, &Settings::bAutoHeadshot});
     Menu::AddMenuItem({"AOE Bullets", Menu::ItemType::Bool, &Settings::bAOEBullets});
-    Menu::AddMenuItem({"AOE Radius", Menu::ItemType::Float, nullptr, &Settings::fAOERadius, 5.0f, 200.0f, 5.0f});
+    Menu::AddMenuItem(
+      {"AOE Radius", Menu::ItemType::Float, nullptr, &Settings::fAOERadius, 5.0f, 200.0f, 5.0f}
+    );
   }
 }  // namespace WeaponMod

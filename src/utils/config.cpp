@@ -125,7 +125,9 @@ namespace Config
 
     // CurrencyMod
     LOAD_BOOL("currency", "free_store", CurrencyMod::Settings::bFreeStore);
-    LOAD_BOOL("currency", "enable_reward_multiplier", CurrencyMod::Settings::bEnableRewardMultiplier);
+    LOAD_BOOL(
+      "currency", "enable_reward_multiplier", CurrencyMod::Settings::bEnableRewardMultiplier
+    );
     LOAD_FLOAT("currency", "coins_multiplier", CurrencyMod::Settings::fCoinsMultiplier);
 
     LOAD_BOOL("lottery", "modify_output", CurrencyMod::Settings::bModifyChestOutput);

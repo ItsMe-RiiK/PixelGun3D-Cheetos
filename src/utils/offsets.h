@@ -216,7 +216,8 @@ namespace Offsets
     constexpr uintptr_t get_Currency_RVA = 0x496100;
 
     // ItemPrice.get_Price()
-    constexpr uintptr_t get_Price_RVA = 0x900B70;  // get_Price for "Coins", "Gems", and "Lottery keys"
+    constexpr uintptr_t get_Price_RVA =
+      0x900B70;  // get_Price for "Coins", "Gems", and "Lottery keys"
   }  // namespace ItemPrice
 
   // ==========================================

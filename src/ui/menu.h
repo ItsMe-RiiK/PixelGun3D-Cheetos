@@ -72,7 +72,15 @@ namespace Menu
     }
 
     // Float Constructor
-    MenuItem(std::string name_, ItemType type_, bool* bValue_, float* fValue_, float fMin_, float fMax_, float fStep_) :
+    MenuItem(
+      std::string name_,
+      ItemType    type_,
+      bool*       bValue_,
+      float*      fValue_,
+      float       fMin_,
+      float       fMax_,
+      float       fStep_
+    ) :
         name(name_),
         type(type_),
         bValue(bValue_),

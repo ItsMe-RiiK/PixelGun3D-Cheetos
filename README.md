@@ -1,9 +1,9 @@
 # Pixel Gun 3D: PC Edition - Internal Cheat
 
-![Cheat Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FItsMe-RiiK%2FPixelGun3D-Cheetos%2Fmain%2Fvcpkg.json&query=%24.version&label=Version&color=green)
+![Cheat Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FRiiK26%2FPixelGun3D-Cheetos%2Fmain%2Fvcpkg.json&query=%24.version&label=Version&color=green)
 ![Game Version](https://img.shields.io/badge/Game%20Version-26.11.0.0-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-[![Build Status](https://github.com/ItsMe-RiiK/PixelGun3D-Cheetos/actions/workflows/build.yml/badge.svg)](https://github.com/ItsMe-RiiK/PixelGun3D-Cheetos/actions)
+[![Build Status](https://github.com/RiiK26/PixelGun3D-Cheetos/actions/workflows/build.yml/badge.svg)](https://github.com/RiiK26/PixelGun3D-Cheetos/actions)
 
 An internal cheat for **Pixel Gun 3D (PC Edition)**
 
@@ -75,7 +75,7 @@ An internal cheat for **Pixel Gun 3D (PC Edition)**
 
 1. **Clone the repository (with submodules):**
    ```bash
-   git clone --recursive https://github.com/ItsMe-RiiK/PixelGun3D-Cheetos.git
+   git clone --recursive https://github.com/RiiK26/PixelGun3D-Cheetos.git
    cd PixelGun3D-Cheetos
    ```
    *(If `vcpkg` isn't bootstrapped yet, run `./vcpkg/bootstrap-vcpkg.sh` first)*
